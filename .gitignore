@@ -1,0 +1,21 @@
+########################################
+# .NET & Visual Studio
+########################################
+**/bin/
+**/obj/
+*.user
+*.suo
+*.sln.docstates
+**/.vs/
+*.db
+*.env
+*.nupkg
+*.snupkg
+*.log
+[Ll]og/
+project.lock.json
+project.fragment.lock.json
+packages/
+.nuget/
+*.psmdcp
+*.nuspec
