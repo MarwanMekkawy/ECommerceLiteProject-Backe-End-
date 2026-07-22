@@ -1,4 +1,6 @@
-﻿using System;
+﻿using IdentityService.Application.DTOs.AuthDTOs;
+using IdentityService.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +10,9 @@ namespace IdentityService.Application.Abstractions
 {
     public interface IAuthService
     {
-        Task<(string? JwtToken, string? RefreshToken)> RegisterAsync(RegisterDto dto);
-        Task<(string? JwtToken, string? RefreshToken)> LoginAsync(LoginDto dto);
-        Task ChangePasswordAsync(int userId, string oldPassword, string newPassword);
-        Task LogoutAsync(string refreshToken);
-        Task<(string? JwtToken, string? RefreshToken)> RefreshSessionAsync(string refreshToken);
+        Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto dto, CancellationToken cancellationToken);
+        Task<AuthResponseDto> LoginAsync(LoginRequestDto dto, CancellationToken cancellationToken);
+        Task LogoutAsync(string refreshToken, CancellationToken cancellationToken);
+        Task<AuthResponseDto> RefreshSessionAsync(string refreshToken, CancellationToken cancellationToken);
     }
 }

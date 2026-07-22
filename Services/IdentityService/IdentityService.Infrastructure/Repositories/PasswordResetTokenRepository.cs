@@ -9,15 +9,8 @@ using System.Threading.Tasks;
 
 namespace IdentityService.Infrastructure.Repositories
 {
-    public class PasswordResetTokenRepository : IPasswordResetTokenRepository
-    {
-        protected readonly IdentityDbContext _context;
-
-        public PasswordResetTokenRepository(IdentityDbContext context)
-        {
-            _context = context;
-        }
-        
+    public class PasswordResetTokenRepository(IdentityDbContext _context) : IPasswordResetTokenRepository
+    {    
         public async Task<PasswordResetToken?> GetByTokenHashAsync(string tokenHash, CancellationToken cancellationToken = default)
         {
             return await _context.PasswordResetTokens.AsNoTracking().FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);

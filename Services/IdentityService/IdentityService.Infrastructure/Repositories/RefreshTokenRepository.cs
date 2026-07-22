@@ -10,23 +10,16 @@ using System.Threading.Tasks;
 
 namespace IdentityService.Infrastructure.Repositories
 {
-    public class RefreshTokenRepository : IRefreshTokenRepository
-    {
-        protected readonly IdentityDbContext _context;
-
-        public RefreshTokenRepository(IdentityDbContext context)
-        {
-            _context = context;
-        }
-
+    public class RefreshTokenRepository(IdentityDbContext _context) : IRefreshTokenRepository
+    {     
         public async Task<RefreshToken?> GetByTokenHashAsync(string tokenHash, CancellationToken cancellationToken = default)
         {
-            return await _context.RefreshTokens.AsNoTracking().FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
+            return await _context.RefreshTokens.FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
         }
 
         public async Task<RefreshToken?> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            return await _context.RefreshTokens.AsNoTracking().FirstOrDefaultAsync(x => x.UserId == userId && x.ExpiresAt > DateTime.UtcNow && x.RevokedAt == null, cancellationToken);
+            return await _context.RefreshTokens.FirstOrDefaultAsync(x => x.UserId == userId && x.ExpiresAt > DateTime.UtcNow && x.RevokedAt == null, cancellationToken);
         }
 
 

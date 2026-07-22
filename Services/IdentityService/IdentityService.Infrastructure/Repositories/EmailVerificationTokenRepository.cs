@@ -9,15 +9,8 @@ using System.Threading.Tasks;
 
 namespace IdentityService.Infrastructure.Repositories
 {
-    public class EmailVerificationTokenRepository : IEmailVerificationTokenRepository
-    {
-        protected readonly IdentityDbContext _context;
-
-        public EmailVerificationTokenRepository(IdentityDbContext context)
-        {
-            _context = context;
-        }
-       
+    public class EmailVerificationTokenRepository(IdentityDbContext _context) : IEmailVerificationTokenRepository
+    {     
         public async Task<EmailVerificationToken?> GetByTokenHashAsync(string tokenHash, CancellationToken cancellationToken = default)
         {
             return await _context.EmailVerificationTokens.AsNoTracking().FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);

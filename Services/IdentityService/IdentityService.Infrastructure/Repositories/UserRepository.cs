@@ -10,26 +10,19 @@ using System.Threading.Tasks;
 
 namespace IdentityService.Infrastructure.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository(IdentityDbContext _context) : IUserRepository
     {
-        protected readonly IdentityDbContext _context;
-
-        public UserRepository(IdentityDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             return await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
+        public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
         {
             return await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
         }
 
-        public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)
+        public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)
         {
             return await _context.Users.AnyAsync(x => x.Email == email, cancellationToken);
         }
@@ -63,24 +56,24 @@ namespace IdentityService.Infrastructure.Repositories
         }
 
 
-        public async Task AddAsync(User user, CancellationToken cancellationToken = default)
+        public async Task AddAsync(User user, CancellationToken cancellationToken   )
         {
             await _context.Users.AddAsync(user, cancellationToken);
         }
 
-        public async Task ActivateAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task ActivateAsync(Guid id, CancellationToken cancellationToken)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken) ?? throw new NotFoundException();
             user.Activate();
         }
 
-        public async Task DeactivateAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task DeactivateAsync(Guid id, CancellationToken cancellationToken)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken) ?? throw new NotFoundException();
             user.Deactivate();
         }
 
-        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken) ?? throw new NotFoundException();
             _context.Users.Remove(user);
