@@ -16,15 +16,18 @@ namespace IdentityService.Infrastructure.Repositories
         public IUserRepository users { get; }
         public IRefreshTokenRepository refreshTokens { get; }
         public IEmailVerificationTokenRepository emailVerificationTokens { get; }
+        public IEmailChangeTokenRepository emailChangeTokens { get; }
         public IPasswordResetTokenRepository passwordResetTokens { get; }
 
         public UnitOfWork(IdentityDbContext context, IUserRepository userRepo, IRefreshTokenRepository tokenRepository, 
-                          IEmailVerificationTokenRepository emailVerificationTokenRepository, IPasswordResetTokenRepository passwordResetTokenRepository)
+                          IEmailVerificationTokenRepository emailVerificationTokenRepository, IEmailChangeTokenRepository emailChangeTokenRepository, 
+                          IPasswordResetTokenRepository passwordResetTokenRepository)
         {
             _context = context;
             users = userRepo;
             refreshTokens = tokenRepository;
             emailVerificationTokens = emailVerificationTokenRepository;
+            emailChangeTokens = emailChangeTokenRepository;
             passwordResetTokens = passwordResetTokenRepository;
         }
 

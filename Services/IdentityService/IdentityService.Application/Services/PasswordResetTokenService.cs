@@ -27,17 +27,25 @@ namespace IdentityService.Application.Services
             if (Password.Length < 8) throw new BadRequestException("New password must be at least 8 characters");
             if (!IsStrongPassword(Password)) throw new BadRequestException("Password is too weak");
         }
+        private string NormalizeEmail(string email)
+        {
+            return email?.Trim().ToLowerInvariant() ?? string.Empty;
+        }
         #endregion//========================================================================
 
         public async Task<string> RequestPasswordResetAsync(ForgotPasswordDto dto, CancellationToken cancellationToken)
         {
             var token = OTTService.GenerateToken();
             var hashedToken = OTTService.HashToken(token);
-            var user = await uow.users.GetByEmailAsync(dto.Email, cancellationToken);
-            if (user == null) throw new NotFoundException("couldnt find a user with this Email");
+            var normalizedEmail = NormalizeEmail(dto.Email);
+
+            var user = await uow.users.GetByEmailAsync(normalizedEmail, cancellationToken);
+            if (user == null)
+                return string.Empty;
 
             var passwordResetToken = new PasswordResetToken() { UserId = user.Id, TokenHash = hashedToken };
 
+            await uow.passwordResetTokens.InvalidateAllByUserIdAsync(user.Id, cancellationToken);
             await uow.passwordResetTokens.AddAsync(passwordResetToken, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
 
@@ -50,6 +58,8 @@ namespace IdentityService.Application.Services
             var oldPassword = dto.OldPassword;
             var newPassword = dto.NewPassword;
             var confirmPassword = dto.ConfirmPassword;
+
+            ValidatePassword(newPassword, confirmPassword);
             var newPasswordHash = hasher.Hash(newPassword);
 
             var passwordResetToken = await uow.passwordResetTokens.GetByTokenHashAsync(hashedToken, cancellationToken);
@@ -62,12 +72,11 @@ namespace IdentityService.Application.Services
 
             var isOldPasswordValid = hasher.Verify(user.PasswordHash, oldPassword);
             if (!isOldPasswordValid)
-                throw new UnauthorizedException($"your Old password is Wrong");
-
-            ValidatePassword(newPassword, confirmPassword);
+                throw new UnauthorizedException("your Old password is Wrong");
+            
 
             passwordResetToken.MarkAsUsed();
-            user.PasswordHash = newPasswordHash;
+            user.ChangePassword(newPasswordHash);
 
             await uow.SaveChangesAsync(cancellationToken);
         }

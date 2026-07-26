@@ -1,14 +1,27 @@
 ﻿using Domain.Exceptions;
 using IdentityService.Application.Abstractions;
 using IdentityService.Application.Abstractions.Authentication;
+using IdentityService.Application.DTOs.EmailVerificationDTOs;
 using IdentityService.Domain.Contracts;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Exceptions;
+using System.Net.Mail;
 
 namespace IdentityService.Application.Services
 {
-    public class EmailVerificationTokenService(IUnitOfWork uow, IOneTimeTokenService OTTService ) : IEmailVerificationTokenService
+    public class EmailVerificationTokenService(IUnitOfWork uow, IOneTimeTokenService OTTService ,IPasswordHasher hasher) : IEmailVerificationTokenService
     {
+        #region //[helper methods]========================================================      
+        private string NormalizeEmail(string email)
+        {
+            return email?.Trim().ToLowerInvariant() ?? string.Empty;
+        }
+        private bool IsValidEmail(string email)
+        {
+            return MailAddress.TryCreate(email, out _);
+        }    
+        #endregion//========================================================================
+
         public async Task<string> GenerateVerificationTokenAsync(Guid userId, CancellationToken cancellationToken)
         {
             var token = OTTService.GenerateToken();
@@ -39,6 +52,65 @@ namespace IdentityService.Application.Services
             emailVerificationToken.MarkAsVerified();
             user.ConfirmEmail();
 
+            await uow.SaveChangesAsync(cancellationToken);
+        }
+
+        //Email Change
+
+        public async Task<string> GenerateEmailChangeTokenAsync(Guid userId, ChangeEmailRequestDto dto, CancellationToken cancellationToken)
+        {
+            var token = OTTService.GenerateToken();
+            var hashedToken = OTTService.HashToken(token);
+            var providedPassword = dto.Password;
+            var normalizedNewEmail = NormalizeEmail(dto.NewEmail);
+
+            if(!IsValidEmail(normalizedNewEmail))
+                throw new BadRequestException("Invalid email format");
+
+            var existingEmail= await uow.users.ExistsByEmailAsync(normalizedNewEmail, cancellationToken);
+            if(existingEmail)
+                throw new BadRequestException("email already in use");
+
+            var user = await uow.users.GetByIdAsync(userId, cancellationToken);
+            if (user == null) throw new NotFoundException("couldnt find the user");
+
+            if(user.Email == normalizedNewEmail)
+                throw new BadRequestException("the new email cant be same as your current email");
+
+            var userPasswordHash = user.PasswordHash;
+
+            if(!hasher.Verify(userPasswordHash, providedPassword))
+                throw new UnauthorizedException("the password is Wrong");
+
+            var emailChangeToken = new EmailChangeToken() { UserId = userId, NewEmail = normalizedNewEmail, TokenHash=hashedToken };
+
+            await uow.emailChangeTokens.InvalidateAllByUserIdAsync(userId, cancellationToken);
+            await uow.emailChangeTokens.AddAsync(emailChangeToken, cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);
+
+            return token;
+        }
+
+        public async Task ConfirmEmailChangeAsync(ChangeEmailDto dto, CancellationToken cancellationToken)
+        {
+            var token = dto.Token;
+            var hashedToken = OTTService.HashToken(token);
+
+            var emailChangeToken = await uow.emailChangeTokens.GetByTokenHashAsync(hashedToken, cancellationToken);
+            if(emailChangeToken == null || emailChangeToken.IsActive == false)
+                throw new InvalidTokenException("Invalid or expired verification token.");
+
+            var existingEmail = await uow.users.ExistsByEmailAsync(emailChangeToken.NewEmail, cancellationToken);
+            if (existingEmail)
+                throw new BadRequestException("email already in use");
+
+            var user = await uow.users.GetByIdAsync(emailChangeToken.UserId, cancellationToken);
+            if (user == null)
+                throw new NotFoundException("the user that you are trying to change email for is not found");
+
+
+            emailChangeToken.Confirm();
+            user.ChangeEmail(emailChangeToken.NewEmail);
             await uow.SaveChangesAsync(cancellationToken);
         }
     }

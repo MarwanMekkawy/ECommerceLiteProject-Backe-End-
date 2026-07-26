@@ -15,6 +15,7 @@ namespace IdentityService.Infrastructure
         public DbSet<User> Users { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
+        public DbSet<EmailChangeToken> EmailChangeTokens { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

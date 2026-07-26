@@ -22,7 +22,7 @@ namespace IdentityService.Domain.Entities
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
         public ICollection<EmailVerificationToken> EmailVerificationTokens { get; set; } = new List<EmailVerificationToken>();
-
+        public ICollection<EmailChangeToken> EmailChangeTokens { get; set; }  = new List<EmailChangeToken>();
 
         public void Activate()
         {
@@ -39,6 +39,14 @@ namespace IdentityService.Domain.Entities
         public void ChangeRole(RoleType newRole)
         {
             Role = newRole;
+        }
+        public void ChangeEmail(string newEmail)
+        {
+            Email = newEmail;
+        }
+        public void ChangePassword(string newPasswordHash)
+        {
+            PasswordHash = newPasswordHash;
         }
     }
 }

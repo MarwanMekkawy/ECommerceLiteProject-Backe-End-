@@ -38,10 +38,13 @@ namespace IdentityService.Application.Services
         {
             // Check if email format is valid
             var normalizedEmail = NormalizeEmail(dto.Email);
-            if (!IsValidEmail(normalizedEmail)) throw new BadRequestException("Invalid email format");
+            if (!IsValidEmail(normalizedEmail))
+                throw new BadRequestException("Invalid email format");
+
             // Check if user already exists 
             var existingEmail = await uow.users.GetByEmailAsync(normalizedEmail, cancellationToken);
-            if (existingEmail != null) throw new ConflictException("Email is already in use");
+            if (existingEmail != null) 
+                throw new ConflictException("Email is already in use");
 
             //password validation
             ValidatePassword(dto.Password, dto.ConfirmPassword);

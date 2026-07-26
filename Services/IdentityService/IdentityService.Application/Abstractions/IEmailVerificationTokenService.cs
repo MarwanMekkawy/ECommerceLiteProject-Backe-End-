@@ -12,5 +12,8 @@ namespace IdentityService.Application.Abstractions
         Task<string> GenerateVerificationTokenAsync(Guid userId, CancellationToken cancellationToken);
         Task<string> ResendVerificationEmailAsync(Guid userId, CancellationToken cancellationToken);
         Task ConfirmEmailAsync(string token, CancellationToken cancellationToken);
+
+        Task<string> GenerateEmailChangeTokenAsync(Guid userId, ChangeEmailRequestDto dto, CancellationToken cancellationToken);
+        Task ConfirmEmailChangeAsync(ChangeEmailDto dto, CancellationToken cancellationToken);
     }
 }

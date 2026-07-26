@@ -19,6 +19,7 @@ namespace IdentityService.Infrastructure.Extentions.Infra
 
             // repositories registering
             services.AddScoped<IEmailVerificationTokenRepository, EmailVerificationTokenRepository>();
+            services.AddScoped<IEmailChangeTokenRepository, EmailChangeTokenRepository>();
             services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
