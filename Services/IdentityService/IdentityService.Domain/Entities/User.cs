@@ -23,6 +23,7 @@ namespace IdentityService.Domain.Entities
         public ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
         public ICollection<EmailVerificationToken> EmailVerificationTokens { get; set; } = new List<EmailVerificationToken>();
         public ICollection<EmailChangeToken> EmailChangeTokens { get; set; }  = new List<EmailChangeToken>();
+        public ICollection<UserPasswordHistory> UserPasswordHistory { get; set; } = new List<UserPasswordHistory>();
 
         public void Activate()
         {

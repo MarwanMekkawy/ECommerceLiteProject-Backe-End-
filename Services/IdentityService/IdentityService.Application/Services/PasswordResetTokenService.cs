@@ -22,7 +22,7 @@ namespace IdentityService.Application.Services
         }
         private void ValidatePassword(string Password, string ConfirmPassword)
         {
-            if (string.IsNullOrWhiteSpace(Password)) throw new BadRequestException("Password Cant be empty");
+            if (string.IsNullOrWhiteSpace(Password)) throw new BadRequestException("Password Cannot be empty");
             if (Password != ConfirmPassword) throw new BadRequestException("New password confirmation must match the password");
             if (Password.Length < 8) throw new BadRequestException("New password must be at least 8 characters");
             if (!IsStrongPassword(Password)) throw new BadRequestException("Password is too weak");
@@ -60,7 +60,6 @@ namespace IdentityService.Application.Services
             var confirmPassword = dto.ConfirmPassword;
 
             ValidatePassword(newPassword, confirmPassword);
-            var newPasswordHash = hasher.Hash(newPassword);
 
             var passwordResetToken = await uow.passwordResetTokens.GetByTokenHashAsync(hashedToken, cancellationToken);
             if (passwordResetToken == null || passwordResetToken.IsActive == false)
@@ -72,9 +71,29 @@ namespace IdentityService.Application.Services
 
             var isOldPasswordValid = hasher.Verify(user.PasswordHash, oldPassword);
             if (!isOldPasswordValid)
-                throw new UnauthorizedException("your Old password is Wrong");
-            
+                throw new UnauthorizedException("The current password is incorrect");
 
+            if (hasher.Verify(user.PasswordHash, newPassword))
+                throw new ConflictException("New password must be different from the current password.");
+
+            //old passwords reuse
+            const int MaxPasswordHistory = 3;
+            var usedBeforePasswordsHash = await uow.userPasswordHistories.GetAllByUserIdAsync(user.Id, MaxPasswordHistory, cancellationToken);
+
+            foreach (var pw in usedBeforePasswordsHash)
+            {
+                if (hasher.Verify(pw.PasswordHash, newPassword))
+                        throw new ConflictException("You cannot reuse one of your recent passwords");
+            }
+            if(usedBeforePasswordsHash.Count>= MaxPasswordHistory)
+            {
+                uow.userPasswordHistories.Delete(usedBeforePasswordsHash[MaxPasswordHistory - 1]);
+            }            
+
+            var currentPasswordSaveHistory = new UserPasswordHistory() { UserId= user.Id, PasswordHash = user.PasswordHash };
+            await uow.userPasswordHistories.AddAsync(currentPasswordSaveHistory, cancellationToken);
+
+            var newPasswordHash = hasher.Hash(newPassword);
             passwordResetToken.MarkAsUsed();
             user.ChangePassword(newPasswordHash);
 

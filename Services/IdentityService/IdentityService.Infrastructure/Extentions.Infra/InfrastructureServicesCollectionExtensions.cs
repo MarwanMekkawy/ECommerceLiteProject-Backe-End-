@@ -1,4 +1,5 @@
 ﻿using IdentityService.Domain.Contracts;
+using IdentityService.Domain.Entities;
 using IdentityService.Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,8 @@ namespace IdentityService.Infrastructure.Extentions.Infra
             services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserPasswordHistoryRepository, UserPasswordHistoryRepository>();
+
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 

@@ -18,10 +18,11 @@ namespace IdentityService.Infrastructure.Repositories
         public IEmailVerificationTokenRepository emailVerificationTokens { get; }
         public IEmailChangeTokenRepository emailChangeTokens { get; }
         public IPasswordResetTokenRepository passwordResetTokens { get; }
+        public IUserPasswordHistoryRepository userPasswordHistories { get; }
 
         public UnitOfWork(IdentityDbContext context, IUserRepository userRepo, IRefreshTokenRepository tokenRepository, 
                           IEmailVerificationTokenRepository emailVerificationTokenRepository, IEmailChangeTokenRepository emailChangeTokenRepository, 
-                          IPasswordResetTokenRepository passwordResetTokenRepository)
+                          IPasswordResetTokenRepository passwordResetTokenRepository, IUserPasswordHistoryRepository UserPasswordHistoryRepository)
         {
             _context = context;
             users = userRepo;
@@ -29,6 +30,7 @@ namespace IdentityService.Infrastructure.Repositories
             emailVerificationTokens = emailVerificationTokenRepository;
             emailChangeTokens = emailChangeTokenRepository;
             passwordResetTokens = passwordResetTokenRepository;
+            userPasswordHistories = UserPasswordHistoryRepository;
         }
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
