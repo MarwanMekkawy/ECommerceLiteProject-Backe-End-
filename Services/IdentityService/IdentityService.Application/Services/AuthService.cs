@@ -12,7 +12,7 @@ namespace IdentityService.Application.Services
 {
     public class AuthService(IUnitOfWork uow, IPasswordHasher hasher, IJwtTokenService jwt, IRefreshTokenService refreshTokenService) : IAuthService
     {
-        //[helper methods]========================================================
+        #region //[helper methods]========================================================      
         private bool IsStrongPassword(string password)
         {
             return password.Any(char.IsUpper) && password.Any(char.IsLower) && password.Any(char.IsDigit);
@@ -32,7 +32,7 @@ namespace IdentityService.Application.Services
             if (Password.Length < 8) throw new BadRequestException("New password must be at least 8 characters");
             if (!IsStrongPassword(Password)) throw new BadRequestException("Password is too weak");
         }
-        //========================================================================
+        #endregion//========================================================================
 
         public async Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto dto, CancellationToken cancellationToken)
         {

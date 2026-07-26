@@ -25,7 +25,7 @@ namespace IdentityService.Domain.Entities
         public void Revoke(string? replacedByTokenHash = null)
         {
             if (!IsActive)
-                throw new InvalidTokenException();
+                throw new InvalidTokenException("the token is expired or revoked");
 
             RevokedAt = DateTime.UtcNow;
             ReplacedByTokenHash = replacedByTokenHash;

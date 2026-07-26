@@ -3,11 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IdentityService.Domain.Exceptions;
+
 
 namespace IdentityService.Domain.Entities
 {
     public class PasswordResetToken : BaseEntity
     {
+        public PasswordResetToken()
+        {
+            ExpiresAt = DateTime.UtcNow.AddHours(24);
+        }
+
         public string TokenHash { get; set; } = default!;
         public Guid UserId { get; set; }
 
@@ -22,7 +29,7 @@ namespace IdentityService.Domain.Entities
 
         public void MarkAsUsed()
         {
-            if (!IsActive) throw new InvalidTokenException();
+            if (!IsActive) throw new InvalidTokenException("the token is expired or used before");
             UsedAt = DateTime.UtcNow;
         }
     }

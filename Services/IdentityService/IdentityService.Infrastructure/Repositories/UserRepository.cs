@@ -14,12 +14,12 @@ namespace IdentityService.Infrastructure.Repositories
     {
         public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            return await _context.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
         public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
         {
-            return await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
+            return await _context.Users.FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
         }
 
         public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken)

@@ -17,7 +17,7 @@ namespace IdentityService.Application.Services
 {
     public class UserService(IUnitOfWork uow, IMapper mapper, IPasswordHasher hasher) : IUserService
     {
-        //[helper methods]==================================================================================
+        #region//[helper methods]==================================================================================
         private async Task<User> GetUserOrThrowAsync(Guid userId, CancellationToken cancellationToken)
         {
             return await uow.users.GetByIdAsync(userId, cancellationToken) ?? throw new NotFoundException("User not found");
@@ -39,7 +39,7 @@ namespace IdentityService.Application.Services
 
             if (!IsStrongPassword(password)) throw new BadRequestException("Password is too weak.");
         }
-        //================================================================================================
+        #endregion//================================================================================================
 
         public async Task<UserDto> GetCurrentUserAsync(Guid userId, CancellationToken cancellationToken)
         {

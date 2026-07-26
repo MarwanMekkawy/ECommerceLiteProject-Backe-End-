@@ -13,7 +13,7 @@ namespace IdentityService.Infrastructure.Repositories
     {     
         public async Task<EmailVerificationToken?> GetByTokenHashAsync(string tokenHash, CancellationToken cancellationToken = default)
         {
-            return await _context.EmailVerificationTokens.AsNoTracking().FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
+            return await _context.EmailVerificationTokens.FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
         }
 
         public async Task<EmailVerificationToken?> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
@@ -29,8 +29,11 @@ namespace IdentityService.Infrastructure.Repositories
 
         public async Task InvalidateAllByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            await _context.EmailVerificationTokens.Where(x => x.UserId == userId && x.VerifiedAt == null)
-                .ExecuteUpdateAsync(t => t.SetProperty(x => x.VerifiedAt, DateTime.UtcNow), cancellationToken);
+            var emailTokens = await _context.EmailVerificationTokens.Where(x => x.UserId == userId && x.VerifiedAt == null).ToListAsync(cancellationToken);
+            foreach (var token in emailTokens)
+            {
+                token.MarkAsVerified();
+            }
         }
 
         public async Task DeleteExpiredAsync(CancellationToken cancellationToken = default)

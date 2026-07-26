@@ -13,7 +13,7 @@ namespace IdentityService.Infrastructure.Repositories
     {    
         public async Task<PasswordResetToken?> GetByTokenHashAsync(string tokenHash, CancellationToken cancellationToken = default)
         {
-            return await _context.PasswordResetTokens.AsNoTracking().FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
+            return await _context.PasswordResetTokens.FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
         }
 
         public async Task<PasswordResetToken?> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
@@ -29,8 +29,11 @@ namespace IdentityService.Infrastructure.Repositories
 
         public async Task InvalidateAllByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            await _context.PasswordResetTokens.Where(x => x.UserId == userId && x.UsedAt == null)
-                .ExecuteUpdateAsync(t => t.SetProperty(x => x.UsedAt, DateTime.UtcNow), cancellationToken);
+            var passwordTokens = await _context.PasswordResetTokens.Where(x => x.UserId == userId && x.UsedAt == null).ToListAsync(cancellationToken);
+                foreach (var token in passwordTokens) 
+                {
+                    token.MarkAsUsed();
+                }
         }
 
         public async Task DeleteExpiredAsync(CancellationToken cancellationToken = default)
