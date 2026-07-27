@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IdentityService.Application.Abstractions
 {
-    public interface IPasswordResetService
+    public interface IPasswordResetTokenService
     {
         Task<string> RequestPasswordResetAsync(ForgotPasswordDto dto, CancellationToken cancellationToken);
         Task ResetPasswordAsync(ResetPasswordDto dto, CancellationToken cancellationToken);

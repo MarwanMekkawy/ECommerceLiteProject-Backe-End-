@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace IdentityService.Application.Services
 {
-    public class PasswordResetTokenService(IUnitOfWork uow, IOneTimeTokenService OTTService, IPasswordHasher hasher) : IPasswordResetService
+    public class PasswordResetTokenService(IUnitOfWork uow, IOneTimeTokenService OTTService, IPasswordHasher hasher) : IPasswordResetTokenService
     {
         #region //[helper methods]========================================================
         private bool IsStrongPassword(string password)

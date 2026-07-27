@@ -21,6 +21,8 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+    <Folder Include="ApiClaimsFactory\" />
+    <Folder Include="Middleware\" />
   </ItemGroup>
 
 </Project>
