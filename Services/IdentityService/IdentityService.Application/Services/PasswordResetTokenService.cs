@@ -55,7 +55,6 @@ namespace IdentityService.Application.Services
         public async Task ResetPasswordAsync(ResetPasswordDto dto, CancellationToken cancellationToken)
         {
             var hashedToken = OTTService.HashToken(dto.Token);
-            var oldPassword = dto.OldPassword;
             var newPassword = dto.NewPassword;
             var confirmPassword = dto.ConfirmPassword;
 
@@ -68,10 +67,6 @@ namespace IdentityService.Application.Services
             var user = await uow.users.GetByIdAsync(passwordResetToken.UserId, cancellationToken);
             if (user == null)
                 throw new NotFoundException("the user that you are trying to change password for is not found");
-
-            var isOldPasswordValid = hasher.Verify(user.PasswordHash, oldPassword);
-            if (!isOldPasswordValid)
-                throw new UnauthorizedException("The current password is incorrect");
 
             if (hasher.Verify(user.PasswordHash, newPassword))
                 throw new ConflictException("New password must be different from the current password.");
