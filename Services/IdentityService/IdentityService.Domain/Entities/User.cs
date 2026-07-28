@@ -1,4 +1,5 @@
-﻿using IdentityService.Domain.Enums;
+﻿using Domain.Exceptions;
+using IdentityService.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -27,10 +28,12 @@ namespace IdentityService.Domain.Entities
 
         public void Activate()
         {
+            if (IsActive == true) throw new BadRequestException("user account already activated");
             IsActive = true;
         }
         public void Deactivate()
         {
+            if (IsActive == false) throw new BadRequestException("user account already Deactivated");
             IsActive = false;
         }
         public void ConfirmEmail()
@@ -39,6 +42,7 @@ namespace IdentityService.Domain.Entities
         }
         public void ChangeRole(RoleType newRole)
         {
+            if(Role == newRole) throw new BadRequestException($"the user account is already {Role}");
             Role = newRole;
         }
         public void ChangeEmail(string newEmail)

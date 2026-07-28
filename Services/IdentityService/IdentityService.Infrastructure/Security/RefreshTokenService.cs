@@ -1,4 +1,5 @@
-﻿using IdentityService.Application.Abstractions.Authentication;
+﻿using Domain.Exceptions;
+using IdentityService.Application.Abstractions.Authentication;
 using IdentityService.Domain.Contracts;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Exceptions;
@@ -8,13 +9,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IdentityService.Infrastructure.Security
 {
-    public class RefreshTokenService(IConfiguration Configuration, IUnitOfWork uow) : IRefreshTokenService
-    {      
-        //[helper methods]===================================================================
+    public class RefreshTokenService(IConfiguration configuration, IUnitOfWork uow) : IRefreshTokenService
+    {
+        #region//[helper methods]===================================================================
         private string GenerateRefreshToken()
         {
             var bytes = RandomNumberGenerator.GetBytes(32);
@@ -22,13 +24,13 @@ namespace IdentityService.Infrastructure.Security
         }
         private string HashRefreshToken(string token)
         {
-            var secret = Configuration["RefreshToken:Secret"]!;
+            var secret = configuration["RefreshToken:Secret"]!;
             using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret));
             return Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(token)));
         }
-        //===================================================================================
+        #endregion ===================================================================================
 
-        public async Task<(RefreshToken StoredToken, string PlaintextToken)> CreateAndStoreRefreshTokenAsync(Guid userId)
+        public async Task<(RefreshToken StoredToken, string PlaintextToken)> CreateAndStoreRefreshTokenAsync(Guid userId, CancellationToken cancellationToken)
         {
             var rawToken = GenerateRefreshToken();
 
@@ -36,27 +38,19 @@ namespace IdentityService.Infrastructure.Security
             {
                 UserId = userId,
                 CreatedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(Configuration["RefreshToken:ExpiryInMinutes"]!)),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(configuration["RefreshToken:ExpiryInMinutes"]!)),
                 TokenHash = HashRefreshToken(rawToken)
             };
 
-            await uow.refreshTokens.AddAsync(refreshToken);
+            await uow.refreshTokens.AddAsync(refreshToken, cancellationToken);
 
             return (refreshToken, rawToken);
         }
 
-
-        public async Task<RefreshToken?> ValidateRefreshTokenAsync(string refreshToken)
+        public async Task<(RefreshToken StoredToken, string PlaintextToken)?> RotateRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken)
         {
             var hash = HashRefreshToken(refreshToken);
-            return await uow.refreshTokens.GetByTokenHashAsync(hash);
-        }
-
-
-        public async Task<(RefreshToken StoredToken, string PlaintextToken)?> RotateRefreshTokenAsync(string refreshToken)
-        {
-            var hash = HashRefreshToken(refreshToken);
-            var existingToken = await uow.refreshTokens.GetByTokenHashAsync(hash);
+            var existingToken = await uow.refreshTokens.GetByTokenHashAsync(hash, cancellationToken);
 
             if (existingToken == null)
                 throw new InvalidTokenException("Refresh token not recognized.");
@@ -69,7 +63,7 @@ namespace IdentityService.Infrastructure.Security
                 if (existingToken.ReplacedByTokenHash != null)
                 {
                     // the use of old token that is replaced
-                    await uow.refreshTokens.RevokeAllByUserIdAsync(userId);
+                    await RevokeAllUserRefreshTokensAsync(userId, cancellationToken);
                     return null;                    
                 }
                 throw new InvalidTokenException("Refresh token expired or revoked.");
@@ -82,27 +76,40 @@ namespace IdentityService.Infrastructure.Security
             {
                 UserId = userId,
                 CreatedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(Configuration["RefreshToken:ExpiryInMinutes"]!)),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(configuration["RefreshToken:ExpiryInMinutes"]!)),
                 TokenHash = newHash
             };
 
             existingToken.Revoke(newToken.TokenHash);
-            await uow.refreshTokens.AddAsync(newToken);
+            await uow.refreshTokens.AddAsync(newToken, cancellationToken);
 
             return (newToken, newRawToken);
         }
 
 
-        public async Task RevokeAllUserRefreshTokensAsync(Guid userId)
+        public async Task RevokeAllUserRefreshTokensAsync(Guid userId, CancellationToken cancellationToken)
         {
-            await uow.refreshTokens.RevokeAllByUserIdAsync(userId);
+            var tokens = await uow.refreshTokens.GetActiveByUserIdAsync(userId, cancellationToken);
+
+            foreach (var token in tokens)
+            {
+                token.Revoke();
+            }
+
+            await uow.SaveChangesAsync(cancellationToken);
         }
 
 
-        public async Task RevokeRefreshTokenAsync(string refreshToken)
+        public async Task RevokeRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken)
         {
             var hashedRefreshToken = HashRefreshToken(refreshToken);
-            await uow.refreshTokens.RevokeAsync(hashedRefreshToken);
+
+            var token = await uow.refreshTokens.GetByTokenHashAsync(hashedRefreshToken, cancellationToken) 
+                ?? throw new InvalidTokenException("Refresh token not recognized.");
+
+            token.Revoke();
+
+            await uow.SaveChangesAsync(cancellationToken);
         }      
     }
 }

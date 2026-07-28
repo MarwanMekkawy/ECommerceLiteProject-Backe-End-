@@ -17,9 +17,9 @@ namespace IdentityService.Infrastructure.Repositories
             return await _context.RefreshTokens.FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
         }
 
-        public async Task<RefreshToken?> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<RefreshToken>> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            return await _context.RefreshTokens.FirstOrDefaultAsync(x => x.UserId == userId && x.ExpiresAt > DateTime.UtcNow && x.RevokedAt == null, cancellationToken);
+            return await _context.RefreshTokens.Where(x => x.UserId == userId && x.RevokedAt == null).ToListAsync(cancellationToken);
         }
 
 
@@ -28,19 +28,6 @@ namespace IdentityService.Infrastructure.Repositories
             await _context.RefreshTokens.AddAsync(refreshToken, cancellationToken);
         }
 
-        public async Task RevokeAsync(string tokenHash, CancellationToken cancellationToken = default)
-        {
-            var token = await _context.RefreshTokens.FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken) ?? throw new NotFoundException();
-            token.Revoke();
-        }
-
-        public async Task RevokeAllByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
-        {
-            var tokens = await _context.RefreshTokens.Where(t => t.UserId == userId && t.RevokedAt == null).ToListAsync(cancellationToken);
-
-            foreach (var token in tokens)
-                token.Revoke();
-        }
 
         public async Task DeleteExpiredAsync(CancellationToken cancellationToken = default)
         {

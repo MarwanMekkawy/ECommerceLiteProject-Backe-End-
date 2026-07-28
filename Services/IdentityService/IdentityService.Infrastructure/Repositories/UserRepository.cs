@@ -60,22 +60,9 @@ namespace IdentityService.Infrastructure.Repositories
         {
             await _context.Users.AddAsync(user, cancellationToken);
         }
-
-        public async Task ActivateAsync(Guid id, CancellationToken cancellationToken)
+      
+        public void Delete(User user)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken) ?? throw new NotFoundException();
-            user.Activate();
-        }
-
-        public async Task DeactivateAsync(Guid id, CancellationToken cancellationToken)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken) ?? throw new NotFoundException();
-            user.Deactivate();
-        }
-
-        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken) ?? throw new NotFoundException();
             _context.Users.Remove(user);
         }
     }

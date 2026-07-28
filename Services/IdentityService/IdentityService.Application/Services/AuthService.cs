@@ -76,7 +76,7 @@ namespace IdentityService.Application.Services
             if (!isValidLogin) throw new UnauthorizedException($"Wrong password or Email");
 
             var newJwtToken = jwt.GenerateAccessToken(existingUser!);
-            var newRefreshToken = await refreshTokenService.CreateAndStoreRefreshTokenAsync(existingUser!.Id);
+            var newRefreshToken = await refreshTokenService.CreateAndStoreRefreshTokenAsync(existingUser!.Id, cancellationToken);
 
             await uow.SaveChangesAsync(cancellationToken);
             return new AuthResponseDto { AccessToken = newJwtToken , RefreshToken = newRefreshToken.PlaintextToken };
@@ -84,13 +84,13 @@ namespace IdentityService.Application.Services
 
         public async Task LogoutAsync(string refreshToken, CancellationToken cancellationToken)
         {
-            await refreshTokenService.RevokeRefreshTokenAsync(refreshToken);
+            await refreshTokenService.RevokeRefreshTokenAsync(refreshToken, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<AuthResponseDto> RefreshSessionAsync(string refreshToken, CancellationToken cancellationToken)
         {
-            var rotatedToken = await refreshTokenService.RotateRefreshTokenAsync(refreshToken);
+            var rotatedToken = await refreshTokenService.RotateRefreshTokenAsync(refreshToken, cancellationToken);
             if (rotatedToken == null) throw new InvalidTokenException("Refresh token reuse detected. All sessions revoked.");
             var (stored, plaintextToken) = rotatedToken.Value;
             var user = await uow.users.GetByIdAsync(stored.UserId, cancellationToken) ?? throw new NotFoundException("User not found");

@@ -21,8 +21,6 @@ namespace IdentityService.Domain.Contracts
         Task<int> GetActiveCountAsync(CancellationToken cancellationToke = default);
 
         Task AddAsync(User user, CancellationToken cancellationToken = default);
-        Task ActivateAsync(Guid id, CancellationToken cancellationToken = default);
-        Task DeactivateAsync(Guid id, CancellationToken cancellationToken = default);
-        Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+        void Delete(User user);
     }
 }

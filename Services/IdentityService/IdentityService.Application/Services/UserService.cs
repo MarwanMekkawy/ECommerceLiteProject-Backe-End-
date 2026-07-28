@@ -6,30 +6,25 @@ using IdentityService.Application.DTOs.UserDTOs;
 using IdentityService.Domain.Contracts;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Enums;
-using Microsoft.VisualBasic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace IdentityService.Application.Services
 {
-    public class UserService(IUnitOfWork uow, IMapper mapper, IPasswordHasher hasher) : IUserService
+    public class UserService(IUnitOfWork uow, IMapper mapper, IPasswordHasher hasher, IRefreshTokenService refreshTokenService) : IUserService
     {
         #region//[helper methods]==================================================================================
+
         private async Task<User> GetUserOrThrowAsync(Guid userId, CancellationToken cancellationToken)
         {
             return await uow.users.GetByIdAsync(userId, cancellationToken) ?? throw new NotFoundException("User not found");
         }
 
-        private static bool IsStrongPassword(string password)
+        private bool IsStrongPassword(string password)
         {
-            return password.Length >= 8 && password.Any(char.IsUpper) &&
-                   password.Any(char.IsLower) && password.Any(char.IsDigit);
+            return password.Any(char.IsUpper) && password.Any(char.IsLower) && password.Any(char.IsDigit);
         }
 
-        private static void ValidatePassword(string password, string confirmPassword)
+        private void ValidatePassword(string password, string confirmPassword)
         {
             if (string.IsNullOrWhiteSpace(password)) throw new BadRequestException("Password can't be empty.");
 
@@ -39,7 +34,32 @@ namespace IdentityService.Application.Services
 
             if (!IsStrongPassword(password)) throw new BadRequestException("Password is too weak.");
         }
-        #endregion//================================================================================================
+
+        private async Task OldPasswordReuseCheckAndCycle(User user, string newPassword, CancellationToken cancellationToken)
+        {
+            if (hasher.Verify(user.PasswordHash, newPassword))
+                throw new ConflictException("New password must be different from the current password.");
+
+            const int MaxPasswordHistory = 3;
+            var usedBeforePasswordsHash = await uow.userPasswordHistories.GetAllByUserIdAsync(user.Id, MaxPasswordHistory, cancellationToken);
+
+            foreach (var pw in usedBeforePasswordsHash)
+            {
+                if (hasher.Verify(pw.PasswordHash, newPassword))
+                    throw new ConflictException("You cannot reuse one of your recent passwords");
+            }
+
+            if (usedBeforePasswordsHash.Count >= MaxPasswordHistory)
+            {
+                uow.userPasswordHistories.Delete(usedBeforePasswordsHash[MaxPasswordHistory - 1]);
+            }
+
+            var currentPasswordSaveHistory = new UserPasswordHistory() { UserId = user.Id, PasswordHash = user.PasswordHash };
+
+            await uow.userPasswordHistories.AddAsync(currentPasswordSaveHistory, cancellationToken);
+        }
+
+        #endregion ================================================================================================
 
         public async Task<UserDto> GetCurrentUserAsync(Guid userId, CancellationToken cancellationToken)
         {
@@ -57,21 +77,30 @@ namespace IdentityService.Application.Services
         public async Task ChangePasswordAsync(Guid userId, ChangePasswordDto dto, CancellationToken cancellationToken)
         {
             var user = await GetUserOrThrowAsync(userId, cancellationToken);
+
             ValidatePassword(dto.NewPassword, dto.ConfirmNewPassword);
-            if (!hasher.Verify(user.PasswordHash,dto.CurrentPassword)) throw new BadRequestException("wrong current password");
-            user.PasswordHash = hasher.Hash(dto.NewPassword);
+
+            if (!hasher.Verify(user.PasswordHash, dto.CurrentPassword)) 
+                throw new BadRequestException("wrong current password");
+
+            await OldPasswordReuseCheckAndCycle(user, dto.NewPassword, cancellationToken);
+
+            user.ChangePassword(hasher.Hash(dto.NewPassword));
+
             await uow.SaveChangesAsync(cancellationToken);
         }
 
         public async Task DeactivateAccountAsync(Guid userId, CancellationToken cancellationToken)
         {
             var user = await GetUserOrThrowAsync(userId, cancellationToken);
-            if (user.IsActive == false) throw new BadRequestException("user account already Deactivated");
+            if (user.IsActive == false) 
+                throw new BadRequestException("user account already Deactivated");
             user.Deactivate();
+            await refreshTokenService.RevokeAllUserRefreshTokensAsync(userId, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
         }
 
-
+        // admin
         public async Task<IEnumerable<UserDto>> GetUsersAsync(int page, int pageSize, CancellationToken cancellationToken)
         {
             var users = await uow.users.GetPagedAsync(page, pageSize, cancellationToken);
@@ -86,17 +115,16 @@ namespace IdentityService.Application.Services
 
         public async Task ActivateUserAsync(Guid id, CancellationToken cancellationToken)
         {
-            var user = await GetUserOrThrowAsync(id, cancellationToken);
-            if (user.IsActive == true) throw new BadRequestException("user account already activated");
+            var user = await GetUserOrThrowAsync(id, cancellationToken);          
             user.Activate();
             await uow.SaveChangesAsync(cancellationToken);
         }
 
         public async Task DeactivateUserAsync(Guid id, CancellationToken cancellationToken)
         {
-            var user = await GetUserOrThrowAsync(id, cancellationToken);
-            if (user.IsActive == false) throw new BadRequestException("user account already Deactivated");
+            var user = await GetUserOrThrowAsync(id, cancellationToken);            
             user.Deactivate();
+            await refreshTokenService.RevokeAllUserRefreshTokensAsync(id, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
         }
 
@@ -104,6 +132,14 @@ namespace IdentityService.Application.Services
         {
             var user = await GetUserOrThrowAsync(id, cancellationToken);
             user.ChangeRole(role);
+            await uow.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task DeleteUserAsync(Guid id, CancellationToken cancellationToken)
+        {
+            var user = await GetUserOrThrowAsync(id, cancellationToken);
+            uow.users.Delete(user);
+            await refreshTokenService.RevokeAllUserRefreshTokensAsync(id, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
         }
     }

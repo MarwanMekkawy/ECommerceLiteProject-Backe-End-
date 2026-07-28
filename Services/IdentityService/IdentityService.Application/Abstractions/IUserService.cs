@@ -21,5 +21,6 @@ namespace IdentityService.Application.Abstractions
         Task ActivateUserAsync(Guid id, CancellationToken cancellationToken);
         Task DeactivateUserAsync(Guid id, CancellationToken cancellationToken);
         Task ChangeUserRoleAsync(Guid id, RoleType role, CancellationToken cancellationToken);
+        Task DeleteUserAsync(Guid id, CancellationToken cancellationToken);
     }
 }

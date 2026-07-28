@@ -9,10 +9,9 @@ namespace IdentityService.Application.Abstractions.Authentication
 {
     public interface IRefreshTokenService
     {
-        Task<(RefreshToken StoredToken, string PlaintextToken)> CreateAndStoreRefreshTokenAsync(Guid userId);
-        Task<RefreshToken?> ValidateRefreshTokenAsync(string refreshToken);
-        Task<(RefreshToken StoredToken, string PlaintextToken)?> RotateRefreshTokenAsync(string refreshToken);
-        Task RevokeRefreshTokenAsync(string refreshToken);
-        Task RevokeAllUserRefreshTokensAsync(Guid userId);
+        Task<(RefreshToken StoredToken, string PlaintextToken)> CreateAndStoreRefreshTokenAsync(Guid userId, CancellationToken cancellationToken);      
+        Task<(RefreshToken StoredToken, string PlaintextToken)?> RotateRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken);
+        Task RevokeRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken);
+        Task RevokeAllUserRefreshTokensAsync(Guid userId, CancellationToken cancellationToken);
     }
 }
