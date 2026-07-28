@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace IdentityService.API.Controllers
 {
+    /// <summary>
+    /// Exposes endpoints for managing user profile.
+    /// </summary>
     [Route("api/v1/users")]
     [ApiController]
     public class UsersController(IUserService userService) : ControllerBase

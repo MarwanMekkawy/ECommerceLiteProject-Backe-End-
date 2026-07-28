@@ -12,9 +12,7 @@ namespace IdentityService.API.Controllers
     [Route("api/v1/auth")]
     [ApiController]
     public class AuthController(IAuthService authService) : ControllerBase
-    {
-
-        
+    {        
         #region// Cookie helper methods ================================================================
         
         // Storing refresh token in HttpOnly cookie

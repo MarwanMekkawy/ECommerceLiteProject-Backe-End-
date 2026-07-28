@@ -9,7 +9,6 @@ namespace IdentityService.Domain.Enums
     public enum RoleType
     {
         Buyer = 1,
-        Admin = 2,
-        Manager = 3
+        Admin = 2
     }
 }
