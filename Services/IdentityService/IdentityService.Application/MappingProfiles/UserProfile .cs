@@ -21,9 +21,12 @@ namespace IdentityService.Application.MappingProfiles
                 .ForMember(dest => dest.IsEmailConfirmed, opt => opt.Ignore())
                 .ForMember(dest => dest.IsActive, opt => opt.Ignore())
                 .ForMember(dest => dest.Role, opt => opt.Ignore())
+                .ForMember(dest => dest.NextVerificationEmailAt, opt => opt.Ignore())
                 .ForMember(dest => dest.RefreshTokens, opt => opt.Ignore())
                 .ForMember(dest => dest.PasswordResetTokens, opt => opt.Ignore())
-                .ForMember(dest => dest.EmailVerificationTokens, opt => opt.Ignore());
+                .ForMember(dest => dest.EmailVerificationTokens, opt => opt.Ignore())
+                .ForMember(dest => dest.EmailChangeTokens, opt => opt.Ignore())
+                .ForMember(dest => dest.UserPasswordHistory, opt => opt.Ignore());
 
             CreateMap<UpdateUserDto, User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -32,11 +35,14 @@ namespace IdentityService.Application.MappingProfiles
                 .ForMember(dest => dest.IsEmailConfirmed, opt => opt.Ignore())
                 .ForMember(dest => dest.IsActive, opt => opt.Ignore())
                 .ForMember(dest => dest.Role, opt => opt.Ignore())
+                .ForMember(dest => dest.NextVerificationEmailAt, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.RefreshTokens, opt => opt.Ignore())
                 .ForMember(dest => dest.PasswordResetTokens, opt => opt.Ignore())
-                .ForMember(dest => dest.EmailVerificationTokens, opt => opt.Ignore());
+                .ForMember(dest => dest.EmailVerificationTokens, opt => opt.Ignore())
+                .ForMember(dest => dest.EmailChangeTokens, opt => opt.Ignore())
+                .ForMember(dest => dest.UserPasswordHistory, opt => opt.Ignore());
         }
     }
 }

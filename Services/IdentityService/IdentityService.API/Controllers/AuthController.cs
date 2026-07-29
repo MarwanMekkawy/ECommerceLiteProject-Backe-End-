@@ -11,7 +11,8 @@ namespace IdentityService.API.Controllers
     /// </summary>
     [Route("api/v1/auth")]
     [ApiController]
-    public class AuthController(IAuthService authService) : ControllerBase
+    [AllowAnonymous]
+    public class AuthController(IAuthService authService, IEmailVerificationTokenService emailVerification) : ControllerBase
     {        
         #region// Cookie helper methods ================================================================
         
@@ -38,16 +39,18 @@ namespace IdentityService.API.Controllers
         #endregion =====================================================================================
 
         [HttpPost("register")]
-        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto dto, CancellationToken cancellationToken)
         {
-            var result = await authService.RegisterAsync(dto, cancellationToken);
+            var registerResultUserId = await authService.RegisterAsync(dto, cancellationToken);
 
-            return Ok(result);
+            var emailTokenResult = emailVerification.GenerateVerificationTokenAsync(registerResultUserId.userId, cancellationToken);
+
+            //@ generate email confirm token and call endpoint to send email with it 
+
+            return Ok(registerResultUserId);
         }
 
         [HttpPost("login")]
-        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody]  LoginRequestDto dto, CancellationToken cancellationToken)
         {
             var result = await authService.LoginAsync(dto, cancellationToken);
@@ -58,7 +61,6 @@ namespace IdentityService.API.Controllers
         }
 
         [HttpPost("logout")]
-        [AllowAnonymous]
         public async Task<IActionResult> Logout(CancellationToken cancellationToken)
         {
             var refreshToken = Request.Cookies["refreshToken"];
@@ -69,11 +71,10 @@ namespace IdentityService.API.Controllers
 
             DeleteRefreshTokenCookie();
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpPost("refresh")]
-        [AllowAnonymous]
         public async Task<IActionResult> Refresh(CancellationToken cancellationToken)
         {
             var refreshToken = Request.Cookies["refreshToken"];

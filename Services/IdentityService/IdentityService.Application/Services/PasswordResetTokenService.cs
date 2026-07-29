@@ -58,7 +58,7 @@ namespace IdentityService.Application.Services
         }
         #endregion ========================================================================
 
-        public async Task<string> RequestPasswordResetAsync(ForgotPasswordDto dto, CancellationToken cancellationToken)
+        public async Task<GeneratePasswordResetDto> RequestPasswordResetAsync(ForgotPasswordDto dto, CancellationToken cancellationToken)
         {
             var token = OTTService.GenerateToken();
             var hashedToken = OTTService.HashToken(token);
@@ -66,7 +66,7 @@ namespace IdentityService.Application.Services
 
             var user = await uow.users.GetByEmailAsync(normalizedEmail, cancellationToken);
             if (user == null)
-                return string.Empty;
+                return new GeneratePasswordResetDto();
 
             var passwordResetToken = new PasswordResetToken() { UserId = user.Id, TokenHash = hashedToken };
 
@@ -74,12 +74,12 @@ namespace IdentityService.Application.Services
             await uow.passwordResetTokens.AddAsync(passwordResetToken, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
 
-            return token;
+            return new GeneratePasswordResetDto() { Email = user.Email, Token = token };
         }
 
-        public async Task ResetPasswordAsync(ResetPasswordDto dto, CancellationToken cancellationToken)
+        public async Task ResetPasswordAsync(string token, ResetPasswordDto dto, CancellationToken cancellationToken)
         {
-            var hashedToken = OTTService.HashToken(dto.Token);
+            var hashedToken = OTTService.HashToken(token);
             var newPassword = dto.NewPassword;
             var confirmPassword = dto.ConfirmPassword;
 

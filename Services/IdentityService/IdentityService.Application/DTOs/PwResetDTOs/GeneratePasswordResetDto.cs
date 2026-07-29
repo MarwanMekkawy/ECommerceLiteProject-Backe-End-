@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IdentityService.Application.DTOs.EmailVerificationDTOs
+namespace IdentityService.Application.DTOs.PwResetDTOs
 {
-    public class ResendVerificationEmailDto
+    public class GeneratePasswordResetDto
     {
         public string Email { get; set; } = default!;
+        public string Token { get; set; } = default!;
     }
 }

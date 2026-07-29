@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace IdentityService.Application.DTOs.EmailVerificationDTOs
 {
-    public class ChangeEmailDto
+    public class GenerateVerificationEmailDto
     {
+        public string Email { get; set; } = default!;
         public string Token { get; set; } = default!;
     }
 }

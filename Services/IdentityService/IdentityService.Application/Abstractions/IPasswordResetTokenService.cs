@@ -9,7 +9,7 @@ namespace IdentityService.Application.Abstractions
 {
     public interface IPasswordResetTokenService
     {
-        Task<string> RequestPasswordResetAsync(ForgotPasswordDto dto, CancellationToken cancellationToken);
-        Task ResetPasswordAsync(ResetPasswordDto dto, CancellationToken cancellationToken);
+        Task<GeneratePasswordResetDto> RequestPasswordResetAsync(ForgotPasswordDto dto, CancellationToken cancellationToken);
+        Task ResetPasswordAsync(string token, ResetPasswordDto dto, CancellationToken cancellationToken);
     }
 }

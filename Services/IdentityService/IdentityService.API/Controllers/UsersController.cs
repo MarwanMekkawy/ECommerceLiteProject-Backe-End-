@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 namespace IdentityService.API.Controllers
 {
     /// <summary>
-    /// Exposes endpoints for managing user profile.
+    /// Handles managing user profile.
     /// </summary>
     [Route("api/v1/users")]
     [ApiController]
+    [Authorize]
     public class UsersController(IUserService userService) : ControllerBase
     {
-        [HttpGet("me")]
-        [Authorize]
+        [HttpGet("me")]    
         public async Task<IActionResult> GetMe(CancellationToken cancellationToken)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
@@ -27,24 +27,32 @@ namespace IdentityService.API.Controllers
         }
 
         [HttpPut("me")]
-        [Authorize]
         public async Task<IActionResult> UpdateMe([FromBody] UpdateUserDto dto, CancellationToken cancellationToken)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 
             await userService.UpdateProfileAsync(claims.UserId, dto, cancellationToken);
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpPatch("me")]
-        [Authorize]
         public async Task<IActionResult> DeactivateMe(CancellationToken cancellationToken) 
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 
             await userService.DeactivateAccountAsync(claims.UserId, cancellationToken);
             
+            return NoContent();
+        }
+
+        [HttpPost("me/change-password")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto dto,CancellationToken cancellationToken)////////////////////////////////
+        {
+            var claims = UserClaimsFactory.ExtractFrom(User);
+
+            await userService.ChangePasswordAsync(claims.UserId, dto, cancellationToken);
+
             return NoContent();
         }
     }

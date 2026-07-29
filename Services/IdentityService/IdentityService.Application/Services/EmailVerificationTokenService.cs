@@ -22,20 +22,50 @@ namespace IdentityService.Application.Services
         }    
         #endregion//========================================================================
 
-        public async Task<string> GenerateVerificationTokenAsync(Guid userId, CancellationToken cancellationToken)
+        public async Task<GenerateVerificationEmailDto> GenerateVerificationTokenAsync(Guid userId, CancellationToken cancellationToken)
         {
             var token = OTTService.GenerateToken();
             var hashedToken = OTTService.HashToken(token);
             var emailVerificationToken = new EmailVerificationToken() { UserId = userId, TokenHash = hashedToken };
+            var user = await uow.users.GetByIdAsync(userId, cancellationToken);
+            if (user == null)
+                throw new NotFoundException("User not found");
+         
             await uow.emailVerificationTokens.AddAsync(emailVerificationToken, cancellationToken);
-            await uow.SaveChangesAsync();
-            return token;
+            await uow.SaveChangesAsync(cancellationToken);
+
+            return new GenerateVerificationEmailDto() { Email = user.Email, Token = token };
         }
 
-        public async Task<string> ResendVerificationEmailAsync(Guid userId, CancellationToken cancellationToken)
+        // overload as helper for the resend
+        private async Task<GenerateVerificationEmailDto> GenerateVerificationTokenAsync(User user, CancellationToken cancellationToken)
         {
+            var token = OTTService.GenerateToken();
+            var hashedToken = OTTService.HashToken(token);
+            var emailVerificationToken = new EmailVerificationToken() { UserId = user.Id, TokenHash = hashedToken };            
+
+            await uow.emailVerificationTokens.AddAsync(emailVerificationToken, cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);
+
+            return new GenerateVerificationEmailDto() { Email = user.Email, Token = token };
+        }
+
+        public async Task<GenerateVerificationEmailDto> ResendVerificationEmailAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            var user = await uow.users.GetByIdAsync(userId, cancellationToken);
+            if (user == null)
+                throw new NotFoundException("User not found");
+
+            if (!user.CanResendVerificationEmail())
+            {
+                var cd = user.ResendCooldownSeconds();
+                throw new TooManyRequestsException($"Please wait {cd}s before requesting another email.");
+            }
+
+            user.StartVerificationEmailCooldown();
+
             await uow.emailVerificationTokens.InvalidateAllByUserIdAsync(userId, cancellationToken);         
-            return await GenerateVerificationTokenAsync(userId, cancellationToken); ;
+            return await GenerateVerificationTokenAsync(user, cancellationToken);
         }
 
         public async Task ConfirmEmailAsync(string token, CancellationToken cancellationToken)
@@ -56,7 +86,6 @@ namespace IdentityService.Application.Services
         }
 
         //Email Change
-
         public async Task<string> GenerateEmailChangeTokenAsync(Guid userId, ChangeEmailRequestDto dto, CancellationToken cancellationToken)
         {
             var token = OTTService.GenerateToken();
@@ -91,9 +120,8 @@ namespace IdentityService.Application.Services
             return token;
         }
 
-        public async Task ConfirmEmailChangeAsync(ChangeEmailDto dto, CancellationToken cancellationToken)
+        public async Task ConfirmEmailChangeAsync(string token, CancellationToken cancellationToken)
         {
-            var token = dto.Token;
             var hashedToken = OTTService.HashToken(token);
 
             var emailChangeToken = await uow.emailChangeTokens.GetByTokenHashAsync(hashedToken, cancellationToken);
