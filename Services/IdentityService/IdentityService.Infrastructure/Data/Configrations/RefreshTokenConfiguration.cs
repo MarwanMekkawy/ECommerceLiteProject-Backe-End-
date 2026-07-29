@@ -1,11 +1,7 @@
 ﻿using IdentityService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace IdentityService.Infrastructure.Data.Configrations
 {
@@ -15,24 +11,29 @@ namespace IdentityService.Infrastructure.Data.Configrations
         {
             builder.ToTable("RefreshTokens");
 
-            builder.HasKey(x => x.Id);
+            builder.HasKey(rt => rt.Id);
 
-            builder.Property(x => x.TokenHash)
-                .IsRequired();
+            builder.Property(rt => rt.TokenHash)
+                .IsRequired()
+                .HasMaxLength(512);
 
-            builder.HasIndex(x => x.TokenHash)
+            builder.HasIndex(rt => rt.TokenHash)
                 .IsUnique();
 
-            builder.Property(x => x.ExpiresAt)
+            builder.Property(rt => rt.ReplacedByTokenHash)
+                .HasMaxLength(512);
+
+            builder.Property(rt => rt.ExpiresAt)
                 .IsRequired();
 
-            builder.Property(x => x.RevokedAt);
+            builder.HasIndex(rt => rt.UserId);
 
-            builder.Property(x => x.ReplacedByTokenHash)
-                .HasMaxLength(255);
-
-            builder.Property(x => x.UserId)
-                .IsRequired();
+            // Ignore computed properties (not strictly necessary, EF ignores
+            // properties without setters/backing fields by convention if
+            // they're not mapped, but explicit is safer for clarity)
+            builder.Ignore(rt => rt.IsExpired);
+            builder.Ignore(rt => rt.IsRevoked);
+            builder.Ignore(rt => rt.IsActive);
         }
     }
 }

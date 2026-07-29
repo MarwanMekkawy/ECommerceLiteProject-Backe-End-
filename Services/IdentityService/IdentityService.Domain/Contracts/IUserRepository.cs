@@ -9,7 +9,8 @@ namespace IdentityService.Domain.Contracts
 {
     public interface IUserRepository
     {
-        Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToke = default);
+        Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<User?> GetByIdIncludingInactiveAsync(Guid id, CancellationToken cancellationToken);
         Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
 

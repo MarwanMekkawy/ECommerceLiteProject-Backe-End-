@@ -1,63 +1,80 @@
 ﻿using IdentityService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-public class UserConfiguration : IEntityTypeConfiguration<User>
+
+namespace IdentityService.Infrastructure.Data.Configrations
 {
-    public void Configure(EntityTypeBuilder<User> builder)
+    public class UserConfiguration : IEntityTypeConfiguration<User>
     {
-        builder.ToTable("Users");
+        public void Configure(EntityTypeBuilder<User> builder)
+        {
+            builder.ToTable("Users");
 
-        builder.HasKey(x => x.Id);
+            builder.HasKey(u => u.Id);
 
-        builder.Property(x => x.FirstName)
-            .IsRequired()
-            .HasMaxLength(100);
+            builder.Property(u => u.FirstName)
+                .IsRequired()
+                .HasMaxLength(100);
 
-        builder.Property(x => x.LastName)
-            .IsRequired()
-            .HasMaxLength(100);
+            builder.Property(u => u.LastName)
+                .IsRequired()
+                .HasMaxLength(100);
 
-        builder.Property(x => x.Email)
-            .IsRequired()
-            .HasMaxLength(255);
+            builder.Property(u => u.Email)
+                .IsRequired()
+                .HasMaxLength(256);
 
-        builder.HasIndex(x => x.Email)
-            .IsUnique();
+            builder.HasIndex(u => u.Email)
+                .IsUnique();
 
-        builder.Property(x => x.PasswordHash)
-            .IsRequired();
+            builder.Property(u => u.PasswordHash)
+                .IsRequired();
 
-        builder.Property(x => x.PhoneNumber)
-            .HasMaxLength(20);
+            builder.Property(u => u.PhoneNumber)
+                .HasMaxLength(20);
 
-        builder.Property(x => x.Role)
-            .HasConversion<int>();
+            builder.Property(u => u.Role)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired();
 
-        builder.Property(x => x.IsEmailConfirmed)
-            .IsRequired();
+            builder.Property(u => u.IsActive)
+                .HasDefaultValue(true);
 
-        builder.Property(x => x.IsActive)
-            .IsRequired();
+            builder.Property(u => u.IsEmailConfirmed)
+                .HasDefaultValue(false);
 
-        builder.HasMany(x => x.RefreshTokens)
-            .WithOne(x => x.User)
-            .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            builder.Property(u => u.CreatedAt)
+                .IsRequired();
 
-        builder.HasMany(x => x.PasswordResetTokens)
-            .WithOne(x => x.User)
-            .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            // Relationships
+            builder.HasMany(u => u.RefreshTokens)
+                .WithOne(rt => rt.User)
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(x => x.EmailVerificationTokens)
-            .WithOne(x => x.User)
-            .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(u => u.PasswordResetTokens)
+                .WithOne(prt => prt.User)
+                .HasForeignKey(prt => prt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(u => u.EmailVerificationTokens)
+                .WithOne(evt => evt.User)
+                .HasForeignKey(evt => evt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(u => u.EmailChangeTokens)
+                .WithOne(ect => ect.User)
+                .HasForeignKey(ect => ect.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(u => u.UserPasswordHistory)
+                .WithOne(uph => uph.User)
+                .HasForeignKey(uph => uph.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasQueryFilter(u => u.IsActive);
+        }
     }
 }

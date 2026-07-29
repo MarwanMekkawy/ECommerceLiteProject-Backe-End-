@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace IdentityService.Infrastructure.Data.Configrations
 {
-    public class EmailVerificationTokenConfiguration : IEntityTypeConfiguration<EmailVerificationToken>
+    public class EmailChangeTokenConfiguration : IEntityTypeConfiguration<EmailChangeToken>
     {
-        public void Configure(EntityTypeBuilder<EmailVerificationToken> builder)
+        public void Configure(EntityTypeBuilder<EmailChangeToken> builder)
         {
-            builder.ToTable("EmailVerificationTokens");
+            builder.ToTable("EmailChangeTokens");
 
             builder.HasKey(t => t.Id);
 
@@ -20,13 +20,17 @@ namespace IdentityService.Infrastructure.Data.Configrations
             builder.HasIndex(t => t.TokenHash)
                 .IsUnique();
 
+            builder.Property(t => t.NewEmail)
+                .IsRequired()
+                .HasMaxLength(256);
+
             builder.Property(t => t.ExpiresAt)
                 .IsRequired();
 
             builder.HasIndex(t => t.UserId);
 
             builder.Ignore(t => t.IsExpired);
-            builder.Ignore(t => t.IsVerified);
+            builder.Ignore(t => t.IsConfirmed);
             builder.Ignore(t => t.IsActive);
         }
     }

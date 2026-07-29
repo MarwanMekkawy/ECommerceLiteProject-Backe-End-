@@ -9,14 +9,19 @@ using System.Threading.Tasks;
 namespace IdentityService.API.Controllers
 {
     /// <summary>
-    /// Handles managing user profile.
+    /// Handles authenticated user profile management operations.
     /// </summary>
     [Route("api/v1/users")]
     [ApiController]
     [Authorize]
     public class UsersController(IUserService userService) : ControllerBase
     {
-        [HttpGet("me")]    
+        /// <summary>
+        /// Retrieves the profile of the currently authenticated user.
+        /// </summary>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>The current user's profile information.</returns>
+        [HttpGet("me")]
         public async Task<IActionResult> GetMe(CancellationToken cancellationToken)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
@@ -26,6 +31,12 @@ namespace IdentityService.API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Updates the profile information of the currently authenticated user.
+        /// </summary>
+        /// <param name="dto">The updated profile information.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>No content if the profile was updated successfully.</returns>
         [HttpPut("me")]
         public async Task<IActionResult> UpdateMe([FromBody] UpdateUserDto dto, CancellationToken cancellationToken)
         {
@@ -36,18 +47,29 @@ namespace IdentityService.API.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Deactivates the currently authenticated user's account.
+        /// </summary>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>No content if the account was deactivated successfully.</returns>
         [HttpPatch("me")]
-        public async Task<IActionResult> DeactivateMe(CancellationToken cancellationToken) 
+        public async Task<IActionResult> DeactivateMe(CancellationToken cancellationToken)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 
             await userService.DeactivateAccountAsync(claims.UserId, cancellationToken);
-            
+
             return NoContent();
         }
 
+        /// <summary>
+        /// Changes the password of the currently authenticated user.
+        /// </summary>
+        /// <param name="dto">The current and new password information.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>No content if the password was changed successfully.</returns>
         [HttpPost("me/change-password")]
-        public async Task<IActionResult> ChangePassword(ChangePasswordDto dto,CancellationToken cancellationToken)////////////////////////////////
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto dto, CancellationToken cancellationToken)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 

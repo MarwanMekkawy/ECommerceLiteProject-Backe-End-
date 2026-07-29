@@ -1,11 +1,7 @@
 ﻿using IdentityService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace IdentityService.Infrastructure.Data.Configrations
 {
@@ -15,21 +11,23 @@ namespace IdentityService.Infrastructure.Data.Configrations
         {
             builder.ToTable("PasswordResetTokens");
 
-            builder.HasKey(x => x.Id);
+            builder.HasKey(t => t.Id);
 
-            builder.Property(x => x.TokenHash)
-                .IsRequired();
+            builder.Property(t => t.TokenHash)
+                .IsRequired()
+                .HasMaxLength(512);
 
-            builder.HasIndex(x => x.TokenHash)
+            builder.HasIndex(t => t.TokenHash)
                 .IsUnique();
 
-            builder.Property(x => x.ExpiresAt)
+            builder.Property(t => t.ExpiresAt)
                 .IsRequired();
 
-            builder.Property(x => x.UsedAt);
+            builder.HasIndex(t => t.UserId);
 
-            builder.Property(x => x.UserId)
-                .IsRequired();
+            builder.Ignore(t => t.IsExpired);
+            builder.Ignore(t => t.IsUsed);
+            builder.Ignore(t => t.IsActive);
         }
     }
 }

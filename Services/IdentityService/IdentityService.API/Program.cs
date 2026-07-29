@@ -1,4 +1,13 @@
+using IdentityService.API.Middleware;
+using IdentityService.Application.Extentions.App;
 using IdentityService.Infrastructure.Extentions.Infra;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
+using System.Text;
+using System.Text.Json.Serialization;
+
+
 namespace IdentityService.API
 {
     public class Program
@@ -7,28 +16,80 @@ namespace IdentityService.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddAppDbContext(builder.Configuration);
+            // Add Di Services extentions
+            builder.Services.AddInfrastructureServices(builder.Configuration).AddApplicationServices();
 
             // Add services to the container.
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });  //json enums serializer
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(
+                // swagger XML comments config //
+                options => {
+                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+                    options.IncludeXmlComments(xmlPath);
+                });
+
+
+            // Auth service config //
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
+                    };
+                });
+            builder.Services.AddAuthorization();
+
+            // CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("Development", policy =>
+                {
+                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                });
+
+                options.AddPolicy("Production", policy =>
+                {
+                    policy.WithOrigins("https://myfrontend.com")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
+
 
             var app = builder.Build();
 
+
+
+            app.UseHttpsRedirection();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
+                app.UseCors("Development");               // allow all CORS
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
-            app.UseHttpsRedirection();
-
+            else
+            {
+                app.UseCors("Production");
+            }
+            app.UseMiddleware<GlobalHandlingMiddleware>();     // global Exception middleware
+            app.UseAuthentication();
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();

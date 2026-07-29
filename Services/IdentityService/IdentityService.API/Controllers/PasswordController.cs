@@ -7,13 +7,19 @@ using Microsoft.AspNetCore.Mvc;
 namespace IdentityService.API.Controllers
 {
     /// <summary>
-    /// Handles forgetting password reset.
+    /// Handles password recovery and password reset operations.
     /// </summary>
     [Route("api/v1/password")]
     [ApiController]
     [AllowAnonymous]
     public class PasswordController(IPasswordResetTokenService passwordService) : ControllerBase
     {
+        /// <summary>
+        /// Generates a password reset token for the specified email address.
+        /// </summary>
+        /// <param name="dto">The password reset request information.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>Redirects the user after the password reset request is processed.</returns>
         [HttpPost("forgot")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto, CancellationToken cancellationToken)
         {
@@ -22,17 +28,29 @@ namespace IdentityService.API.Controllers
             //@ send email with the token tokenResult:{email,token}
 
             //@ add valid url to redirect
-            return Redirect("https://myfrontend.com/resendemail");
+            //return Redirect("https://myfrontend.com/resendemail");
+
+            //@ for testing
+            return Ok(tokenResult);
         }
 
+        /// <summary>
+        /// Resets a user's password using a valid password reset token.
+        /// </summary>
+        /// <param name="token">The password reset token.</param>
+        /// <param name="dto">The new password information.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>Redirects the user after the password has been successfully reset.</returns>
         [HttpPost("reset")]
-        public async Task<IActionResult> ResetPassword(string token,ResetPasswordDto dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> ResetPassword(string token, ResetPasswordDto dto, CancellationToken cancellationToken)
         {
             await passwordService.ResetPasswordAsync(token, dto, cancellationToken);
 
-
             //@ add valid url to redirect
-            return Redirect("https://myfrontend.com/login");
+            //return Redirect("https://myfrontend.com/login");
+
+            //@ for testing
+            return Ok();
         }
     }
 }

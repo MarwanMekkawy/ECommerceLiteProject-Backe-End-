@@ -91,7 +91,7 @@ namespace IdentityService.Application.Services
 
             var user = await uow.users.GetByIdAsync(passwordResetToken.UserId, cancellationToken);
             if (user == null)
-                throw new NotFoundException("the user that you are trying to change password for is not found");
+                throw new NotFoundException("the user that you are trying to change password for is not found or inactive");
 
             await OldPasswordReuseCheckAndCycle(user, newPassword, cancellationToken);
 

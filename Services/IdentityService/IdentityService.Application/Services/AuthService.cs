@@ -42,8 +42,8 @@ namespace IdentityService.Application.Services
                 throw new BadRequestException("Invalid email format");
 
             // Check if user already exists 
-            var existingEmail = await uow.users.GetByEmailAsync(normalizedEmail, cancellationToken);
-            if (existingEmail != null) 
+            var existingEmail = await uow.users.ExistsByEmailAsync(normalizedEmail, cancellationToken);
+            if (existingEmail) 
                 throw new ConflictException("Email is already in use");
 
             //password validation
@@ -93,7 +93,7 @@ namespace IdentityService.Application.Services
             var rotatedToken = await refreshTokenService.RotateRefreshTokenAsync(refreshToken, cancellationToken);
             if (rotatedToken == null) throw new InvalidTokenException("Refresh token reuse detected. All sessions revoked.");
             var (stored, plaintextToken) = rotatedToken.Value;
-            var user = await uow.users.GetByIdAsync(stored.UserId, cancellationToken) ?? throw new NotFoundException("User not found");
+            var user = await uow.users.GetByIdAsync(stored.UserId, cancellationToken) ?? throw new UnauthorizedException("User not found or inactive");
 
             var newJwt = jwt.GenerateAccessToken(user);
             await uow.SaveChangesAsync(cancellationToken);

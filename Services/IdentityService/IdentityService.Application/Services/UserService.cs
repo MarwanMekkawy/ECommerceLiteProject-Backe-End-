@@ -14,9 +14,11 @@ namespace IdentityService.Application.Services
     {
         #region//[helper methods]==================================================================================
 
-        private async Task<User> GetUserOrThrowAsync(Guid userId, CancellationToken cancellationToken)
+        private async Task<User> GetUserOrThrowAsync(bool admin, Guid userId, CancellationToken cancellationToken)
         {
-            return await uow.users.GetByIdAsync(userId, cancellationToken) ?? throw new NotFoundException("User not found");
+            if (admin) return await uow.users.GetByIdIncludingInactiveAsync(userId, cancellationToken) ?? throw new NotFoundException("User not found");
+
+            return await uow.users.GetByIdAsync(userId, cancellationToken) ?? throw new NotFoundException("User not found or inactive");
         }
 
         private bool IsStrongPassword(string password)
@@ -63,20 +65,20 @@ namespace IdentityService.Application.Services
 
         public async Task<UserDto> GetCurrentUserAsync(Guid userId, CancellationToken cancellationToken)
         {
-            var user = await GetUserOrThrowAsync(userId, cancellationToken);
+            var user = await GetUserOrThrowAsync(admin: false, userId, cancellationToken);
             return mapper.Map<UserDto>(user);
         }
 
         public async Task UpdateProfileAsync(Guid userId, UpdateUserDto dto, CancellationToken cancellationToken)
         {
-            var user = await GetUserOrThrowAsync(userId, cancellationToken);
+            var user = await GetUserOrThrowAsync(admin: false, userId, cancellationToken);
             mapper.Map(dto, user);
             await uow.SaveChangesAsync(cancellationToken);
         }
 
         public async Task ChangePasswordAsync(Guid userId, ChangePasswordDto dto, CancellationToken cancellationToken)
         {
-            var user = await GetUserOrThrowAsync(userId, cancellationToken);
+            var user = await GetUserOrThrowAsync(admin: false, userId, cancellationToken);
 
             ValidatePassword(dto.NewPassword, dto.ConfirmNewPassword);
 
@@ -92,7 +94,7 @@ namespace IdentityService.Application.Services
 
         public async Task DeactivateAccountAsync(Guid userId, CancellationToken cancellationToken)
         {
-            var user = await GetUserOrThrowAsync(userId, cancellationToken);
+            var user = await GetUserOrThrowAsync(admin: false, userId, cancellationToken);
             if (user.IsActive == false) 
                 throw new BadRequestException("user account already Deactivated");
             user.Deactivate();
@@ -109,20 +111,20 @@ namespace IdentityService.Application.Services
 
         public async Task<UserDto> GetUserByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            var user = await GetUserOrThrowAsync(id, cancellationToken);
+            var user = await GetUserOrThrowAsync(admin: true, id, cancellationToken);
             return mapper.Map<UserDto>(user);
         }
 
         public async Task ActivateUserAsync(Guid id, CancellationToken cancellationToken)
         {
-            var user = await GetUserOrThrowAsync(id, cancellationToken);          
+            var user = await GetUserOrThrowAsync(admin: true, id, cancellationToken);          
             user.Activate();
             await uow.SaveChangesAsync(cancellationToken);
         }
 
         public async Task DeactivateUserAsync(Guid id, CancellationToken cancellationToken)
         {
-            var user = await GetUserOrThrowAsync(id, cancellationToken);            
+            var user = await GetUserOrThrowAsync(admin: true, id, cancellationToken);            
             user.Deactivate();
             await refreshTokenService.RevokeAllUserRefreshTokensAsync(id, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
@@ -130,14 +132,14 @@ namespace IdentityService.Application.Services
 
         public async Task ChangeUserRoleAsync(Guid id, RoleType role, CancellationToken cancellationToken)
         {
-            var user = await GetUserOrThrowAsync(id, cancellationToken);
+            var user = await GetUserOrThrowAsync(admin: true, id, cancellationToken);
             user.ChangeRole(role);
             await uow.SaveChangesAsync(cancellationToken);
         }
 
         public async Task DeleteUserAsync(Guid id, CancellationToken cancellationToken)
         {
-            var user = await GetUserOrThrowAsync(id, cancellationToken);
+            var user = await GetUserOrThrowAsync(admin: true, id, cancellationToken);
             uow.users.Delete(user);
             await refreshTokenService.RevokeAllUserRefreshTokensAsync(id, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
