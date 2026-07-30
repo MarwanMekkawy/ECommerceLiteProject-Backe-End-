@@ -22,6 +22,8 @@ namespace IdentityService.Application.Extentions.App
 
             services.AddAutoMapper(cfg => { cfg.AddMaps(typeof(AutoMapperMarker).Assembly); });
 
+            services.AddScoped<ITokenCleanupService, TokenCleanupService>();
+
             return services;
         }
     }

@@ -12,6 +12,7 @@ namespace IdentityService.Domain.Entities
         public string TokenHash { get; set; } = default!;
         public Guid UserId { get; set; }
 
+        public bool RememberMe { get; set; }
         public DateTime ExpiresAt { get; set; }
         public DateTime? RevokedAt { get; set; }
         public string? ReplacedByTokenHash { get; set; }

@@ -89,7 +89,7 @@ namespace IdentityService.Application.Services
             if (!isValidLogin) throw new UnauthorizedException($"Wrong password or Email.");
 
             var newJwtToken = jwt.GenerateAccessToken(existingUser!);
-            var newRefreshToken = await refreshTokenService.CreateAndStoreRefreshTokenAsync(existingUser!.Id, cancellationToken);
+            var newRefreshToken = await refreshTokenService.CreateAndStoreRefreshTokenAsync(dto.RememberMe, existingUser!.Id, cancellationToken);
 
             await uow.SaveChangesAsync(cancellationToken);
             return new AuthResponseDto { AccessToken = newJwtToken , RefreshToken = newRefreshToken.PlaintextToken };

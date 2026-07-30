@@ -114,10 +114,43 @@ namespace IdentityService.Application.Services
         }
 
         // admin ======================================================================================
-        public async Task<IEnumerable<UserDto>> GetUsersAsync(int page, int pageSize, CancellationToken cancellationToken)
+        public async Task<PagedResult<UserDto>> GetUsersPaginatedWithCountAsync(UserStatus status, int page, int pageSize, CancellationToken cancellationToken)
         {
-            var users = await uow.users.GetPagedAsync(page, pageSize, cancellationToken);
-            return mapper.Map < IEnumerable < UserDto >> (users);
+            IReadOnlyList<User> users;
+            int totalCount;
+
+            switch (status)
+            {
+                case UserStatus.Active:
+
+                    users = await uow.users.GetPagedActiveAsync(page, pageSize, cancellationToken);
+                    totalCount = await uow.users.GetActiveCountAsync(cancellationToken);
+
+                    break;
+
+                case UserStatus.Inactive:
+                    users = await uow.users.GetPagedInactiveAsync(page, pageSize, cancellationToken);
+                    var total = await uow.users.GetTotalCountAsync(cancellationToken);
+                    var active = await uow.users.GetActiveCountAsync(cancellationToken);
+                    totalCount = total - active;
+
+                    break;
+
+                default:
+                    users = await uow.users.GetPagedAsync(page, pageSize, cancellationToken);
+                    totalCount = await uow.users.GetTotalCountAsync(cancellationToken);
+
+                    break;
+
+            }
+
+            return new PagedResult<UserDto>
+            {
+                Items = mapper.Map<IReadOnlyList<UserDto>>(users),
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
         public async Task<UserDto> GetUserByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -155,5 +188,8 @@ namespace IdentityService.Application.Services
             await refreshTokenService.RevokeAllUserRefreshTokensAsync(id, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
         }
+
+
+
     }
 }

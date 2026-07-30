@@ -16,12 +16,6 @@ namespace IdentityService.Infrastructure.Repositories
             return await _context.EmailVerificationTokens.FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
         }
 
-        public async Task<EmailVerificationToken?> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
-        {
-            return await _context.EmailVerificationTokens.SingleOrDefaultAsync(x => x.UserId == userId && x.ExpiresAt > DateTime.UtcNow && x.VerifiedAt == null, cancellationToken);
-        }
-
-
         public async Task AddAsync(EmailVerificationToken token, CancellationToken cancellationToken = default)
         {
             await _context.EmailVerificationTokens.AddAsync(token,cancellationToken);

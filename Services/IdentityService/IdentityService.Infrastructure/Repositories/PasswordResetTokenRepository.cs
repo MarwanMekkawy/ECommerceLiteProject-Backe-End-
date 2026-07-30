@@ -16,12 +16,6 @@ namespace IdentityService.Infrastructure.Repositories
             return await _context.PasswordResetTokens.FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
         }
 
-        public async Task<PasswordResetToken?> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
-        {
-            return await _context.PasswordResetTokens.SingleOrDefaultAsync(x =>x.UserId == userId && x.ExpiresAt > DateTime.UtcNow && x.UsedAt == null, cancellationToken);
-        }
-
-
         public async Task AddAsync(PasswordResetToken token, CancellationToken cancellationToken = default)
         {
             await _context.PasswordResetTokens.AddAsync(token, cancellationToken);

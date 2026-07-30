@@ -25,15 +25,18 @@ namespace IdentityService.Infrastructure.Security
         }
         #endregion ===================================================================================
 
-        public async Task<(RefreshToken StoredToken, string PlaintextToken)> CreateAndStoreRefreshTokenAsync(Guid userId, CancellationToken cancellationToken)
+        public async Task<(RefreshToken StoredToken, string PlaintextToken)> CreateAndStoreRefreshTokenAsync(bool rememberMe, Guid userId, CancellationToken cancellationToken)
         {
             var rawToken = GenerateRefreshToken();
+
+            var expiryMinutes = rememberMe ? configuration["RefreshToken:ExpiryInMinutesRememberMe"] : configuration["RefreshToken:ExpiryInMinutes"];
 
             var refreshToken = new RefreshToken
             {
                 UserId = userId,
+                RememberMe = rememberMe,
                 CreatedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(configuration["RefreshToken:ExpiryInMinutes"]!)),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(expiryMinutes!)),
                 TokenHash = HashRefreshToken(rawToken)
             };
 
@@ -67,11 +70,14 @@ namespace IdentityService.Infrastructure.Security
             var newRawToken = GenerateRefreshToken();
             var newHash = HashRefreshToken(newRawToken);
 
+            var expiryMinutes = existingToken.RememberMe ? configuration["RefreshToken:ExpiryInMinutesRememberMe"] : configuration["RefreshToken:ExpiryInMinutes"];
+
             var newToken = new RefreshToken
             {
                 UserId = userId,
+                RememberMe = existingToken.RememberMe,
                 CreatedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(configuration["RefreshToken:ExpiryInMinutes"]!)),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(expiryMinutes!)),
                 TokenHash = newHash
             };
 

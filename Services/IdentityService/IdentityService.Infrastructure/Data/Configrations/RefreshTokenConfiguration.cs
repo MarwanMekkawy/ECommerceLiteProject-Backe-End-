@@ -19,7 +19,8 @@ namespace IdentityService.Infrastructure.Data.Configrations
 
             builder.HasIndex(rt => rt.TokenHash)
                 .IsUnique();
-
+            builder.Property(rt => rt.RememberMe)
+                .IsRequired();
             builder.Property(rt => rt.ReplacedByTokenHash)
                 .HasMaxLength(512);
 
@@ -28,9 +29,7 @@ namespace IdentityService.Infrastructure.Data.Configrations
 
             builder.HasIndex(rt => rt.UserId);
 
-            // Ignore computed properties (not strictly necessary, EF ignores
-            // properties without setters/backing fields by convention if
-            // they're not mapped, but explicit is safer for clarity)
+
             builder.Ignore(rt => rt.IsExpired);
             builder.Ignore(rt => rt.IsRevoked);
             builder.Ignore(rt => rt.IsActive);

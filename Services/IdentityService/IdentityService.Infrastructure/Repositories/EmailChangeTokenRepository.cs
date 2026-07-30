@@ -16,12 +16,6 @@ namespace IdentityService.Infrastructure.Repositories
            return await _context.EmailChangeTokens.FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
         }
 
-        public async Task<EmailChangeToken?> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
-        {
-            return await _context.EmailChangeTokens.SingleOrDefaultAsync
-                (x => x.UserId == userId && x.ExpiresAt > DateTime.UtcNow && x.ConfirmedAt == null, cancellationToken);
-        }
-
         public async Task AddAsync(EmailChangeToken token, CancellationToken cancellationToken = default)
         {
             await _context.EmailChangeTokens.AddAsync(token, cancellationToken);

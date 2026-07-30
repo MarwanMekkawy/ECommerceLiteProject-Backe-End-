@@ -22,11 +22,12 @@ namespace IdentityService.API.Controllers
         /// <param name="pageNumber">The page number to retrieve.</param>
         /// <param name="pageSize">The number of users per page.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <param name="status">User status : Active/Inactive/All .</param>
         /// <returns>A paginated collection of users.</returns>
         [HttpGet("users")]
-        public async Task<IActionResult> GetUsers(int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetUsers(UserStatus status,int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
         {
-            var result = await userService.GetUsersAsync(pageNumber, pageSize, cancellationToken);
+            var result = await userService.GetUsersPaginatedWithCountAsync(status, pageNumber, pageSize, cancellationToken);
 
             return Ok(result);
         }

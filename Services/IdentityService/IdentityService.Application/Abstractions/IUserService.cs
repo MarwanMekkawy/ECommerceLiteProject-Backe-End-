@@ -16,7 +16,7 @@ namespace IdentityService.Application.Abstractions
         Task DeactivateAccountAndLogOutAllDevicesAsync(Guid userId, CancellationToken cancellationToken);
 
         // Admin
-        Task<IEnumerable<UserDto>> GetUsersAsync(int page, int pageSize, CancellationToken cancellationToken);
+        Task<PagedResult<UserDto>> GetUsersPaginatedWithCountAsync(UserStatus status, int page, int pageSize, CancellationToken cancellationToken);
         Task<UserDto> GetUserByIdAsync(Guid id, CancellationToken cancellationToken);
         Task ActivateUserAsync(Guid id, CancellationToken cancellationToken);
         Task DeactivateUserAsync(Guid id, CancellationToken cancellationToken);

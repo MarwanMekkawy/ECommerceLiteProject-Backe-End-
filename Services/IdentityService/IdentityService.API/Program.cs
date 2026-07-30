@@ -1,3 +1,4 @@
+using IdentityService.API.BackgroundTasks;
 using IdentityService.API.Middleware;
 using IdentityService.Application.Extentions.App;
 using IdentityService.Infrastructure.Extentions.Infra;
@@ -18,6 +19,9 @@ namespace IdentityService.API
 
             // Add Di Services extentions
             builder.Services.AddInfrastructureServices(builder.Configuration).AddApplicationServices();
+
+            // Register the background cleaning service
+            builder.Services.AddHostedService<TokenCleanupBackgroundService>();
 
             // Add services to the container.
             builder.Services.AddControllers()
