@@ -1,4 +1,5 @@
-﻿using IdentityService.Application.Abstractions;
+﻿using IdentityService.API.CookiesHelpers;
+using IdentityService.Application.Abstractions;
 using IdentityService.Application.DTOs.AuthDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,30 +15,6 @@ namespace IdentityService.API.Controllers
     [AllowAnonymous]
     public class AuthController(IAuthService authService, IEmailVerificationTokenService emailVerification) : ControllerBase
     {
-        #region// Cookie helper methods ================================================================
-
-        // Storing refresh token in HttpOnly cookie
-        private void AppendRefreshTokenCookie(string refreshToken)
-        {
-            Response.Cookies.Append("refreshToken", refreshToken,
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict,
-                    Path = "/api/v1/auth",
-                    Expires = DateTimeOffset.UtcNow.AddDays(15)
-                });
-        }
-
-        // Removes the refresh token cookie
-        private void DeleteRefreshTokenCookie()
-        {
-            Response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/api/v1/auth" });
-        }
-
-        #endregion =====================================================================================
-
         /// <summary>
         /// Registers a new user account.
         /// </summary>
@@ -49,16 +26,16 @@ namespace IdentityService.API.Controllers
         {
             var registerResultUserId = await authService.RegisterAsync(dto, cancellationToken);
 
-            var emailTokenResult = await emailVerification.GenerateVerificationTokenAsync(registerResultUserId.userId, cancellationToken);
+            var emailVerificationTokenResult = await emailVerification.GenerateVerificationTokenAsync(registerResultUserId.userId, cancellationToken);
 
             //@ generate email confirm token and call endpoint to send email with it 
 
             //@ for testing
-            return Ok(new { registerResultUserId, emailTokenResult });
+            return Ok(new { registerResultUserId, emailVerificationTokenResult });
         }
 
         /// <summary>
-        /// Authenticates a user and creates a new session.
+        /// Authenticates a user and creates a new session if email confirmed.
         /// </summary>
         /// <param name="dto">The user's login credentials.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
@@ -68,7 +45,7 @@ namespace IdentityService.API.Controllers
         {
             var result = await authService.LoginAsync(dto, cancellationToken);
 
-            AppendRefreshTokenCookie(result.RefreshToken);
+            CookieHelper.AppendRefreshTokenCookie(Response, result.RefreshToken);
 
             return Ok(new { jwtToken = result.AccessToken });
         }
@@ -83,11 +60,11 @@ namespace IdentityService.API.Controllers
         {
             var refreshToken = Request.Cookies["refreshToken"];
 
-            if (string.IsNullOrEmpty(refreshToken)) return Unauthorized(cancellationToken);
+            if (string.IsNullOrEmpty(refreshToken)) return Unauthorized(new { message = "you are are logged out." });
 
             await authService.LogoutAsync(refreshToken, cancellationToken);
 
-            DeleteRefreshTokenCookie();
+            CookieHelper.DeleteRefreshTokenCookie(Response);
 
             return NoContent();
         }
@@ -102,11 +79,11 @@ namespace IdentityService.API.Controllers
         {
             var refreshToken = Request.Cookies["refreshToken"];
 
-            if (string.IsNullOrWhiteSpace(refreshToken)) return Unauthorized();
+            if (string.IsNullOrWhiteSpace(refreshToken)) return Unauthorized(new { message = "you are are logged out." });
 
             var result = await authService.RefreshSessionAsync(refreshToken, cancellationToken);
 
-            AppendRefreshTokenCookie(result.RefreshToken);
+            CookieHelper.AppendRefreshTokenCookie(Response, result.RefreshToken);
 
             return Ok(new { jwtToken = result.AccessToken });
         }

@@ -13,19 +13,21 @@ using System.Threading.Tasks;
 
 namespace IdentityService.Application.Services
 {
-    public class PasswordResetTokenService(IUnitOfWork uow, IOneTimeTokenService OTTService, IPasswordHasher hasher) : IPasswordResetTokenService
+    public class PasswordResetTokenService(IUnitOfWork uow, IOneTimeTokenService OTTService, IPasswordHasher hasher, IRefreshTokenService refreshTokenService) : IPasswordResetTokenService
     {
+
         #region //[helper methods]========================================================
         private bool IsStrongPassword(string password)
         {
-            return password.Any(char.IsUpper) && password.Any(char.IsLower) && password.Any(char.IsDigit);
+            return password.Any(char.IsUpper) && password.Any(char.IsLower) && password.Any(char.IsDigit) && password.Any(c => char.IsPunctuation(c) || char.IsSymbol(c)); ;
         }
         private void ValidatePassword(string Password, string ConfirmPassword)
         {
             if (string.IsNullOrWhiteSpace(Password)) throw new BadRequestException("Password Cannot be empty");
             if (Password != ConfirmPassword) throw new BadRequestException("New password confirmation must match the password");
             if (Password.Length < 8) throw new BadRequestException("New password must be at least 8 characters");
-            if (!IsStrongPassword(Password)) throw new BadRequestException("Password is too weak");
+            if (!IsStrongPassword(Password)) 
+                throw new BadRequestException("Password is too weak. It must contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
         }
 
         private string NormalizeEmail(string email)
@@ -77,7 +79,7 @@ namespace IdentityService.Application.Services
             return new GeneratePasswordResetDto() { Email = user.Email, Token = token };
         }
 
-        public async Task ResetPasswordAsync(string token, ResetPasswordDto dto, CancellationToken cancellationToken)
+        public async Task ResetPasswordAndLogOutAllDevicesAsync(string token, ResetPasswordDto dto, CancellationToken cancellationToken)
         {
             var hashedToken = OTTService.HashToken(token);
             var newPassword = dto.NewPassword;
@@ -98,6 +100,8 @@ namespace IdentityService.Application.Services
             var newPasswordHash = hasher.Hash(newPassword);
             passwordResetToken.MarkAsUsed();
             user.ChangePassword(newPasswordHash);
+
+            await refreshTokenService.RevokeAllUserRefreshTokensAsync(user.Id, cancellationToken);
 
             await uow.SaveChangesAsync(cancellationToken);
         }

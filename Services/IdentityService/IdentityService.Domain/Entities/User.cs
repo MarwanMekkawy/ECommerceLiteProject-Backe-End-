@@ -56,7 +56,7 @@ namespace IdentityService.Domain.Entities
         }
         public void StartVerificationEmailCooldown()
         {
-            NextVerificationEmailAt = DateTime.UtcNow.AddSeconds(15);
+            NextVerificationEmailAt = DateTime.UtcNow.AddSeconds(20);
         }
         public bool CanResendVerificationEmail()
         {

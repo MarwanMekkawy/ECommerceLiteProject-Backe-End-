@@ -29,8 +29,12 @@ namespace IdentityService.Application.Services
             var emailVerificationToken = new EmailVerificationToken() { UserId = userId, TokenHash = hashedToken };
             var user = await uow.users.GetByIdAsync(userId, cancellationToken);
             if (user == null)
-                throw new NotFoundException("User not found");
-         
+                throw new NotFoundException("User not found.");
+
+            if (user.IsEmailConfirmed)
+                throw new BadRequestException("Email is already confirmed.");
+
+            await uow.emailVerificationTokens.InvalidateAllByUserIdAsync(userId, cancellationToken);
             await uow.emailVerificationTokens.AddAsync(emailVerificationToken, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
 
@@ -42,8 +46,12 @@ namespace IdentityService.Application.Services
         {
             var token = OTTService.GenerateToken();
             var hashedToken = OTTService.HashToken(token);
-            var emailVerificationToken = new EmailVerificationToken() { UserId = user.Id, TokenHash = hashedToken };            
+            var emailVerificationToken = new EmailVerificationToken() { UserId = user.Id, TokenHash = hashedToken };
 
+            if (user.IsEmailConfirmed)
+                throw new BadRequestException("Email is already confirmed.");
+
+            await uow.emailVerificationTokens.InvalidateAllByUserIdAsync(user.Id, cancellationToken);
             await uow.emailVerificationTokens.AddAsync(emailVerificationToken, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
 
@@ -63,8 +71,7 @@ namespace IdentityService.Application.Services
             }
 
             user.StartVerificationEmailCooldown();
-
-            await uow.emailVerificationTokens.InvalidateAllByUserIdAsync(userId, cancellationToken);         
+  
             return await GenerateVerificationTokenAsync(user, cancellationToken);
         }
 
@@ -103,13 +110,16 @@ namespace IdentityService.Application.Services
             var user = await uow.users.GetByIdAsync(userId, cancellationToken);
             if (user == null) throw new NotFoundException("couldnt find the user");
 
-            if(user.Email == normalizedNewEmail)
+            if (!user.IsEmailConfirmed)
+                throw new BadRequestException("you need to confirm your current email first");
+
+            if (NormalizeEmail(user.Email) == normalizedNewEmail)
                 throw new BadRequestException("the new email cant be same as your current email");
 
             var userPasswordHash = user.PasswordHash;
 
             if(!hasher.Verify(userPasswordHash, providedPassword))
-                throw new UnauthorizedException("the password is Wrong");
+                throw new UnauthorizedException("the password you have entered is Wrong");
 
             var emailChangeToken = new EmailChangeToken() { UserId = userId, NewEmail = normalizedNewEmail, TokenHash=hashedToken };
 
@@ -137,7 +147,7 @@ namespace IdentityService.Application.Services
                 throw new NotFoundException("the user that you are trying to change email for is not found");
 
 
-            emailChangeToken.Confirm();
+            emailChangeToken.Confirm();      
             user.ChangeEmail(emailChangeToken.NewEmail);
             await uow.SaveChangesAsync(cancellationToken);
         }

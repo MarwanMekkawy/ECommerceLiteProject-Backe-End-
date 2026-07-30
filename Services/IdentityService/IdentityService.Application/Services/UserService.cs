@@ -6,6 +6,7 @@ using IdentityService.Application.DTOs.UserDTOs;
 using IdentityService.Domain.Contracts;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Enums;
+using System.Text.RegularExpressions;
 
 
 namespace IdentityService.Application.Services
@@ -20,12 +21,10 @@ namespace IdentityService.Application.Services
 
             return await uow.users.GetByIdAsync(userId, cancellationToken) ?? throw new NotFoundException("User not found or inactive");
         }
-
         private bool IsStrongPassword(string password)
         {
-            return password.Any(char.IsUpper) && password.Any(char.IsLower) && password.Any(char.IsDigit);
+            return password.Any(char.IsUpper) && password.Any(char.IsLower) && password.Any(char.IsDigit) && password.Any(c => char.IsPunctuation(c) || char.IsSymbol(c)); ;
         }
-
         private void ValidatePassword(string password, string confirmPassword)
         {
             if (string.IsNullOrWhiteSpace(password)) throw new BadRequestException("Password can't be empty.");
@@ -34,9 +33,17 @@ namespace IdentityService.Application.Services
 
             if (password.Length < 8) throw new BadRequestException("Password must be at least 8 characters.");
 
-            if (!IsStrongPassword(password)) throw new BadRequestException("Password is too weak.");
+            if (!IsStrongPassword(password)) 
+                throw new BadRequestException("Password is too weak. It must contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
         }
-
+        private static void ValidatePhoneNumber(string? phoneNumber)
+        {
+            if (!string.IsNullOrWhiteSpace(phoneNumber) &&
+                !Regex.IsMatch(phoneNumber, @"^\+?[1-9]\d{7,14}$"))
+            {
+                throw new BadRequestException("Invalid phone number format.");
+            }
+        }
         private async Task OldPasswordReuseCheckAndCycle(User user, string newPassword, CancellationToken cancellationToken)
         {
             if (hasher.Verify(user.PasswordHash, newPassword))
@@ -72,11 +79,15 @@ namespace IdentityService.Application.Services
         public async Task UpdateProfileAsync(Guid userId, UpdateUserDto dto, CancellationToken cancellationToken)
         {
             var user = await GetUserOrThrowAsync(admin: false, userId, cancellationToken);
+
+            ValidatePhoneNumber(dto.PhoneNumber);
+
             mapper.Map(dto, user);
+
             await uow.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task ChangePasswordAsync(Guid userId, ChangePasswordDto dto, CancellationToken cancellationToken)
+        public async Task ChangePasswordAndLogOutAllDevicesAsync(Guid userId, ChangePasswordDto dto, CancellationToken cancellationToken)
         {
             var user = await GetUserOrThrowAsync(admin: false, userId, cancellationToken);
 
@@ -88,11 +99,11 @@ namespace IdentityService.Application.Services
             await OldPasswordReuseCheckAndCycle(user, dto.NewPassword, cancellationToken);
 
             user.ChangePassword(hasher.Hash(dto.NewPassword));
-
+            await refreshTokenService.RevokeAllUserRefreshTokensAsync(userId, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeactivateAccountAsync(Guid userId, CancellationToken cancellationToken)
+        public async Task DeactivateAccountAndLogOutAllDevicesAsync(Guid userId, CancellationToken cancellationToken)
         {
             var user = await GetUserOrThrowAsync(admin: false, userId, cancellationToken);
             if (user.IsActive == false) 
@@ -102,7 +113,7 @@ namespace IdentityService.Application.Services
             await uow.SaveChangesAsync(cancellationToken);
         }
 
-        // admin
+        // admin ======================================================================================
         public async Task<IEnumerable<UserDto>> GetUsersAsync(int page, int pageSize, CancellationToken cancellationToken)
         {
             var users = await uow.users.GetPagedAsync(page, pageSize, cancellationToken);

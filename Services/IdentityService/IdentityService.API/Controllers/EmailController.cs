@@ -28,7 +28,10 @@ namespace IdentityService.API.Controllers
             await emailVerificationService.ConfirmEmailAsync(token, cancellationToken);
 
             //@ add valid url to redirect
-            return Redirect("https://myfrontend.com/login");
+            //return Redirect("https://myfrontend.com/login");
+
+            //@ for testing
+            return Ok("confirmed");
         }
 
         /// <summary>
@@ -55,6 +58,7 @@ namespace IdentityService.API.Controllers
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>Redirects the user after the email change request is created.</returns>
         [HttpPost("change-request")]
+        [Authorize(Policy = "VerifiedEmail")]
         public async Task<IActionResult> ChangeEmail(ChangeEmailRequestDto dto, CancellationToken cancellationToken)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);

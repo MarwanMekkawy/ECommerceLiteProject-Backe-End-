@@ -1,4 +1,5 @@
-﻿using IdentityService.Application.Abstractions;
+﻿using IdentityService.API.CookiesHelpers;
+using IdentityService.Application.Abstractions;
 using IdentityService.Application.DTOs.PwResetDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -44,7 +45,9 @@ namespace IdentityService.API.Controllers
         [HttpPost("reset")]
         public async Task<IActionResult> ResetPassword(string token, ResetPasswordDto dto, CancellationToken cancellationToken)
         {
-            await passwordService.ResetPasswordAsync(token, dto, cancellationToken);
+            await passwordService.ResetPasswordAndLogOutAllDevicesAsync(token, dto, cancellationToken);
+
+            CookieHelper.DeleteRefreshTokenCookie(Response);
 
             //@ add valid url to redirect
             //return Redirect("https://myfrontend.com/login");

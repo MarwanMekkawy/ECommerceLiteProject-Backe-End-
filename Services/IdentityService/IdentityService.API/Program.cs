@@ -50,8 +50,33 @@ namespace IdentityService.API
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
                     };
+
+                    // Authentication error msgs
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnChallenge = context =>
+                        {
+                            context.HandleResponse();
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+
+                            return context.Response.WriteAsJsonAsync(new { error = "Authentication required." });
+                        },
+
+                        OnForbidden = context =>
+                        {
+                            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+
+                            return context.Response.WriteAsJsonAsync(new { error = "You are not authorized or Verified to perform this action." });
+                        }                        
+                    };
+
                 });
-            builder.Services.AddAuthorization();
+
+            builder.Services.AddAuthorization(
+                options =>
+                {
+                    options.AddPolicy("VerifiedEmail", policy => policy.RequireClaim("emailVerified", "true"));
+                });
 
             // CORS
             builder.Services.AddCors(options =>

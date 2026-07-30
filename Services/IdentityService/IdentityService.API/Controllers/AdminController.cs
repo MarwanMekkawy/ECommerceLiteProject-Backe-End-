@@ -13,7 +13,7 @@ namespace IdentityService.API.Controllers
     /// </summary>
     [Route("api/V1/admin")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin", Policy = "VerifiedEmail")]
     public class AdminController(IUserService userService) : ControllerBase
     {
         /// <summary>

@@ -12,8 +12,8 @@ namespace IdentityService.Application.Abstractions
     {
         Task<UserDto> GetCurrentUserAsync(Guid userId, CancellationToken cancellationToken);
         Task UpdateProfileAsync(Guid userId, UpdateUserDto dto, CancellationToken cancellationToken);
-        Task ChangePasswordAsync(Guid userId, ChangePasswordDto dto, CancellationToken cancellationToken);
-        Task DeactivateAccountAsync(Guid userId, CancellationToken cancellationToken);
+        Task ChangePasswordAndLogOutAllDevicesAsync(Guid userId, ChangePasswordDto dto, CancellationToken cancellationToken);
+        Task DeactivateAccountAndLogOutAllDevicesAsync(Guid userId, CancellationToken cancellationToken);
 
         // Admin
         Task<IEnumerable<UserDto>> GetUsersAsync(int page, int pageSize, CancellationToken cancellationToken);

@@ -1,4 +1,5 @@
 ﻿using IdentityService.API.ApiClaimsFactory;
+using IdentityService.API.CookiesHelpers;
 using IdentityService.Application.Abstractions;
 using IdentityService.Application.DTOs.UserDTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -38,6 +39,7 @@ namespace IdentityService.API.Controllers
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the profile was updated successfully.</returns>
         [HttpPut("me")]
+        [Authorize(Policy = "VerifiedEmail")]
         public async Task<IActionResult> UpdateMe([FromBody] UpdateUserDto dto, CancellationToken cancellationToken)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
@@ -57,7 +59,9 @@ namespace IdentityService.API.Controllers
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 
-            await userService.DeactivateAccountAsync(claims.UserId, cancellationToken);
+            await userService.DeactivateAccountAndLogOutAllDevicesAsync(claims.UserId, cancellationToken);
+
+            CookieHelper.DeleteRefreshTokenCookie(Response);
 
             return NoContent();
         }
@@ -69,11 +73,14 @@ namespace IdentityService.API.Controllers
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the password was changed successfully.</returns>
         [HttpPost("me/change-password")]
+        [Authorize(Policy = "VerifiedEmail")]
         public async Task<IActionResult> ChangePassword(ChangePasswordDto dto, CancellationToken cancellationToken)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 
-            await userService.ChangePasswordAsync(claims.UserId, dto, cancellationToken);
+            await userService.ChangePasswordAndLogOutAllDevicesAsync(claims.UserId, dto, cancellationToken);
+
+            CookieHelper.DeleteRefreshTokenCookie(Response);
 
             return NoContent();
         }
