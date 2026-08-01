@@ -28,6 +28,8 @@ namespace IdentityService.Infrastructure.Data.Configrations
             builder.Ignore(t => t.IsExpired);
             builder.Ignore(t => t.IsVerified);
             builder.Ignore(t => t.IsActive);
+
+            builder.HasQueryFilter(t => t.User.IsActive);
         }
     }
 }
