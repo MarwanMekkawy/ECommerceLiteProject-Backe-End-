@@ -1,21 +1,37 @@
 ########################################
 # .NET & Visual Studio
 ########################################
+# Build
 **/bin/
 **/obj/
+
+# Visual Studio
+**/.vs/
 *.user
 *.suo
 *.sln.docstates
-**/.vs/
+
+# Databases
 *.db
-*.env
+
+# Environment files
+**/.env
+**/.env.*
+**/appsettings.Development.json
+
+# NuGet
 *.nupkg
 *.snupkg
+.nuget/
+packages/
+*.nuspec
+
+# Logs
 *.log
 [Ll]og/
+
+# Legacy
 project.lock.json
 project.fragment.lock.json
-packages/
-.nuget/
 *.psmdcp
-*.nuspec
+
