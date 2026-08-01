@@ -33,6 +33,8 @@ namespace IdentityService.Infrastructure.Data.Configrations
             builder.Ignore(rt => rt.IsExpired);
             builder.Ignore(rt => rt.IsRevoked);
             builder.Ignore(rt => rt.IsActive);
+
+            builder.HasQueryFilter(t => t.User.IsActive);
         }
     }
 }

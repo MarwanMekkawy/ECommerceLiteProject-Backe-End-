@@ -17,6 +17,8 @@ namespace IdentityService.Infrastructure.Data.Configrations
                 .IsRequired();
 
             builder.HasIndex(h => h.UserId);
+
+            builder.HasQueryFilter(t => t.User.IsActive);
         }
     }
 }
