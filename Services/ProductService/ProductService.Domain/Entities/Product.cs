@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ProductService.Domain.Entities
 {
-    public class Product
+    public class Product : BaseEntity
     {
         public Guid Id { get; private set; }
         public string Name { get; private set; } = null!;
@@ -19,9 +19,23 @@ namespace ProductService.Domain.Entities
         public Guid CategoryId { get; private set; }
         public Category Category { get; private set; } = null!;
 
-        public DateTime CreatedAt { get; private set; }
-        public DateTime UpdatedAt { get; private set; }
+        private Product() { }
 
+        public Product(string name, string? description, Money price, int stockQuantity, Guid categoryId)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Product name is required.");
+
+            if (stockQuantity < 0)
+                throw new ArgumentException("Stock quantity cannot be negative.");
+
+            Name = name.Trim();
+            Description = description?.Trim();
+            Price = price;
+            StockQuantity = stockQuantity;
+            CategoryId = categoryId;
+            IsActive = true;
+        }
 
         public void ChangePrice(Money price)
         {

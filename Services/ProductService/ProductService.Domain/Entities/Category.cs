@@ -12,12 +12,19 @@ namespace ProductService.Domain.Entities
 
         public string Name { get; private set; } = null!;
         public string? Description { get; private set; }
-
-        public DateTime CreatedAt { get; private set; }
-        public DateTime UpdatedAt { get; private set; }
-
+       
         public ICollection<Product> Products { get; set; } = new List<Product>();
 
+        private Category() { } 
+
+        public Category(string name, string? description)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Category name is required.");
+
+            Name = name.Trim();
+            Description = description?.Trim();
+        }
 
         public void Rename(string name)
         {

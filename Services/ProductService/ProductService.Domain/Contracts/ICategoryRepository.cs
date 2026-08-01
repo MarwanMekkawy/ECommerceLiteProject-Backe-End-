@@ -9,7 +9,11 @@ namespace ProductService.Domain.Contracts
 {
     public interface ICategoryRepository
     {
-        Task<Category?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<Category?> GetByIdTrackedAsync(Guid id, CancellationToken cancellationToken = default);
+
+        Task<Category?> GetByIdUntrackedAsync(Guid id, CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<Category>> GetPaginatedUntrackedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 
         Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default);
 
