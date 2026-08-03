@@ -1,19 +1,24 @@
 using IdentityService.API.BackgroundTasks;
 using IdentityService.API.Middleware;
+using IdentityService.Application.Abstractions.Authentication;
 using IdentityService.Application.Extentions.App;
+using IdentityService.Infrastructure;
+using IdentityService.Infrastructure.Data.Seeding;
 using IdentityService.Infrastructure.Extentions.Infra;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 
 namespace IdentityService.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -102,7 +107,19 @@ namespace IdentityService.API
 
             var app = builder.Build();
 
-
+            // seeding default admin =====================================
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var context = services.GetRequiredService<IdentityDbContext>();
+                await context.Database.MigrateAsync();
+                await DatabaseSeeder.SeedAsync(
+                    context,
+                    services.GetRequiredService<IConfiguration>(),
+                    services.GetRequiredService<IPasswordHasher>(),
+                    services.GetRequiredService<ILoggerFactory>());
+            }
+            //============================================================
 
             app.UseHttpsRedirection();
             // Configure the HTTP request pipeline.
