@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Electronics",
+    "description": "Electronic devices and accessories."
+  },
+  {
+    "name": "Computers",
+    "description": "Computers and computer hardware."
+  },
+  {
+    "name": "Gaming",
+    "description": "Gaming equipment and accessories."
+  },
+  {
+    "name": "Networking",
+    "description": "Networking equipment and accessories."
+  },
+  {
+    "name": "Storage",
+    "description": "Data storage devices and accessories."
+  },
+  {
+    "name": "Monitors",
+    "description": "Computer monitors and display accessories."
+  },
+  {
+    "name": "Peripherals",
+    "description": "Computer input devices and peripherals."
+  },
+  {
+    "name": "Accessories",
+    "description": "General technology accessories."
+  }
+]

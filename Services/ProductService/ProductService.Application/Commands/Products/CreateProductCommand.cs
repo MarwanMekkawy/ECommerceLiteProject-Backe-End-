@@ -11,15 +11,13 @@ namespace ProductService.Application.Commands.Products
         public string? Description { get; }
         public Money Price { get; }
         public int StockQuantity { get;  }
-        public bool IsActive { get; }
         public Guid CategoryId { get; }
 
         public CreateProductCommand
-            (string name, string description, decimal amount, decimal discount, CurrencyCode currency, bool isActive, Guid categoryId, int stockQuantity) 
+            (string name, string? description, decimal amount, decimal discount, CurrencyCode currency, Guid categoryId, int stockQuantity) 
         {
             Name = name;
             Description = description;
-            IsActive = isActive;
             CategoryId = categoryId;
             StockQuantity =stockQuantity;
 

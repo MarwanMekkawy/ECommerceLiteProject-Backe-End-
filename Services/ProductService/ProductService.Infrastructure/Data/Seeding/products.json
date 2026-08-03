@@ -1,0 +1,802 @@
+[
+  {
+    "name": "Wireless Mouse",
+    "description": "Wireless Mouse.",
+    "amount": 25.99,
+    "currency": "USD",
+    "stockQuantity": 10,
+    "categoryName": "Peripherals"
+  },
+  {
+    "name": "Mechanical Keyboard",
+    "description": "Mechanical Keyboard.",
+    "amount": 79.99,
+    "currency": "USD",
+    "stockQuantity": 17,
+    "categoryName": "Peripherals"
+  },
+  {
+    "name": "USB-C Hub",
+    "description": "USB-C Hub.",
+    "amount": 34.99,
+    "currency": "USD",
+    "stockQuantity": 24,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "Gaming Headset",
+    "description": "Gaming Headset.",
+    "amount": 59.99,
+    "currency": "USD",
+    "stockQuantity": 31,
+    "categoryName": "Gaming"
+  },
+  {
+    "name": "Gaming Mouse",
+    "description": "Gaming Mouse.",
+    "amount": 49.99,
+    "currency": "USD",
+    "stockQuantity": 38,
+    "categoryName": "Gaming"
+  },
+  {
+    "name": "Monitor Stand",
+    "description": "Monitor Stand.",
+    "amount": 39.99,
+    "currency": "USD",
+    "stockQuantity": 45,
+    "categoryName": "Monitors"
+  },
+  {
+    "name": "Bluetooth Speaker",
+    "description": "Bluetooth Speaker.",
+    "amount": 45.99,
+    "currency": "USD",
+    "stockQuantity": 52,
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Webcam 1080p",
+    "description": "Webcam 1080p.",
+    "amount": 54.99,
+    "currency": "USD",
+    "stockQuantity": 59,
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "USB Microphone",
+    "description": "USB Microphone.",
+    "amount": 69.99,
+    "currency": "USD",
+    "stockQuantity": 66,
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Laptop Cooling Pad",
+    "description": "Laptop Cooling Pad.",
+    "amount": 29.99,
+    "currency": "USD",
+    "stockQuantity": 73,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "Gaming Keyboard",
+    "description": "Gaming Keyboard.",
+    "amount": 99.99,
+    "currency": "USD",
+    "stockQuantity": 80,
+    "categoryName": "Gaming"
+  },
+  {
+    "name": "Wireless Controller",
+    "description": "Wireless Controller.",
+    "amount": 64.99,
+    "currency": "USD",
+    "stockQuantity": 87,
+    "categoryName": "Gaming"
+  },
+  {
+    "name": "Ethernet Switch 8-Port",
+    "description": "Ethernet Switch 8-Port.",
+    "amount": 39.99,
+    "currency": "USD",
+    "stockQuantity": 94,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "Wi-Fi USB Adapter",
+    "description": "Wi-Fi USB Adapter.",
+    "amount": 24.99,
+    "currency": "USD",
+    "stockQuantity": 10,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "Wi-Fi Router",
+    "description": "Wi-Fi Router.",
+    "amount": 89.99,
+    "currency": "USD",
+    "stockQuantity": 17,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "Network Cable Cat6",
+    "description": "Network Cable Cat6.",
+    "amount": 9.99,
+    "currency": "USD",
+    "stockQuantity": 24,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "1TB NVMe SSD",
+    "description": "1TB NVMe SSD.",
+    "amount": 74.99,
+    "currency": "USD",
+    "stockQuantity": 31,
+    "categoryName": "Storage"
+  },
+  {
+    "name": "2TB NVMe SSD",
+    "description": "2TB NVMe SSD.",
+    "amount": 129.99,
+    "currency": "USD",
+    "stockQuantity": 38,
+    "categoryName": "Storage"
+  },
+  {
+    "name": "External SSD 1TB",
+    "description": "External SSD 1TB.",
+    "amount": 94.99,
+    "currency": "USD",
+    "stockQuantity": 45,
+    "categoryName": "Storage"
+  },
+  {
+    "name": "USB Flash Drive 128GB",
+    "description": "USB Flash Drive 128GB.",
+    "amount": 14.99,
+    "currency": "USD",
+    "stockQuantity": 52,
+    "categoryName": "Storage"
+  },
+  {
+    "name": "24-inch IPS Monitor",
+    "description": "24-inch IPS Monitor.",
+    "amount": 139.99,
+    "currency": "USD",
+    "stockQuantity": 59,
+    "categoryName": "Monitors"
+  },
+  {
+    "name": "27-inch IPS Monitor",
+    "description": "27-inch IPS Monitor.",
+    "amount": 249.99,
+    "currency": "USD",
+    "stockQuantity": 66,
+    "categoryName": "Monitors"
+  },
+  {
+    "name": "27-inch Gaming Monitor",
+    "description": "27-inch Gaming Monitor.",
+    "amount": 279.99,
+    "currency": "USD",
+    "stockQuantity": 73,
+    "categoryName": "Monitors"
+  },
+  {
+    "name": "32-inch 4K Monitor",
+    "description": "32-inch 4K Monitor.",
+    "amount": 399.99,
+    "currency": "USD",
+    "stockQuantity": 80,
+    "categoryName": "Monitors"
+  },
+  {
+    "name": "HDMI Cable",
+    "description": "HDMI Cable.",
+    "amount": 12.99,
+    "currency": "USD",
+    "stockQuantity": 87,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "DisplayPort Cable",
+    "description": "DisplayPort Cable.",
+    "amount": 15.99,
+    "currency": "USD",
+    "stockQuantity": 94,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "USB-C Cable",
+    "description": "USB-C Cable.",
+    "amount": 11.99,
+    "currency": "USD",
+    "stockQuantity": 10,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "Laptop Sleeve",
+    "description": "Laptop Sleeve.",
+    "amount": 22.99,
+    "currency": "USD",
+    "stockQuantity": 17,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "External HDD 2TB",
+    "description": "External HDD 2TB.",
+    "amount": 69.99,
+    "currency": "USD",
+    "stockQuantity": 24,
+    "categoryName": "Storage"
+  },
+  {
+    "name": "External HDD 4TB",
+    "description": "External HDD 4TB.",
+    "amount": 109.99,
+    "currency": "USD",
+    "stockQuantity": 31,
+    "categoryName": "Storage"
+  },
+  {
+    "name": "DDR4 16GB RAM",
+    "description": "DDR4 16GB RAM.",
+    "amount": 39.99,
+    "currency": "USD",
+    "stockQuantity": 38,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "DDR4 32GB RAM Kit",
+    "description": "DDR4 32GB RAM Kit.",
+    "amount": 74.99,
+    "currency": "USD",
+    "stockQuantity": 45,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "Laptop RAM 16GB",
+    "description": "Laptop RAM 16GB.",
+    "amount": 42.99,
+    "currency": "USD",
+    "stockQuantity": 52,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "Mini PC",
+    "description": "Mini PC.",
+    "amount": 329.99,
+    "currency": "USD",
+    "stockQuantity": 59,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "USB Keyboard",
+    "description": "USB Keyboard.",
+    "amount": 19.99,
+    "currency": "USD",
+    "stockQuantity": 66,
+    "categoryName": "Peripherals"
+  },
+  {
+    "name": "Ergonomic Keyboard",
+    "description": "Ergonomic Keyboard.",
+    "amount": 69.99,
+    "currency": "USD",
+    "stockQuantity": 73,
+    "categoryName": "Peripherals"
+  },
+  {
+    "name": "Wireless Keyboard",
+    "description": "Wireless Keyboard.",
+    "amount": 44.99,
+    "currency": "USD",
+    "stockQuantity": 80,
+    "categoryName": "Peripherals"
+  },
+  {
+    "name": "Vertical Mouse",
+    "description": "Vertical Mouse.",
+    "amount": 39.99,
+    "currency": "USD",
+    "stockQuantity": 87,
+    "categoryName": "Peripherals"
+  },
+  {
+    "name": "USB Numeric Keypad",
+    "description": "USB Numeric Keypad.",
+    "amount": 17.99,
+    "currency": "USD",
+    "stockQuantity": 94,
+    "categoryName": "Peripherals"
+  },
+  {
+    "name": "Gaming Mouse Pad",
+    "description": "Gaming Mouse Pad.",
+    "amount": 24.99,
+    "currency": "USD",
+    "stockQuantity": 10,
+    "categoryName": "Gaming"
+  },
+  {
+    "name": "Gaming Chair",
+    "description": "Gaming Chair.",
+    "amount": 199.99,
+    "currency": "USD",
+    "stockQuantity": 17,
+    "categoryName": "Gaming"
+  },
+  {
+    "name": "Gaming Desk",
+    "description": "Gaming Desk.",
+    "amount": 179.99,
+    "currency": "USD",
+    "stockQuantity": 24,
+    "categoryName": "Gaming"
+  },
+  {
+    "name": "Game Capture Card",
+    "description": "Game Capture Card.",
+    "amount": 119.99,
+    "currency": "USD",
+    "stockQuantity": 31,
+    "categoryName": "Gaming"
+  },
+  {
+    "name": "USB Wi-Fi Adapter AX",
+    "description": "USB Wi-Fi Adapter AX.",
+    "amount": 39.99,
+    "currency": "USD",
+    "stockQuantity": 38,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "Gigabit Ethernet Adapter",
+    "description": "Gigabit Ethernet Adapter.",
+    "amount": 21.99,
+    "currency": "USD",
+    "stockQuantity": 45,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "24-Port Network Switch",
+    "description": "24-Port Network Switch.",
+    "amount": 159.99,
+    "currency": "USD",
+    "stockQuantity": 52,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "Mesh Wi-Fi Node",
+    "description": "Mesh Wi-Fi Node.",
+    "amount": 119.99,
+    "currency": "USD",
+    "stockQuantity": 59,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "Router UPS",
+    "description": "Router UPS.",
+    "amount": 49.99,
+    "currency": "USD",
+    "stockQuantity": 66,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "SATA SSD 500GB",
+    "description": "SATA SSD 500GB.",
+    "amount": 39.99,
+    "currency": "USD",
+    "stockQuantity": 73,
+    "categoryName": "Storage"
+  },
+  {
+    "name": "SATA SSD 1TB",
+    "description": "SATA SSD 1TB.",
+    "amount": 69.99,
+    "currency": "USD",
+    "stockQuantity": 80,
+    "categoryName": "Storage"
+  },
+  {
+    "name": "NVMe SSD 500GB",
+    "description": "NVMe SSD 500GB.",
+    "amount": 44.99,
+    "currency": "USD",
+    "stockQuantity": 87,
+    "categoryName": "Storage"
+  },
+  {
+    "name": "USB SSD Enclosure",
+    "description": "USB SSD Enclosure.",
+    "amount": 29.99,
+    "currency": "USD",
+    "stockQuantity": 94,
+    "categoryName": "Storage"
+  },
+  {
+    "name": "Portable SSD 2TB",
+    "description": "Portable SSD 2TB.",
+    "amount": 169.99,
+    "currency": "USD",
+    "stockQuantity": 10,
+    "categoryName": "Storage"
+  },
+  {
+    "name": "21-inch Monitor",
+    "description": "21-inch Monitor.",
+    "amount": 109.99,
+    "currency": "USD",
+    "stockQuantity": 17,
+    "categoryName": "Monitors"
+  },
+  {
+    "name": "24-inch 144Hz Monitor",
+    "description": "24-inch 144Hz Monitor.",
+    "amount": 179.99,
+    "currency": "USD",
+    "stockQuantity": 24,
+    "categoryName": "Monitors"
+  },
+  {
+    "name": "27-inch 165Hz Monitor",
+    "description": "27-inch 165Hz Monitor.",
+    "amount": 299.99,
+    "currency": "USD",
+    "stockQuantity": 31,
+    "categoryName": "Monitors"
+  },
+  {
+    "name": "34-inch Ultrawide Monitor",
+    "description": "34-inch Ultrawide Monitor.",
+    "amount": 449.99,
+    "currency": "USD",
+    "stockQuantity": 38,
+    "categoryName": "Monitors"
+  },
+  {
+    "name": "USB-C Monitor",
+    "description": "USB-C Monitor.",
+    "amount": 329.99,
+    "currency": "USD",
+    "stockQuantity": 45,
+    "categoryName": "Monitors"
+  },
+  {
+    "name": "Bluetooth Keyboard",
+    "description": "Bluetooth Keyboard.",
+    "amount": 49.99,
+    "currency": "USD",
+    "stockQuantity": 52,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "USB-C Dock",
+    "description": "USB-C Dock.",
+    "amount": 109.99,
+    "currency": "USD",
+    "stockQuantity": 59,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "Laptop Stand",
+    "description": "Laptop Stand.",
+    "amount": 35.99,
+    "currency": "USD",
+    "stockQuantity": 66,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "Cable Management Kit",
+    "description": "Cable Management Kit.",
+    "amount": 14.99,
+    "currency": "USD",
+    "stockQuantity": 73,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "Power Strip",
+    "description": "Power Strip.",
+    "amount": 29.99,
+    "currency": "USD",
+    "stockQuantity": 80,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "Smartphone Charger",
+    "description": "Smartphone Charger.",
+    "amount": 24.99,
+    "currency": "USD",
+    "stockQuantity": 87,
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Wireless Charger",
+    "description": "Wireless Charger.",
+    "amount": 27.99,
+    "currency": "USD",
+    "stockQuantity": 94,
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Power Bank 10000mAh",
+    "description": "Power Bank 10000mAh.",
+    "amount": 29.99,
+    "currency": "USD",
+    "stockQuantity": 10,
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Power Bank 20000mAh",
+    "description": "Power Bank 20000mAh.",
+    "amount": 44.99,
+    "currency": "USD",
+    "stockQuantity": 17,
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Smart LED Bulb",
+    "description": "Smart LED Bulb.",
+    "amount": 18.99,
+    "currency": "USD",
+    "stockQuantity": 24,
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Bluetooth Earbuds",
+    "description": "Bluetooth Earbuds.",
+    "amount": 49.99,
+    "currency": "USD",
+    "stockQuantity": 31,
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Noise Cancelling Headphones",
+    "description": "Noise Cancelling Headphones.",
+    "amount": 129.99,
+    "currency": "USD",
+    "stockQuantity": 38,
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Portable Projector",
+    "description": "Portable Projector.",
+    "amount": 249.99,
+    "currency": "USD",
+    "stockQuantity": 45,
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "HDMI Switch",
+    "description": "HDMI Switch.",
+    "amount": 29.99,
+    "currency": "USD",
+    "stockQuantity": 52,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "USB-C to HDMI Adapter",
+    "description": "USB-C to HDMI Adapter.",
+    "amount": 19.99,
+    "currency": "USD",
+    "stockQuantity": 59,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "USB 3.0 Hub",
+    "description": "USB 3.0 Hub.",
+    "amount": 21.99,
+    "currency": "USD",
+    "stockQuantity": 66,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "Bluetooth Adapter",
+    "description": "Bluetooth Adapter.",
+    "amount": 13.99,
+    "currency": "USD",
+    "stockQuantity": 73,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "Desk Lamp",
+    "description": "Desk Lamp.",
+    "amount": 32.99,
+    "currency": "USD",
+    "stockQuantity": 80,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "CPU Air Cooler",
+    "description": "CPU Air Cooler.",
+    "amount": 44.99,
+    "currency": "USD",
+    "stockQuantity": 87,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "Thermal Paste",
+    "description": "Thermal Paste.",
+    "amount": 9.99,
+    "currency": "USD",
+    "stockQuantity": 94,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "PC Case",
+    "description": "PC Case.",
+    "amount": 79.99,
+    "currency": "USD",
+    "stockQuantity": 10,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "750W Power Supply",
+    "description": "750W Power Supply.",
+    "amount": 89.99,
+    "currency": "USD",
+    "stockQuantity": 17,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "650W Power Supply",
+    "description": "650W Power Supply.",
+    "amount": 69.99,
+    "currency": "USD",
+    "stockQuantity": 24,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "USB DVD Drive",
+    "description": "USB DVD Drive.",
+    "amount": 29.99,
+    "currency": "USD",
+    "stockQuantity": 31,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "Graphics Card",
+    "description": "Graphics Card.",
+    "amount": 399.99,
+    "currency": "USD",
+    "stockQuantity": 38,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "Mini ITX Motherboard",
+    "description": "Mini ITX Motherboard.",
+    "amount": 159.99,
+    "currency": "USD",
+    "stockQuantity": 45,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "ATX Motherboard",
+    "description": "ATX Motherboard.",
+    "amount": 189.99,
+    "currency": "USD",
+    "stockQuantity": 52,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "CPU Processor",
+    "description": "CPU Processor.",
+    "amount": 229.99,
+    "currency": "USD",
+    "stockQuantity": 59,
+    "categoryName": "Computers"
+  },
+  {
+    "name": "Gaming Monitor Arm",
+    "description": "Gaming Monitor Arm.",
+    "amount": 69.99,
+    "currency": "USD",
+    "stockQuantity": 66,
+    "categoryName": "Monitors"
+  },
+  {
+    "name": "Dual Monitor Arm",
+    "description": "Dual Monitor Arm.",
+    "amount": 99.99,
+    "currency": "USD",
+    "stockQuantity": 73,
+    "categoryName": "Monitors"
+  },
+  {
+    "name": "Screen Cleaning Kit",
+    "description": "Screen Cleaning Kit.",
+    "amount": 12.99,
+    "currency": "USD",
+    "stockQuantity": 80,
+    "categoryName": "Monitors"
+  },
+  {
+    "name": "HDMI to VGA Adapter",
+    "description": "HDMI to VGA Adapter.",
+    "amount": 17.99,
+    "currency": "USD",
+    "stockQuantity": 87,
+    "categoryName": "Accessories"
+  },
+  {
+    "name": "Ethernet Cable Cat6 10m",
+    "description": "Ethernet Cable Cat6 10m.",
+    "amount": 19.99,
+    "currency": "USD",
+    "stockQuantity": 94,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "Ethernet Cable Cat6 20m",
+    "description": "Ethernet Cable Cat6 20m.",
+    "amount": 29.99,
+    "currency": "USD",
+    "stockQuantity": 10,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "Network Patch Panel",
+    "description": "Network Patch Panel.",
+    "amount": 49.99,
+    "currency": "USD",
+    "stockQuantity": 17,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "Wireless Access Point",
+    "description": "Wireless Access Point.",
+    "amount": 99.99,
+    "currency": "USD",
+    "stockQuantity": 24,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "Network Tool Kit",
+    "description": "Network Tool Kit.",
+    "amount": 34.99,
+    "currency": "USD",
+    "stockQuantity": 31,
+    "categoryName": "Networking"
+  },
+  {
+    "name": "USB Gamepad",
+    "description": "USB Gamepad.",
+    "amount": 29.99,
+    "currency": "USD",
+    "stockQuantity": 38,
+    "categoryName": "Gaming"
+  },
+  {
+    "name": "Gaming Speakers",
+    "description": "Gaming Speakers.",
+    "amount": 54.99,
+    "currency": "USD",
+    "stockQuantity": 45,
+    "categoryName": "Gaming"
+  },
+  {
+    "name": "Gaming Microphone",
+    "description": "Gaming Microphone.",
+    "amount": 89.99,
+    "currency": "USD",
+    "stockQuantity": 52,
+    "categoryName": "Gaming"
+  },
+  {
+    "name": "RGB Light Strip",
+    "description": "RGB Light Strip.",
+    "amount": 24.99,
+    "currency": "USD",
+    "stockQuantity": 59,
+    "categoryName": "Gaming"
+  },
+  {
+    "name": "Streaming Webcam",
+    "description": "Streaming Webcam.",
+    "amount": 79.99,
+    "currency": "USD",
+    "stockQuantity": 66,
+    "categoryName": "Gaming"
+  }
+]

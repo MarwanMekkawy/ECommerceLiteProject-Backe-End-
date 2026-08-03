@@ -29,6 +29,18 @@ namespace ProductService.Infrastructure.Data.Configrations
                 .HasForeignKey(p => p.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.OwnsOne(p => p.Price, money =>
+            {
+                money.Property(m => m.Amount)
+                    .HasColumnName("Price")
+                    .HasPrecision(18, 2)
+                    .IsRequired();
+
+                money.Property(m => m.Currency)
+                    .HasColumnName("Currency")
+                    .IsRequired();
+            });
+
             builder.HasIndex(p => p.Name);
         }
     }

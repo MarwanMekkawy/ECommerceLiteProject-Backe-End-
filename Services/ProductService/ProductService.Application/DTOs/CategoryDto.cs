@@ -4,8 +4,8 @@ namespace ProductService.Application.DTOs
 {
     public class CategoryDto
     {
-        public Guid Id { get; init; }
-        public string Name { get; init; } = null!;
-        public string? Description { get; init; }
+        public Guid Id { get; set; }
+        public string Name { get; set; } = null!;
+        public string? Description { get; set; }
     }
 }

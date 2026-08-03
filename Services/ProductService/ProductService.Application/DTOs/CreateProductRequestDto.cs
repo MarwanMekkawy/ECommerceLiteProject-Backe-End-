@@ -1,16 +1,16 @@
-﻿using ProductService.Domain.Value_Objects;
+﻿using ProductService.Domain.Enums;
 
 
 namespace ProductService.Application.DTOs
 {
-    public class ProductDto
+    public class CreateProductRequestDto
     {
-        public Guid Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
-        public Money Price { get; set; } = null!;
+        public decimal Amount { get; set; }
+        public decimal Discount { get; set; }
+        public CurrencyCode Currency { get; set; }
         public int StockQuantity { get; set; }
-        public bool IsActive { get; set; }
         public Guid CategoryId { get; set; }
     }
 }
