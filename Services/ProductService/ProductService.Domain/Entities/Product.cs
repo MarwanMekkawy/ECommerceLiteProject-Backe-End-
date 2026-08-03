@@ -1,9 +1,5 @@
 ﻿using ProductService.Domain.Value_Objects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ProductService.Domain.Entities
 {
@@ -63,12 +59,29 @@ namespace ProductService.Domain.Entities
 
         public void Activate()
         {
+            if (IsActive)
+                throw new InvalidOperationException("Product is already active.");
+
             IsActive = true;
         }
 
         public void Deactivate()
         {
+            if (!IsActive)
+                throw new InvalidOperationException("Product is already inactive.");
+
             IsActive = false;
+        }
+
+        public void Update(string name, string? description, Money price, Guid categoryId)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Product name is required.");
+
+            Name = name.Trim();
+            Description = description?.Trim();
+            Price = price;
+            CategoryId = categoryId;
         }
     }
 }

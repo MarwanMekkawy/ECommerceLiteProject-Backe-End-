@@ -1,5 +1,5 @@
 ﻿using ProductService.Domain.Enums;
-using System;
+
 
 namespace ProductService.Domain.Value_Objects
 {

@@ -2,16 +2,15 @@
 using ProductService.Application.DTOs;
 
 
-
 namespace ProductService.Application.Queries.Categories
 {
-    public class GetCategoryByIdQuery : IQuery<CategoryDto?>
+    public class GetCategoryByNameQuery : IQuery<CategoryDto?>
     {
-        public Guid Id;
+        public string Name { get; }
 
-        public GetCategoryByIdQuery(Guid id)
+        public GetCategoryByNameQuery(string name)
         {
-            Id = id;
+            Name = name;
         }
     }
 }

@@ -10,9 +10,4 @@
     <ProjectReference Include="..\ProductService.Domain\ProductService.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Commands\Products\" />
-    <Folder Include="Extentions.App\" />
-  </ItemGroup>
-
 </Project>

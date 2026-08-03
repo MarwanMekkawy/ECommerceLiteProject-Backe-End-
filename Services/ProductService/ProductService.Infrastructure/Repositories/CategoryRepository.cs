@@ -17,6 +17,17 @@ namespace ProductService.Infrastructure.Repositories
             return await _context.Categories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
+        public async Task<Category?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
+        {
+            return await _context.Categories.AsNoTracking().FirstOrDefaultAsync(x => x.Name == name, cancellationToken);
+        }
+
+
+        public async Task<IReadOnlyList<Category>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default)
+        {
+            return await _context.Categories.AsNoTracking().Where(p => p.Name.Contains(searchTerm)).OrderBy(p => p.Name).ToListAsync(cancellationToken);
+        }
+
         public async Task<IReadOnlyList<Category>> GetPaginatedUntrackedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             return await _context.Categories.AsNoTracking().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
