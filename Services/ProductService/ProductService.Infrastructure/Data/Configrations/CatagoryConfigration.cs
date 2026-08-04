@@ -24,8 +24,7 @@ namespace ProductService.Infrastructure.Data.Configrations
                 .HasForeignKey(p => p.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-
-            builder.HasIndex(c => c.Name)                     //unique cat name
+            builder.HasIndex(c => c.Name)
                 .IsUnique();
         }
     }

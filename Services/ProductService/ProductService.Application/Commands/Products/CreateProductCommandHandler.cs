@@ -11,14 +11,18 @@ namespace ProductService.Application.Commands.Products
     {
         public async Task<Guid> HandleAsync(CreateProductCommand command, CancellationToken cancellationToken = default)
         {
-            var existingCategory = await categoryRepository.ExistsAsync(command.CategoryId);
+            var existingProduct = await productRepository.GetByNameAsync(command.Name, cancellationToken);
+            if (existingProduct != null)
+                throw new ConflictException("Product already exists");
+
+            var existingCategory = await categoryRepository.ExistsAsync(command.CategoryId, cancellationToken);
 
             if (!existingCategory)
                 throw new NotFoundException("Category was NOT FOUND.");
 
-            var product = new Product(command.Name, command.Description, command.Price, command.StockQuantity, command.CategoryId) { };
+            var product = new Product(command.Name, command.Description, command.Price, command.StockQuantity, command.CategoryId);
 
-            await productRepository.AddAsync(product);
+            await productRepository.AddAsync(product, cancellationToken);
 
             await uow.SaveChangesAsync(cancellationToken);
 

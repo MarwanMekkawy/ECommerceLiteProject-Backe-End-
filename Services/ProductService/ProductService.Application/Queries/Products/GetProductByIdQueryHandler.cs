@@ -15,12 +15,16 @@ namespace ProductService.Application.Queries.Products
             if (product is null)
                 throw new NotFoundException("Product not found.");
 
+            if (!query.IncludeInactives && !product.IsActive)
+                throw new NotFoundException("Product not found.");
+
             return new ProductDto
             {
                 Id = product.Id,
                 Name = product.Name,
                 Description = product.Description,
-                Price = product.Price,
+                Price = product.Price.Amount,
+                Currency = product.Price.Currency,
                 StockQuantity = product.StockQuantity,
                 IsActive = product.IsActive,
                 CategoryId = product.CategoryId

@@ -41,7 +41,8 @@ namespace ProductService.Infrastructure.Data.Configrations
                     .IsRequired();
             });
 
-            builder.HasIndex(p => p.Name);
+            builder.HasIndex(p => p.Name)
+                .IsUnique();
         }
     }
 }

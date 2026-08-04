@@ -22,8 +22,7 @@ namespace ProductService.Application.Commands.Products
             NewDescription = newDescription;
             NewCategoryId = newCategoryId;
 
-            NewPrice = new Money(newAmount,newCurrency);
-            NewPrice.ApplyDiscount(discount);
+            NewPrice = new Money(newAmount,newCurrency).ApplyDiscount(discount);
         }
     }
 }

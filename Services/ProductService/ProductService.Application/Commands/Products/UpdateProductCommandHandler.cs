@@ -18,6 +18,10 @@ namespace ProductService.Application.Commands.Products
             if(!existingCategory)
                 throw new NotFoundException("Category was NOT FOUND.");
 
+            var existingSameName = await productRepository.GetByNameAsync(command.NewName, cancellationToken);
+            if (existingSameName != null && existingSameName.Id != existingProduct.Id)
+                throw new ConflictException("Product already exists");
+
             existingProduct.Update(command.NewName, command.NewDescription, command.NewPrice, command.NewCategoryId);
 
             await uow.SaveChangesAsync(cancellationToken);

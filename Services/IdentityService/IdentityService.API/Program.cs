@@ -11,7 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+
 
 
 namespace IdentityService.API
@@ -125,7 +125,7 @@ namespace IdentityService.API
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseCors("Development");               // allow all CORS
+                app.UseCors("Development");                     // allow all CORS
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }

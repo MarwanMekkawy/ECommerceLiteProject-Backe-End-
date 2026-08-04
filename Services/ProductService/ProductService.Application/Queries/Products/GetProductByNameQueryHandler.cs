@@ -1,4 +1,5 @@
-﻿using ProductService.Application.Abstractions;
+﻿using Domain.Exceptions;
+using ProductService.Application.Abstractions;
 using ProductService.Application.DTOs;
 using ProductService.Application.Queries.Products;
 using ProductService.Domain.Contracts;
@@ -13,12 +14,16 @@ public class GetProductByNameQueryHandler(IProductRepository productRepository) 
         if (product is null)
             return null;
 
+        if (!query.IncludeInactives && !product.IsActive)
+            return null;
+
         return new ProductDto
         {
             Id = product.Id,
             Name = product.Name,
             Description = product.Description,
-            Price = product.Price,
+            Price = product.Price.Amount,
+            Currency = product.Price.Currency,
             StockQuantity = product.StockQuantity,
             IsActive = product.IsActive,
             CategoryId = product.CategoryId

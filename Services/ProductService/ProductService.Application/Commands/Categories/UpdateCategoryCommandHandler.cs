@@ -14,10 +14,15 @@ namespace ProductService.Application.Commands.Categories
             if (category is null)
                 throw new NotFoundException("Category Not found.");
 
+            var existingCategory = await categoryRepository.GetByNameAsync(command.NewName, cancellationToken);
+            if (existingCategory != null && existingCategory.Id != category.Id)
+                throw new ConflictException("category already exists");
+
+
             category.Rename(command.NewName);
             category.ChangeDescription(command.NewDiscription);
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChangesAsync(cancellationToken);
         }
     }
 }

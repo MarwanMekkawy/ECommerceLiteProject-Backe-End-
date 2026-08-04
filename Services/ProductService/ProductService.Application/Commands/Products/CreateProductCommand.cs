@@ -21,8 +21,7 @@ namespace ProductService.Application.Commands.Products
             CategoryId = categoryId;
             StockQuantity =stockQuantity;
 
-            Price = new Money(amount,currency);
-            Price.ApplyDiscount(discount);
+            Price = new Money(amount,currency).ApplyDiscount(discount);
         }
     }
 }

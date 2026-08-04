@@ -15,7 +15,7 @@ namespace ProductService.API.Controllers
     /// Product retrieval endpoints are publicly accessible, while management operations
     /// require administrator authorization.
     /// </summary>
-    [Route("api/V1/products")]
+    [Route("api/v1/products")]
     [ApiController]
     public class ProductsController(
         IQueryHandler<GetProductsQuery, IReadOnlyList<ProductDto>> getProducts,
@@ -33,17 +33,18 @@ namespace ProductService.API.Controllers
 
     {
         /// <summary>
-        /// Retrieves a paginated list of products.
+        /// Retrieves a paginated list of products, optionally filtered by category.
         /// </summary>
         /// <param name="pageNumber">The page number to retrieve. Defaults to 1.</param>
         /// <param name="pageSize">The number of products per page. Defaults to 10.</param>
+        /// <param name="categoryId">The unique identifier of the category to filter products by.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>A paginated list of products.</returns>
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetProducts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetProducts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] Guid? categoryId = null, CancellationToken cancellationToken = default)
         {
-            var query = new GetProductsQuery(pageNumber, pageSize);
+            var query = new GetProductsQuery(pageNumber, pageSize, categoryId);
 
             var result = await getProducts.HandleAsync(query, cancellationToken);
 
@@ -73,9 +74,9 @@ namespace ProductService.API.Controllers
         /// <param name="name">The name of the product to retrieve.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>The requested product.</returns>
-        [HttpGet("by-name/{name}")]
+        [HttpGet("by-name")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetProductByName(string name, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetProductByName([FromQuery] string name, CancellationToken cancellationToken)
         {
             var query = new GetProductByNameQuery(name);
 
@@ -221,6 +222,81 @@ namespace ProductService.API.Controllers
             await decreaseStock.HandleAsync(command, cancellationToken);
 
             return Ok();
+        }
+
+        /// <summary>
+        /// Retrieves a paginated list of all products, including inactive products,
+        /// optionally filtered by category.
+        /// This endpoint is restricted to administrators.
+        /// </summary>
+        /// <param name="pageNumber">The page number to retrieve. Defaults to 1.</param>
+        /// <param name="pageSize">The number of products per page. Defaults to 10.</param>
+        /// <param name="categoryId">The unique identifier of the category to filter products by.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>A paginated list of all products, optionally filtered by category.</returns>
+        [HttpGet("admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllProductsForAdmin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] Guid? categoryId = null, CancellationToken cancellationToken = default)
+        {
+            var query = new GetProductsQuery(pageNumber, pageSize, categoryId, true);
+
+            var result = await getProducts.HandleAsync(query, cancellationToken);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Retrieves a product by its unique identifier, including inactive products.
+        /// This endpoint is restricted to administrators.
+        /// </summary>
+        /// <param name="id">The unique identifier of the product.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>The requested product.</returns>
+        [HttpGet("admin/{id:guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetProductByIdForAdmin(Guid id, CancellationToken cancellationToken)
+        {
+            var query = new GetProductByIdQuery(id, true);
+
+            var result = await getProductById.HandleAsync(query, cancellationToken);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Retrieves a product by its name, including inactive products.
+        /// This endpoint is restricted to administrators.
+        /// </summary>
+        /// <param name="name">The name of the product to retrieve.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>The requested product.</returns>
+        [HttpGet("admin/by-name")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetProductByNameForAdmin([FromQuery] string name, CancellationToken cancellationToken)
+        {
+            var query = new GetProductByNameQuery(name, true);
+
+            var result = await getProductByName.HandleAsync(query, cancellationToken);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Searches for products whose names match the specified search term, including inactive products.
+        /// This endpoint is restricted to administrators.
+        /// </summary>
+        /// <param name="name">The search term to use when searching product names.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>A list of all products matching the search term.</returns>
+        [HttpGet("admin/search")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> SearchProductsForAdmin([FromQuery] string name, CancellationToken cancellationToken)
+        {
+            var query = new SearchProductsByNameQuery(name, true);
+
+            var result = await searchProducts.HandleAsync(query, cancellationToken);
+
+            return Ok(result);
         }
     }
 }

@@ -24,12 +24,24 @@ namespace ProductService.Infrastructure.Repositories
 
         public async Task<IReadOnlyList<Product>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default)
         {
+            return await _context.Products.AsNoTracking().Where(p => p.Name.Contains(searchTerm) && p.IsActive).OrderBy(p => p.Name).ToListAsync(cancellationToken);
+        }
+
+        public async Task<IReadOnlyList<Product>> SearchByNameIncludeInactiveAsync(string searchTerm, CancellationToken cancellationToken = default)
+        {
             return await _context.Products.AsNoTracking().Where(p => p.Name.Contains(searchTerm)).OrderBy(p => p.Name).ToListAsync(cancellationToken);
         }
 
-        public async Task<IReadOnlyList<Product>> GetPaginatedUntrackedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<Product>> GetPaginatedUntrackedAsync
+            (int pageNumber, int pageSize, Guid? categoryId, bool includeInactives, CancellationToken cancellationToken = default)
         {
-            return await _context.Products.AsNoTracking().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+            var query = _context.Products.AsNoTracking().AsQueryable();
+
+            if (categoryId.HasValue) query = query.Where(p => p.CategoryId == categoryId.Value);
+
+            if (!includeInactives) query = query.Where(p => p.IsActive);
+
+            return await query.OrderBy(p => p.Name).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
         }
 
         public async Task AddAsync(Product product, CancellationToken cancellationToken = default)

@@ -32,6 +32,7 @@ namespace ProductService.API.Middleware
                 InvalidTokenException => (int)HttpStatusCode.Unauthorized,
                 TooManyRequestsException => (int)HttpStatusCode.TooManyRequests,
                 ArgumentException=> (int)HttpStatusCode.BadRequest,
+                InvalidOperationException=>(int)HttpStatusCode.Conflict,
                 _ => (int)HttpStatusCode.InternalServerError,
             };
 

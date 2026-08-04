@@ -12,7 +12,7 @@ namespace ProductService.API.Controllers
     /// Handles category retrieval and management operations.
     /// Category retrieval endpoints are publicly accessible, while management operations require administrator authorization.
     /// </summary>
-    [Route("api/V1/categories")]
+    [Route("api/v1/categories")]
     [ApiController]
     public class CategoriesController(
         IQueryHandler<GetCategoriesQuery, IReadOnlyList<CategoryDto>> getCategories,

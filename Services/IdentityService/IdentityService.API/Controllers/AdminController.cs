@@ -11,7 +11,7 @@ namespace IdentityService.API.Controllers
     /// <summary>
     /// Handles administrator operations for managing user accounts.
     /// </summary>
-    [Route("api/V1/admin")]
+    [Route("api/v1/admin")]
     [ApiController]
     [Authorize(Roles = "Admin", Policy = "VerifiedEmail")]
     public class AdminController(IUserService userService) : ControllerBase
@@ -38,7 +38,7 @@ namespace IdentityService.API.Controllers
         /// <param name="id">The user's unique identifier.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>The requested user.</returns>
-        [HttpGet("users/{id}")]
+        [HttpGet("users/{id:guid}")]
         public async Task<IActionResult> GetUserById(Guid id, CancellationToken cancellationToken)
         {
             var result = await userService.GetUserByIdAsync(id, cancellationToken);
@@ -53,7 +53,7 @@ namespace IdentityService.API.Controllers
         /// <param name="dto">The requested role change.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the role was updated successfully.</returns>
-        [HttpPatch("users/{id}/role")]
+        [HttpPatch("users/{id:guid}/role")]
         public async Task<IActionResult> ChangeUserRole(Guid id, ChangeUserRoleDto dto, CancellationToken cancellationToken)
         {
             await userService.ChangeUserRoleAsync(id, dto.Role, cancellationToken);
@@ -67,7 +67,7 @@ namespace IdentityService.API.Controllers
         /// <param name="id">The user's unique identifier.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the account was activated successfully.</returns>
-        [HttpPatch("users/{id}/activate")]
+        [HttpPatch("users/{id:guid}/activate")]
         public async Task<IActionResult> ActivateUser(Guid id, CancellationToken cancellationToken)
         {
             await userService.ActivateUserAsync(id, cancellationToken);
@@ -81,7 +81,7 @@ namespace IdentityService.API.Controllers
         /// <param name="id">The user's unique identifier.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the account was deactivated successfully.</returns>
-        [HttpPatch("users/{id}/deactivate")]
+        [HttpPatch("users/{id:guid}/deactivate")]
         public async Task<IActionResult> DeactivateUser(Guid id, CancellationToken cancellationToken)
         {
             await userService.DeactivateUserAsync(id, cancellationToken);
@@ -95,7 +95,7 @@ namespace IdentityService.API.Controllers
         /// <param name="id">The user's unique identifier.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the user was deleted successfully.</returns>
-        [HttpDelete("users/{id}")]
+        [HttpDelete("users/{id:guid}")]
         public async Task<IActionResult> DeleteUser(Guid id, CancellationToken cancellationToken)
         {
             await userService.DeleteUserAsync(id, cancellationToken);
