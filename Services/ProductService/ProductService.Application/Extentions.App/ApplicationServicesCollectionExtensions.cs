@@ -22,7 +22,9 @@ namespace ProductService.Application.Extentions.App
             services.AddScoped<ICommandHandler<UpdateProductCommand>, UpdateProductCommandHandler>();
 
             // Category Commands
+            services.AddScoped<ICommandHandler<ActivateCategoryCommand>, ActivateCategoryCommandHandler>();
             services.AddScoped<ICommandHandler<CreateCategoryCommand, Guid>, CreateCategoryCommandHandler>();
+            services.AddScoped<ICommandHandler<DeactivateCategoryCommand>, DeactivateCategoryCommandHandler>();
             services.AddScoped<ICommandHandler<DeleteCategoryCommand>, DeleteCategoryCommandHandler>();
             services.AddScoped<ICommandHandler<UpdateCategoryCommand>, UpdateCategoryCommandHandler>();
 
@@ -30,6 +32,7 @@ namespace ProductService.Application.Extentions.App
             services.AddScoped<IQueryHandler<GetProductByIdQuery, ProductDto?>, GetProductByIdQueryHandler>();
             services.AddScoped<IQueryHandler<GetProductByNameQuery, ProductDto?>, GetProductByNameQueryHandler>();
             services.AddScoped<IQueryHandler<GetProductsQuery, IReadOnlyList<ProductDto>>, GetProductsQueryHandler>();
+            services.AddScoped<IQueryHandler<GetProductsAdminQuery, IReadOnlyList<ProductWithCategoryDto>>, GetProductsAdminQueryHandler>();
             services.AddScoped<IQueryHandler<SearchProductsByNameQuery, IReadOnlyList<ProductDto>>, SearchProductsByNameQueryHandler>();
 
             // Category Queries

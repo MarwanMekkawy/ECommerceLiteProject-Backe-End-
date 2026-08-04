@@ -12,7 +12,7 @@ namespace ProductService.Application.Queries.Products
         {
             IReadOnlyList<Product> products;
 
-            if (query.IncludeInactives)
+            if (query.IncludeInactive)
                 products = await productRepository.SearchByNameIncludeInactiveAsync(query.SearchTerm, cancellationToken);
             else
                 products = await productRepository.SearchByNameAsync(query.SearchTerm, cancellationToken);

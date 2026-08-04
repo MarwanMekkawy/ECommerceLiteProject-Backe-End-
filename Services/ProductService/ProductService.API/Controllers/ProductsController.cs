@@ -19,6 +19,7 @@ namespace ProductService.API.Controllers
     [ApiController]
     public class ProductsController(
         IQueryHandler<GetProductsQuery, IReadOnlyList<ProductDto>> getProducts,
+        IQueryHandler<GetProductsAdminQuery, IReadOnlyList<ProductWithCategoryDto>> getAdminProducts,
         IQueryHandler<GetProductByIdQuery, ProductDto?> getProductById,
         IQueryHandler<GetProductByNameQuery, ProductDto?> getProductByName,
         IQueryHandler<SearchProductsByNameQuery, IReadOnlyList<ProductDto>> searchProducts,
@@ -238,9 +239,9 @@ namespace ProductService.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllProductsForAdmin([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] Guid? categoryId = null, CancellationToken cancellationToken = default)
         {
-            var query = new GetProductsQuery(pageNumber, pageSize, categoryId, true);
+            var query = new GetProductsAdminQuery(pageNumber, pageSize, categoryId, true);
 
-            var result = await getProducts.HandleAsync(query, cancellationToken);
+            var result = await getAdminProducts.HandleAsync(query, cancellationToken);
 
             return Ok(result);
         }

@@ -15,7 +15,7 @@ namespace ProductService.Application.Queries.Products
             if (product is null)
                 throw new NotFoundException("Product not found.");
 
-            if (!query.IncludeInactives && !product.IsActive)
+            if (!query.IncludeInactive && (!product.IsActive || !product.Category.IsActive))
                 throw new NotFoundException("Product not found.");
 
             return new ProductDto

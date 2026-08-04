@@ -15,10 +15,14 @@ namespace ProductService.Application.Queries.Categories
             if (category is null)
                 throw new NotFoundException("Category not found.");
 
+            if(!query.IncludeInactive && !category.IsActive)
+                throw new NotFoundException("Category not found.");
+
             return new CategoryDto
             {
                 Id = category.Id,
                 Name = category.Name,
+                IsActive = category.IsActive,
                 Description = category.Description
             };
         }

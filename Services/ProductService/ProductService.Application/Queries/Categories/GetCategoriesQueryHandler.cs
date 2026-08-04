@@ -9,7 +9,7 @@ namespace ProductService.Application.Queries.Categories
     {
         public async Task<IReadOnlyList<CategoryDto>> HandleAsync(GetCategoriesQuery query, CancellationToken cancellationToken = default)
         {
-            var categories = await categoryRepository.GetPaginatedUntrackedAsync(query.PageNumber, query.PageSize, cancellationToken);
+            var categories = await categoryRepository.GetPaginatedUntrackedAsync(query.PageNumber, query.PageSize, query.IncludeInactive, cancellationToken);
 
             var result = new List<CategoryDto>();
 
@@ -19,6 +19,7 @@ namespace ProductService.Application.Queries.Categories
                 {
                     Id = category.Id,
                     Name = category.Name,
+                    IsActive = category.IsActive,
                     Description = category.Description
                 });
             }

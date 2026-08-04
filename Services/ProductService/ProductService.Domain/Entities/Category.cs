@@ -12,7 +12,8 @@ namespace ProductService.Domain.Entities
 
         public string Name { get; private set; } = null!;
         public string? Description { get; private set; }
-       
+        public bool IsActive { get; private set; }
+
         public ICollection<Product> Products { get; set; } = new List<Product>();
 
         private Category() { } 
@@ -24,6 +25,7 @@ namespace ProductService.Domain.Entities
 
             Name = name.Trim();
             Description = description?.Trim();
+            IsActive = true;
         }
 
         public void Rename(string name)
@@ -37,6 +39,22 @@ namespace ProductService.Domain.Entities
         public void ChangeDescription(string? description)
         {
             Description = description?.Trim();
+        }
+
+        public void Activate()
+        {
+            if (IsActive)
+                throw new InvalidOperationException("Category is already active.");
+
+            IsActive = true;
+        }
+
+        public void Deactivate()
+        {
+            if (!IsActive)
+                throw new InvalidOperationException("Category is already inactive.");
+
+            IsActive = false;
         }
     }
 }

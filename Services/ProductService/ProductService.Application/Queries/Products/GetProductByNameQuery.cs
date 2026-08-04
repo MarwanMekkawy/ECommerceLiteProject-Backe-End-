@@ -7,12 +7,12 @@ namespace ProductService.Application.Queries.Products
     public class GetProductByNameQuery : IQuery<ProductDto?>
     {
         public string Name { get; }
-        public bool IncludeInactives { get; }
+        public bool IncludeInactive { get; }
 
-        public GetProductByNameQuery(string name, bool includeInactives = false)
+        public GetProductByNameQuery(string name, bool includeInactive = false)
         {
             Name = name;
-            IncludeInactives = includeInactives;
+            IncludeInactive = includeInactive;
         }
     }
 }

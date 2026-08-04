@@ -14,9 +14,12 @@ namespace ProductService.Application.Commands.Categories
             if (category is null)
                 throw new NotFoundException("Category Not found.");
 
+            if (await categoryRepository.HasProductsAsync(command.Id, cancellationToken))
+                throw new ConflictException("Cannot delete a category that contains products. Deactivate it instead.");
+
             categoryRepository.Remove(category);
 
-            await uow.SaveChangesAsync(cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken); 
         }
     }
 }

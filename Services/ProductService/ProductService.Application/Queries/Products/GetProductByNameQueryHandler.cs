@@ -12,10 +12,10 @@ public class GetProductByNameQueryHandler(IProductRepository productRepository) 
         var product = await productRepository.GetByNameAsync(query.Name, cancellationToken);
 
         if (product is null)
-            return null;
+            throw new NotFoundException("Product not found.");
 
-        if (!query.IncludeInactives && !product.IsActive)
-            return null;
+        if (!query.IncludeInactive && (!product.IsActive || !product.Category.IsActive))
+            throw new NotFoundException("Product not found.");
 
         return new ProductDto
         {

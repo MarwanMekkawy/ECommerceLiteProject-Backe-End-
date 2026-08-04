@@ -1,4 +1,5 @@
-﻿using ProductService.Application.Abstractions;
+﻿using Domain.Exceptions;
+using ProductService.Application.Abstractions;
 using ProductService.Application.DTOs;
 using ProductService.Domain.Contracts;
 
@@ -11,12 +12,16 @@ namespace ProductService.Application.Queries.Categories
             var category = await categoryRepository.GetByNameAsync(query.Name, cancellationToken);
 
             if (category is null)
-                return null;
+                throw new NotFoundException("Category not found.");
+
+            if (!query.IncludeInactive && !category.IsActive)
+                throw new NotFoundException("Category not found.");
 
             return new CategoryDto
             {
                 Id = category.Id,
                 Name = category.Name,
+                IsActive = category.IsActive,
                 Description = category.Description
             };
         }

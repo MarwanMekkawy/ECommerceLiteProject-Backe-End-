@@ -1,11 +1,7 @@
 ﻿using Domain.Exceptions;
 using ProductService.Application.Abstractions;
 using ProductService.Domain.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ProductService.Application.Commands.Products
 {

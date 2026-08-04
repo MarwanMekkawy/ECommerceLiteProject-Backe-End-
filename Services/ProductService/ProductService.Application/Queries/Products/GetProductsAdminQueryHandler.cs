@@ -3,19 +3,20 @@ using ProductService.Application.DTOs;
 using ProductService.Domain.Contracts;
 
 
+
 namespace ProductService.Application.Queries.Products
 {
-    public class GetProductsQueryHandler(IProductRepository productRepository) : IQueryHandler<GetProductsQuery, IReadOnlyList<ProductDto>>
+    public class GetProductsAdminQueryHandler(IProductRepository productRepository) : IQueryHandler<GetProductsAdminQuery, IReadOnlyList<ProductWithCategoryDto>>
     {
-        public async Task<IReadOnlyList<ProductDto>> HandleAsync(GetProductsQuery query, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<ProductWithCategoryDto>> HandleAsync(GetProductsAdminQuery query, CancellationToken cancellationToken = default)
         {
             var products = await productRepository.GetPaginatedUntrackedAsync(query.PageNumber, query.PageSize, query.CategoryId, query.IncludeInactive, cancellationToken);
 
-            var result = new List<ProductDto>();
+            var result = new List<ProductWithCategoryDto>();
 
             foreach (var product in products)
             {
-                result.Add(new ProductDto
+                result.Add(new ProductWithCategoryDto
                 {
                     Id = product.Id,
                     Name = product.Name,
@@ -24,10 +25,12 @@ namespace ProductService.Application.Queries.Products
                     Currency = product.Price.Currency,
                     StockQuantity = product.StockQuantity,
                     IsActive = product.IsActive,
-                    CategoryId = product.CategoryId
+                    CategoryId = product.CategoryId,
+                    CategoryName = product.Category.Name,
+                    CategoryIsActive = product.Category.IsActive
                 });
             }
-            return result;
+            return result;        
         }
     }
 }

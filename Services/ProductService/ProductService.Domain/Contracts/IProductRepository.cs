@@ -7,6 +7,8 @@ namespace ProductService.Domain.Contracts
     {
         Task<Product?> GetByIdTrackedAsync(Guid id, CancellationToken cancellationToken = default);
 
+        Task<Product?> GetByIdTrackedWithCategoryAsync(Guid id, CancellationToken cancellationToken = default);
+
         Task<Product?> GetByIdUntrackedAsync(Guid id, CancellationToken cancellationToken = default);
 
         Task<Product?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
