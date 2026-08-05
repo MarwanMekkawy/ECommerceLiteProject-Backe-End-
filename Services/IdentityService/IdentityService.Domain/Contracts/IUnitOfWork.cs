@@ -14,6 +14,7 @@ namespace IdentityService.Domain.Contracts
         public IEmailChangeTokenRepository emailChangeTokens { get; }
         public IPasswordResetTokenRepository passwordResetTokens  { get; }
         public IUserPasswordHistoryRepository userPasswordHistories { get; }
+        public IServiceClientRepository serviceClients { get; }
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

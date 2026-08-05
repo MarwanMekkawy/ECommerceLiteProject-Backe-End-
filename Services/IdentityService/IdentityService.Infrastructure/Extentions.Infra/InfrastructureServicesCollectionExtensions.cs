@@ -29,8 +29,8 @@ namespace IdentityService.Infrastructure.Extentions.Infra
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserPasswordHistoryRepository, UserPasswordHistoryRepository>();
+            services.AddScoped<IServiceClientRepository, ServiceClientRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-
 
 
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();

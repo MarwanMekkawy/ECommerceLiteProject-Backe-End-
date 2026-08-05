@@ -19,6 +19,8 @@ namespace IdentityService.Application.Extentions.App
             services.AddScoped<IEmailVerificationTokenService, EmailVerificationTokenService>();
             services.AddScoped<IPasswordResetTokenService, PasswordResetTokenService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IServiceClientService, ServiceClientService>();
+
 
             services.AddAutoMapper(cfg => { cfg.AddMaps(typeof(AutoMapperMarker).Assembly); });
 

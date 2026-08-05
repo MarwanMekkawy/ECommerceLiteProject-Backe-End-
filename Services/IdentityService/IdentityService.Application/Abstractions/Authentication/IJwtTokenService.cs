@@ -12,5 +12,6 @@ namespace IdentityService.Application.Abstractions.Authentication
     {
         string GenerateAccessToken(User user);
         ClaimsPrincipal? ValidateToken(string token);
+        string GenerateAccessTokenForClient(ServiceClient client);
     }
 }

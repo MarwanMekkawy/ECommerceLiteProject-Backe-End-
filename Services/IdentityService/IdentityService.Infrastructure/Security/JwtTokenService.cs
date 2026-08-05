@@ -2,13 +2,10 @@
 using IdentityService.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace IdentityService.Infrastructure.Security
 {
@@ -66,6 +63,29 @@ namespace IdentityService.Infrastructure.Security
             {
                 return null;
             }
+        }
+
+        public string GenerateAccessTokenForClient(ServiceClient client)
+        {
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.NameIdentifier, client.ClientId),
+                new Claim(ClaimTypes.Name, client.ServiceName),
+                new Claim("token_type", "service")
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtForServiceClient:Secret"]!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: configuration["Jwt:Issuer"],
+                audience: configuration["Jwt:Audience"],                               
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(15),                
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

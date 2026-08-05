@@ -1,5 +1,6 @@
 ﻿using IdentityService.API.CookiesHelpers;
 using IdentityService.Application.Abstractions;
+using IdentityService.Application.DTOs;
 using IdentityService.Application.DTOs.AuthDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,7 +14,8 @@ namespace IdentityService.API.Controllers
     [Route("api/v1/auth")]
     [ApiController]
     [AllowAnonymous]
-    public class AuthController(IAuthService authService, IEmailVerificationTokenService emailVerification) : ControllerBase
+    public class AuthController(IAuthService authService, IServiceClientService clientService, IEmailVerificationTokenService emailVerification)
+        : ControllerBase
     {
         /// <summary>
         /// Registers a new user account.
@@ -84,6 +86,14 @@ namespace IdentityService.API.Controllers
             var result = await authService.RefreshSessionAsync(refreshToken, cancellationToken);
 
             CookieHelper.AppendRefreshTokenCookie(Response, result.RefreshToken);
+
+            return Ok(new { jwtToken = result.AccessToken });
+        }
+
+        [HttpPost("oauth/service-token")]
+        public async Task<IActionResult> ServiceToken([FromBody] ServiceTokenRequestDto request, CancellationToken cancellationToken)
+        {
+            var result = await clientService.AuthinticateAsync(request.ClientId, request.ClientSecret, cancellationToken);
 
             return Ok(new { jwtToken = result.AccessToken });
         }

@@ -107,7 +107,7 @@ namespace IdentityService.API
 
             var app = builder.Build();
 
-            // seeding default admin =====================================
+            // seeding default admin & Service Cliensts=====================================
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -117,9 +117,10 @@ namespace IdentityService.API
                     context,
                     services.GetRequiredService<IConfiguration>(),
                     services.GetRequiredService<IPasswordHasher>(),
+                    services.GetRequiredService<IOneTimeTokenService>(),
                     services.GetRequiredService<ILoggerFactory>());
             }
-            //============================================================
+            //===============================================================================
 
             app.UseHttpsRedirection();
             // Configure the HTTP request pipeline.
