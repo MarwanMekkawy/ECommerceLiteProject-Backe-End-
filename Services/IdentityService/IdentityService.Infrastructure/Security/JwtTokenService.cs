@@ -36,6 +36,7 @@ namespace IdentityService.Infrastructure.Security
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        // just incase manual validation
         public ClaimsPrincipal? ValidateToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

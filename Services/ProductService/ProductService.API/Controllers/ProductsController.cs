@@ -197,7 +197,7 @@ namespace ProductService.API.Controllers
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the stock was increased successfully.</returns>
         [HttpPatch("{id:guid}/stock/increase")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminOrService")]
         public async Task<IActionResult> IncreaseStock(Guid id, [FromQuery] int quantity, CancellationToken cancellationToken)
         {
             var command = new IncreaseStockCommand(id, quantity);
@@ -215,7 +215,7 @@ namespace ProductService.API.Controllers
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the stock was decreased successfully.</returns>
         [HttpPatch("{id:guid}/stock/decrease")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminOrService")]
         public async Task<IActionResult> DecreaseStock(Guid id, [FromQuery] int quantity, CancellationToken cancellationToken)
         {
             var command = new DecreaseStockCommand(id, quantity);

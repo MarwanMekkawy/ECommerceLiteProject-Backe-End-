@@ -38,43 +38,66 @@ namespace ProductService.API
                 });
 
             // Auth service config //
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
+                };
+
+                // Authentication error msgs
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = context =>
                     {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                        ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
-                    };
+                        context.HandleResponse();
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
 
-                    // Authentication error msgs
-                    options.Events = new JwtBearerEvents
+                        return context.Response.WriteAsJsonAsync(new { error = "Authentication required." });
+                    },
+
+                    OnForbidden = context =>
                     {
-                        OnChallenge = context =>
-                        {
-                            context.HandleResponse();
-                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
 
-                            return context.Response.WriteAsJsonAsync(new { error = "Authentication required." });
-                        },
+                        return context.Response.WriteAsJsonAsync(new { error = "You are not authorized or Verified to perform this action." });
+                    }
+                };
+            })
+            .AddJwtBearer("ServiceJwt", options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["ProductService:ServiceSecret"]!))
+                };
+            });
 
-                        OnForbidden = context =>
-                        {
-                            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-
-                            return context.Response.WriteAsJsonAsync(new { error = "You are not authorized or Verified to perform this action." });
-                        }
-                    };
-
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOrService", policy =>
+                {
+                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme,"ServiceJwt");
+                    policy.RequireAssertion
+                        (context =>context.User.IsInRole("Admin") || context.User.HasClaim("token_type", "service"));
                 });
-
-            builder.Services.AddAuthorization();
+            });
 
             // CORS
             builder.Services.AddCors(options =>
