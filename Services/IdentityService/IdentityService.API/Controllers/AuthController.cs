@@ -90,10 +90,16 @@ namespace IdentityService.API.Controllers
             return Ok(new { jwtToken = result.AccessToken });
         }
 
+        /// <summary>
+        /// Authenticates a microservice.
+        /// </summary>
+        /// <param name="dto">The serviceClient credentials.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>A ServiceClient JWT access token.</returns>
         [HttpPost("oauth/service-token")]
-        public async Task<IActionResult> ServiceToken([FromBody] ServiceTokenRequestDto request, CancellationToken cancellationToken)
+        public async Task<IActionResult> ServiceToken([FromBody] ServiceTokenRequestDto dto, CancellationToken cancellationToken)
         {
-            var result = await clientService.AuthinticateAsync(request.ClientId, request.ClientSecret, cancellationToken);
+            var result = await clientService.AuthinticateAsync(dto.ClientId, dto.ClientSecret, cancellationToken);
 
             return Ok(new { jwtToken = result.AccessToken });
         }
