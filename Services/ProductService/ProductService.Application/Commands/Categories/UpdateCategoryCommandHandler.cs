@@ -16,7 +16,7 @@ namespace ProductService.Application.Commands.Categories
 
             var existingCategory = await categoryRepository.GetByNameAsync(command.NewName, cancellationToken);
             if (existingCategory != null && existingCategory.Id != category.Id)
-                throw new ConflictException("category already exists");
+                throw new ConflictException("category with same name already exists");
 
 
             category.Rename(command.NewName);
