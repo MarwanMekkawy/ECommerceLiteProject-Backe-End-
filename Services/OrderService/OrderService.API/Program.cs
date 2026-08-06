@@ -1,3 +1,6 @@
+using OrderService.API.Middleware;
+
+
 
 namespace OrderService.API
 {
@@ -24,7 +27,7 @@ namespace OrderService.API
             }
 
             app.UseHttpsRedirection();
-
+            app.UseMiddleware<GlobalHandlingMiddleware>();
             app.UseAuthorization();
 
 
