@@ -1,7 +1,6 @@
-﻿using OrderService.Domain.Shared.Enums;
+﻿using OrderService.Domain.Enums;
 
-
-namespace OrderService.Domain.Shared.ValueObject
+namespace OrderService.Domain.ValueObjects
 {
     public sealed record Money
     {

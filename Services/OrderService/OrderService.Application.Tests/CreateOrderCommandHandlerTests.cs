@@ -197,5 +197,32 @@ namespace OrderService.Application.Tests
             orderRepository.Verify(x => x.AddAsync(It.IsAny<Order>()),Times.Never);
             unitOfWork.Verify(x => x.SaveChangesAsync(),Times.Never);
         }
+        [Fact]
+        public async Task Handle_ShouldNotIgnore_WhenStockCompensationFails()
+        {
+            // Arrange
+            var productA = Guid.NewGuid();
+            var productB = Guid.NewGuid();
+            var command = new CreateOrderCommand
+            {
+                UserId = Guid.NewGuid(),
+                Items = [new CreateOrderItemDto { ProductId = productA, Quantity = 2 }, new CreateOrderItemDto { ProductId = productB, Quantity = 3 }]
+            };
+            var orderRepository = new Mock<IOrderRepository>();
+            var unitOfWork = new Mock<IUnitOfWork>();
+            var productService = new Mock<IProductServiceClient>();
+
+            productService.Setup(x => x.DecreaseStockAsync(productA, 2)).Returns(Task.CompletedTask);
+            productService.Setup(x => x.DecreaseStockAsync(productB, 3)).ThrowsAsync(new HttpRequestException());
+            productService.Setup(x => x.IncreaseStockAsync(productA, 2)).ThrowsAsync(new HttpRequestException());
+
+            var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
+
+            // Act
+            var action = () => handler.Handle(command);
+
+            // Assert
+            await Assert.ThrowsAsync<HttpRequestException>(action);
+        }
     }
 }

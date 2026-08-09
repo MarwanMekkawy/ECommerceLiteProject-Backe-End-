@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Domain.Tests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Application.Tests", "OrderService.Application.Tests\OrderService.Application.Tests.csproj", "{3A52DC73-2CDC-4499-BBF3-4F776C3C4BD0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Infrastructure.Tests", "OrderService.Infrastructure.Tests\OrderService.Infrastructure.Tests.csproj", "{20B0CBBC-1528-499B-8091-77FC41E738AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{3A52DC73-2CDC-4499-BBF3-4F776C3C4BD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A52DC73-2CDC-4499-BBF3-4F776C3C4BD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A52DC73-2CDC-4499-BBF3-4F776C3C4BD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20B0CBBC-1528-499B-8091-77FC41E738AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20B0CBBC-1528-499B-8091-77FC41E738AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20B0CBBC-1528-499B-8091-77FC41E738AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20B0CBBC-1528-499B-8091-77FC41E738AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,6 +60,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{67533FCA-FC70-4414-A125-733119CB179B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{3A52DC73-2CDC-4499-BBF3-4F776C3C4BD0} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{20B0CBBC-1528-499B-8091-77FC41E738AA} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9F02ADDB-DE0E-45C0-B79D-AC454627967B}

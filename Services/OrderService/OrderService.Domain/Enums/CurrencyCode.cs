@@ -1,5 +1,4 @@
-﻿
-namespace OrderService.Domain.Shared.Enums
+﻿namespace OrderService.Domain.Enums
 {
     public enum CurrencyCode
     {
