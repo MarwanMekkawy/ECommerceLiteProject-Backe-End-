@@ -8,5 +8,10 @@ namespace OrderService.InfraStructure.Repositories
         {
             await _context.Orders.AddAsync(order);
         }
+
+        public Task<Order?> GetByIdAsync(Guid orderId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

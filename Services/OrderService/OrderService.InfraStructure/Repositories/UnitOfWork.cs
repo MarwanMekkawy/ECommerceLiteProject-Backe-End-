@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OrderService.InfraStructure.Repositories
+﻿namespace OrderService.InfraStructure.Repositories
 {
-    internal class UnitOfWork
+    public class UnitOfWork(OrderDbContext _context) : IUnitOfWork
     {
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.SaveChangesAsync(cancellationToken);
+
+        }
     }
 }

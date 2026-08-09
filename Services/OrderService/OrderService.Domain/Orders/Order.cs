@@ -11,6 +11,7 @@ namespace OrderService.Domain.Orders
         public Guid Id { get; private set; }
         public Guid UserId { get; private set; }
         public OrderStatus Status { get; private set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
 
