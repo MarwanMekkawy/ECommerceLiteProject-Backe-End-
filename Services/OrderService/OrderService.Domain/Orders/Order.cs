@@ -1,5 +1,4 @@
-﻿using Domain.Exceptions;
-using OrderService.Domain.Exceptions.DomainExceptions;
+﻿using OrderService.Domain.Exceptions.DomainExceptions;
 
 
 
@@ -29,6 +28,12 @@ namespace OrderService.Domain.Orders
 
         public void AddItem(Guid productId, int quantity)
         {
+            if (productId == Guid.Empty)
+                throw new InvalidOrderItemException("ProductId cannot be empty.");
+
+            if (quantity <= 0)
+                throw new InvalidOrderItemException("Quantity must be greater than zero.");
+
             var existingItem = _items.FirstOrDefault(x => x.ProductId == productId);
 
             if (existingItem is not null)
