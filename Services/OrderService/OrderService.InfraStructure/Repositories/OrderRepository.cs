@@ -1,4 +1,5 @@
-﻿using OrderService.Domain.Orders;
+﻿using Microsoft.EntityFrameworkCore;
+using OrderService.Domain.Orders;
 
 namespace OrderService.InfraStructure.Repositories
 {
@@ -9,9 +10,9 @@ namespace OrderService.InfraStructure.Repositories
             await _context.Orders.AddAsync(order);
         }
 
-        public Task<Order?> GetByIdAsync(Guid orderId)
+        public async Task<Order?> GetByIdAsync(Guid orderId)
         {
-            throw new NotImplementedException();
+            return await _context.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
         }
     }
 }
