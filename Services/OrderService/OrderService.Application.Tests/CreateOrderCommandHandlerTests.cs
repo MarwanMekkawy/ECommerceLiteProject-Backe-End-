@@ -151,7 +151,7 @@ namespace OrderService.Application.Tests
             await handler.Handle(command, TestContext.Current.CancellationToken);
 
             // Assert
-            productService.Verify(x => x.DecreaseStockAsync(productId, 2),Times.Once);
+            productService.Verify(x => x.DecreaseStockAsync(productId, 2, TestContext.Current.CancellationToken),Times.Once);
         }
         [Fact]
         public async Task Handle_ShouldNotCreateOrder_WhenStockDecreaseFails()
@@ -166,7 +166,7 @@ namespace OrderService.Application.Tests
             var orderRepository = new Mock<IOrderRepository>();
             var unitOfWork = new Mock<IUnitOfWork>();
             var productService = new Mock<IProductServiceClient>();
-            productService.Setup(x => x.DecreaseStockAsync(productId, 2)).ThrowsAsync(new HttpRequestException());
+            productService.Setup(x => x.DecreaseStockAsync(productId, 2, TestContext.Current.CancellationToken)).ThrowsAsync(new HttpRequestException());
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
@@ -192,8 +192,8 @@ namespace OrderService.Application.Tests
             var orderRepository = new Mock<IOrderRepository>();
             var unitOfWork = new Mock<IUnitOfWork>();
             var productService = new Mock<IProductServiceClient>();
-            productService.Setup(x => x.DecreaseStockAsync(productA, 2)).Returns(Task.CompletedTask);
-            productService.Setup(x => x.DecreaseStockAsync(productB, 3)).ThrowsAsync(new HttpRequestException());
+            productService.Setup(x => x.DecreaseStockAsync(productA, 2, TestContext.Current.CancellationToken)).Returns(Task.CompletedTask);
+            productService.Setup(x => x.DecreaseStockAsync(productB, 3, TestContext.Current.CancellationToken)).ThrowsAsync(new HttpRequestException());
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
@@ -201,7 +201,7 @@ namespace OrderService.Application.Tests
 
             // Assert
             await Assert.ThrowsAsync<HttpRequestException>(action);
-            productService.Verify(x => x.IncreaseStockAsync(productA, 2),Times.Once);
+            productService.Verify(x => x.IncreaseStockAsync(productA, 2, TestContext.Current.CancellationToken),Times.Once);
             orderRepository.Verify(x => x.AddAsync(It.IsAny<Order>(), TestContext.Current.CancellationToken),Times.Never);
             unitOfWork.Verify(x => x.SaveChangesAsync(TestContext.Current.CancellationToken),Times.Never);
         }
@@ -220,9 +220,9 @@ namespace OrderService.Application.Tests
             var unitOfWork = new Mock<IUnitOfWork>();
             var productService = new Mock<IProductServiceClient>();
 
-            productService.Setup(x => x.DecreaseStockAsync(productA, 2)).Returns(Task.CompletedTask);
-            productService.Setup(x => x.DecreaseStockAsync(productB, 3)).ThrowsAsync(new HttpRequestException());
-            productService.Setup(x => x.IncreaseStockAsync(productA, 2)).ThrowsAsync(new HttpRequestException());
+            productService.Setup(x => x.DecreaseStockAsync(productA, 2, TestContext.Current.CancellationToken)).Returns(Task.CompletedTask);
+            productService.Setup(x => x.DecreaseStockAsync(productB, 3, TestContext.Current.CancellationToken)).ThrowsAsync(new HttpRequestException());
+            productService.Setup(x => x.IncreaseStockAsync(productA, 2, TestContext.Current.CancellationToken)).ThrowsAsync(new HttpRequestException());
 
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 

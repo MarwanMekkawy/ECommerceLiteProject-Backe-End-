@@ -1,7 +1,13 @@
 ﻿using OrderService.Domain.Orders;
 
-public interface IOrderRepository
+namespace OrderService.Domain.Contracts 
 {
-    Task<Order?> GetByIdAsync(Guid orderId, CancellationToken cancellationToken);
-    Task AddAsync(Order order, CancellationToken cancellationToken);
+    public interface IOrderRepository
+    {
+        Task<Order?> GetByIdAsync(Guid orderId, CancellationToken cancellationToken = default);
+        Task AddAsync(Order order, CancellationToken cancellationToken = default);
+        Task<Order?> GetByIdTrackedAsync(Guid orderId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<Order>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<Order>> GetPagedByUserIdAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+    }
 }

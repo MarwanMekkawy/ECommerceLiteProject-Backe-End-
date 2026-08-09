@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrderService.Domain.Orders;
+using OrderService.InfraStructure;
 
-namespace OrderService.InfraStructure.Repositories
+namespace OrderService.Domain.Contracts
 {
     public class OrderRepository(OrderDbContext _context) : IOrderRepository
     {
@@ -13,6 +14,21 @@ namespace OrderService.InfraStructure.Repositories
         public async Task<Order?> GetByIdAsync(Guid orderId, CancellationToken cancellationToken = default)
         {
             return await _context.Orders.Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == orderId, cancellationToken);
+        }
+
+        public Task<Order?> GetByIdTrackedAsync(Guid orderId, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyList<Order>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyList<Order>> GetPagedByUserIdAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
     }
 }

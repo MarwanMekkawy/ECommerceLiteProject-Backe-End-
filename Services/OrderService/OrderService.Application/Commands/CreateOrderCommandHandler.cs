@@ -1,5 +1,6 @@
 ﻿using OrderService.Application.Abstractions;
 using OrderService.Application.DTOs;
+using OrderService.Domain.Contracts;
 using OrderService.Domain.Orders;
 
 namespace OrderService.Application.Commands
@@ -15,7 +16,7 @@ namespace OrderService.Application.Commands
             {
                 foreach (var item in command.Items)
                 {
-                    await productServiceClient.DecreaseStockAsync(item.ProductId,item.Quantity);
+                    await productServiceClient.DecreaseStockAsync(item.ProductId,item.Quantity, cancellationToken);
 
                     decreasedItems.Add(item);
 
@@ -26,7 +27,7 @@ namespace OrderService.Application.Commands
             {
                 foreach (var item in decreasedItems)
                 {
-                    await productServiceClient.IncreaseStockAsync(item.ProductId, item.Quantity);
+                    await productServiceClient.IncreaseStockAsync(item.ProductId, item.Quantity, cancellationToken);
                 }
                 throw;
             }
