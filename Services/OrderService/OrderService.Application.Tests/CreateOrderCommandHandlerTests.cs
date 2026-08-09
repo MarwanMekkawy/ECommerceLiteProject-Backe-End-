@@ -16,30 +16,38 @@ namespace OrderService.Application.Tests
             // Arrange
             var userId = Guid.NewGuid();
             var productId = Guid.NewGuid();
+
             var command = new CreateOrderCommand
-                            {
-                                UserId = userId,
-                                Items = [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]
-                            };
+            {
+                UserId = userId,
+                Items = [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]
+            };
+
             var orderRepository = new Mock<IOrderRepository>();
-            var unitOfWork = new Mock<IUnitOfWork>();
-            var productService = new Mock<IProductServiceClient>();
-            var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
+            var productServiceClient = new Mock<IProductServiceClient>();
+            var uow = new Mock<IUnitOfWork>();
+
+            var handler = new CreateOrderCommandHandler(
+                orderRepository.Object,
+                productServiceClient.Object,
+                uow.Object);
 
             // Act
-            await handler.Handle(command);
+            await handler.Handle(command, TestContext.Current.CancellationToken);
 
             // Assert
             orderRepository.Verify(
                 x => x.AddAsync(
                     It.Is<Order>(o =>
-                    o.UserId == userId &&
-                    o.Items.Count == 1 &&
-                    o.Items.Single().ProductId == productId &&
-                    o.Items.Single().Quantity == 2)),
+                        o.UserId == userId &&
+                        o.Items.Count == 1 &&
+                        o.Items.First().ProductId == productId &&
+                        o.Items.First().Quantity == 2),
+                    TestContext.Current.CancellationToken),
                 Times.Once);
 
-            unitOfWork.Verify(x => x.SaveChangesAsync(), Times.Once);
+            uow.Verify(
+                x => x.SaveChangesAsync(TestContext.Current.CancellationToken),Times.Once);
         }
         [Fact]
         public async Task Handle_ShouldThrow_WhenUserIdIsEmpty()
@@ -58,7 +66,7 @@ namespace OrderService.Application.Tests
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command);
+            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<InvalidOrderException>(action);
@@ -78,7 +86,7 @@ namespace OrderService.Application.Tests
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command);
+            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<InvalidOrderItemException>(action);
@@ -98,7 +106,7 @@ namespace OrderService.Application.Tests
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command);
+            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<InvalidOrderItemException>(action);
@@ -118,7 +126,7 @@ namespace OrderService.Application.Tests
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command);
+            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<InvalidOrderItemException>(action);
@@ -140,7 +148,7 @@ namespace OrderService.Application.Tests
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            await handler.Handle(command);
+            await handler.Handle(command, TestContext.Current.CancellationToken);
 
             // Assert
             productService.Verify(x => x.DecreaseStockAsync(productId, 2),Times.Once);
@@ -162,12 +170,12 @@ namespace OrderService.Application.Tests
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command);
+            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<HttpRequestException>(action);
-            orderRepository.Verify(x => x.AddAsync(It.IsAny<Order>()), Times.Never);
-            unitOfWork.Verify(x => x.SaveChangesAsync(), Times.Never);
+            orderRepository.Verify(x => x.AddAsync(It.IsAny<Order>(), TestContext.Current.CancellationToken), Times.Never);
+            unitOfWork.Verify(x => x.SaveChangesAsync(TestContext.Current.CancellationToken), Times.Never);
         }
         [Fact]
         public async Task Handle_ShouldRestorePreviousStock_WhenLaterStockDecreaseFails()
@@ -189,13 +197,13 @@ namespace OrderService.Application.Tests
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command);
+            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<HttpRequestException>(action);
             productService.Verify(x => x.IncreaseStockAsync(productA, 2),Times.Once);
-            orderRepository.Verify(x => x.AddAsync(It.IsAny<Order>()),Times.Never);
-            unitOfWork.Verify(x => x.SaveChangesAsync(),Times.Never);
+            orderRepository.Verify(x => x.AddAsync(It.IsAny<Order>(), TestContext.Current.CancellationToken),Times.Never);
+            unitOfWork.Verify(x => x.SaveChangesAsync(TestContext.Current.CancellationToken),Times.Never);
         }
         [Fact]
         public async Task Handle_ShouldNotIgnore_WhenStockCompensationFails()
@@ -219,7 +227,7 @@ namespace OrderService.Application.Tests
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command);
+            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<HttpRequestException>(action);

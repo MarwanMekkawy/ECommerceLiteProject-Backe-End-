@@ -9,40 +9,44 @@ namespace OrderService.Domain.Tests
         [Fact]
         public void Constructor_ShouldThrow_WhenProductIdIsEmpty()
         {
+            var orderId = Guid.NewGuid();
             var productId = Guid.Empty;
             var quantity = 1;
 
-            var action = () => new OrderItem(productId, quantity);
+            var action = () => new OrderItem(orderId, productId, quantity);
 
             Assert.Throws<InvalidOrderItemException>(action);
         }
         [Fact]
         public void Constructor_ShouldThrow_WhenQuantityIsZero()
         {
+            var orderId = Guid.NewGuid();
             var productId = Guid.NewGuid();
             var quantity = 0;
 
-            var action = () => new OrderItem(productId, quantity);
+            var action = () => new OrderItem(orderId, productId, quantity);
 
             Assert.Throws<InvalidOrderItemException>(action);
         }
         [Fact]
         public void Constructor_ShouldThrow_WhenQuantityIsNegative()
         {
+            var orderId = Guid.NewGuid();
             var productId = Guid.NewGuid();
             var quantity = -1;
 
-            var action = () => new OrderItem(productId, quantity);
+            var action = () => new OrderItem(orderId, productId, quantity);
 
             Assert.Throws<InvalidOrderItemException>(action);
         }
         [Fact]
         public void Constructor_ShouldCreateItem_WhenArgumentsAreValid()
         {
+            var orderId = Guid.NewGuid();
             var productId = Guid.NewGuid();
             var quantity = 2;
 
-            var item = new OrderItem(productId, quantity);
+            var item = new OrderItem(orderId, productId, quantity);
 
             Assert.NotEqual(Guid.Empty, item.Id);
             Assert.Equal(productId, item.ProductId);

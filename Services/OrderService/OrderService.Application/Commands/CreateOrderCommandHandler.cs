@@ -6,7 +6,7 @@ namespace OrderService.Application.Commands
 {
     public class CreateOrderCommandHandler(IOrderRepository orderRepository, IProductServiceClient productServiceClient, IUnitOfWork uow)
     {
-        public async Task Handle(CreateOrderCommand command)
+        public async Task Handle(CreateOrderCommand command, CancellationToken cancellationToken)
         {
             var order = new Order(command.UserId);
             var decreasedItems = new List<CreateOrderItemDto>();
@@ -31,8 +31,8 @@ namespace OrderService.Application.Commands
                 throw;
             }
 
-            await orderRepository.AddAsync(order);
-            await uow.SaveChangesAsync();
+            await orderRepository.AddAsync(order, cancellationToken);
+            await uow.SaveChangesAsync(cancellationToken);
         }
     }
 }

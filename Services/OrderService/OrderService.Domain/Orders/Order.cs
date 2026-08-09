@@ -43,7 +43,7 @@ namespace OrderService.Domain.Orders
                 return;
             }
 
-            _items.Add(new OrderItem(productId, quantity));
+            _items.Add(new OrderItem(Id, productId, quantity));
         }
     }
 }

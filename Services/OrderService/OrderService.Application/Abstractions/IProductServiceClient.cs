@@ -2,7 +2,7 @@
 {
     public interface IProductServiceClient
     {
-        Task DecreaseStockAsync(Guid productId, int quantity);
+        Task DecreaseStockAsync(Guid productId, int quantity);  // cancellation token??
         Task IncreaseStockAsync(Guid productId, int quantity);
     }
 }
