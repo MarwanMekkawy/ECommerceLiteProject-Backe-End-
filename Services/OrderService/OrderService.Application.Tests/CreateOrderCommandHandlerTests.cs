@@ -1,6 +1,8 @@
-﻿using Moq;
+﻿using Domain.Exceptions;
+using Moq;
 using OrderService.Application.Commands;
 using OrderService.Application.DTOs;
+using OrderService.Domain.Exceptions.DomainExceptions;
 using OrderService.Domain.Orders;
 using Xunit;
 
@@ -15,10 +17,10 @@ namespace OrderService.Application.Tests
             var userId = Guid.NewGuid();
             var productId = Guid.NewGuid();
             var command = new CreateOrderCommand
-            {
-                UserId = userId,
-                Items = [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]
-            };
+                            {
+                                UserId = userId,
+                                Items = [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]
+                            };
             var orderRepository = new Mock<IOrderRepository>();
             var unitOfWork = new Mock<IUnitOfWork>();
             var handler = new CreateOrderCommandHandler(orderRepository.Object, unitOfWork.Object);
@@ -37,6 +39,84 @@ namespace OrderService.Application.Tests
                 Times.Once);
 
             unitOfWork.Verify(x => x.SaveChangesAsync(), Times.Once);
+        }
+        [Fact]
+        public async Task Handle_ShouldThrow_WhenUserIdIsEmpty()
+        {
+            // Arrange
+            var userId = Guid.Empty;
+            var productId = Guid.NewGuid();
+            var command = new CreateOrderCommand
+                            {
+                                UserId = userId,
+                                Items = [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]
+                            };
+            var orderRepository = new Mock<IOrderRepository>();
+            var unitOfWork = new Mock<IUnitOfWork>();
+            var handler = new CreateOrderCommandHandler(orderRepository.Object, unitOfWork.Object);
+
+            // Act
+            var action = () => handler.Handle(command);
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOrderException>(action);
+        }
+        [Fact]
+        public async Task Handle_ShouldThrow_WhenProductIdIsEmpty()
+        {
+            // Arrange
+            var command = new CreateOrderCommand
+                            {
+                                UserId = Guid.NewGuid(),
+                                Items = [new CreateOrderItemDto { ProductId = Guid.Empty, Quantity = 2 }]
+                            };
+            var orderRepository = new Mock<IOrderRepository>();
+            var unitOfWork = new Mock<IUnitOfWork>();
+            var handler = new CreateOrderCommandHandler(orderRepository.Object, unitOfWork.Object);
+            // Act
+            var action = () => handler.Handle(command);
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOrderItemException>(action);
+        }
+
+        [Fact]
+        public async Task Handle_ShouldThrow_WhenQuantityIsZero()
+        {
+            // Arrange
+            var command = new CreateOrderCommand
+                            {
+                                UserId = Guid.NewGuid(),
+                                Items = [new CreateOrderItemDto { ProductId = Guid.NewGuid(), Quantity = 0 }]
+                            };
+            var orderRepository = new Mock<IOrderRepository>();
+            var unitOfWork = new Mock<IUnitOfWork>();
+            var handler = new CreateOrderCommandHandler(orderRepository.Object, unitOfWork.Object);
+
+            // Act
+            var action = () => handler.Handle(command);
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOrderItemException>(action);
+        }
+        [Fact]
+        public async Task Handle_ShouldThrow_WhenQuantityIsNegative()
+        {
+            // Arrange
+            var command = new CreateOrderCommand
+                            {
+                                UserId = Guid.NewGuid(),
+                                Items = [new CreateOrderItemDto { ProductId = Guid.NewGuid(), Quantity = -1 }]
+                            };
+            var orderRepository = new Mock<IOrderRepository>();
+            var unitOfWork = new Mock<IUnitOfWork>();
+            var handler = new CreateOrderCommandHandler(orderRepository.Object, unitOfWork.Object);
+
+            // Act
+            var action = () => handler.Handle(command);
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOrderItemException>(action);
         }
     }
 }
