@@ -11,9 +11,9 @@ namespace OrderService.Domain.Contracts
             await _context.Orders.AddAsync(order, cancellationToken);
         }
 
-        public async Task<Order?> GetByIdAsync(Guid orderId, CancellationToken cancellationToken = default)
+        public async Task<Order?> GetByIdUntrackedAsync(Guid orderId, CancellationToken cancellationToken = default)
         {
-            return await _context.Orders.Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == orderId, cancellationToken);
+            return await _context.Orders.AsNoTracking().Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == orderId, cancellationToken);
         }
 
         public async Task<Order?> GetByIdTrackedAsync(Guid orderId, CancellationToken cancellationToken = default)
