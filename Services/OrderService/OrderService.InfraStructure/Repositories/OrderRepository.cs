@@ -32,5 +32,11 @@ namespace OrderService.Domain.Contracts
             return await _context.Orders.AsNoTracking().Include(x => x.Items).Where(x => x.UserId == userId)
             .OrderByDescending(x => x.CreatedAt).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
         }
+
+        public async Task<IReadOnlyList<Order>> GetPagedAsync(int pageNumber,int pageSize,CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders.AsNoTracking().Include(x => x.Items).OrderByDescending(x => x.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+        }
     }
 }

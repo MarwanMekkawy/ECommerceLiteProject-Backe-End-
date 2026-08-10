@@ -6,7 +6,7 @@ namespace OrderService.Application.Queries
 {
     public class GetOrdersByUserQueryHandler(IOrderRepository orderRepository) : IQueryHandler<GetOrdersByUserQuery, IReadOnlyList<Order>>
     {
-        public async Task<IReadOnlyList<Order>> HandleAsync(GetOrdersByUserQuery query, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<Order>> HandleAsync(GetOrdersByUserQuery query, CancellationToken cancellationToken)
         {
             return await orderRepository.GetPagedByUserIdAsync(query.UserId, query.PageNumber, query.PageSize, cancellationToken);
         }
