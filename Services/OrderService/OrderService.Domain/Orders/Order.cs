@@ -46,8 +46,26 @@ namespace OrderService.Domain.Orders
             _items.Add(new OrderItem(Id, productId, quantity));
         }
 
-        public void Confirm() { }
-        public void Complete() { }
-        public void Cancel() { }
+        public void Confirm()
+        {
+            if (Status != OrderStatus.Pending)
+                throw new InvalidOrderException("Only pending orders can be confirmed.");
+
+            Status = OrderStatus.Confirmed;
+        }
+        public void Complete()
+        {
+            if (Status != OrderStatus.Confirmed)
+                throw new InvalidOrderException("Only confirmed orders can be completed.");
+
+            Status = OrderStatus.Completed;
+        }
+        public void Cancel()
+        {
+            if (Status != OrderStatus.Pending && Status != OrderStatus.Confirmed)
+                throw new InvalidOrderException("Only pending or confirmed orders can be cancelled.");
+
+            Status = OrderStatus.Cancelled;
+        }
     }
 }
