@@ -2,6 +2,7 @@
 using OrderService.Application.Abstractions;
 using OrderService.Application.Commands;
 using OrderService.Application.DTOs;
+using OrderService.Domain.Contracts;
 using OrderService.Domain.Exceptions.DomainExceptions;
 using OrderService.Domain.Orders;
 using Xunit;
@@ -17,11 +18,7 @@ namespace OrderService.Application.Tests
             var userId = Guid.NewGuid();
             var productId = Guid.NewGuid();
 
-            var command = new CreateOrderCommand
-            {
-                UserId = userId,
-                Items = [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]
-            };
+            var command = new CreateOrderCommand(userId, [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]);
 
             var orderRepository = new Mock<IOrderRepository>();
             var productServiceClient = new Mock<IProductServiceClient>();
@@ -33,7 +30,7 @@ namespace OrderService.Application.Tests
                 uow.Object);
 
             // Act
-            await handler.Handle(command, TestContext.Current.CancellationToken);
+            await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
             // Assert
             orderRepository.Verify(
@@ -55,18 +52,15 @@ namespace OrderService.Application.Tests
             // Arrange
             var userId = Guid.Empty;
             var productId = Guid.NewGuid();
-            var command = new CreateOrderCommand
-                            {
-                                UserId = userId,
-                                Items = [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]
-                            };
+            var command = new CreateOrderCommand(userId, [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]);
+                            
             var orderRepository = new Mock<IOrderRepository>();
             var unitOfWork = new Mock<IUnitOfWork>();
             var productService = new Mock<IProductServiceClient>();
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
+            var action = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<InvalidOrderException>(action);
@@ -75,18 +69,15 @@ namespace OrderService.Application.Tests
         public async Task Handle_ShouldThrow_WhenProductIdIsEmpty()
         {
             // Arrange
-            var command = new CreateOrderCommand
-                            {
-                                UserId = Guid.NewGuid(),
-                                Items = [new CreateOrderItemDto { ProductId = Guid.Empty, Quantity = 2 }]
-                            };
+            var command = new CreateOrderCommand(Guid.NewGuid(), [new CreateOrderItemDto { ProductId = Guid.Empty, Quantity = 2 }]);
+ 
             var orderRepository = new Mock<IOrderRepository>();
             var unitOfWork = new Mock<IUnitOfWork>();
             var productService = new Mock<IProductServiceClient>();
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
+            var action = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<InvalidOrderItemException>(action);
@@ -95,18 +86,15 @@ namespace OrderService.Application.Tests
         public async Task Handle_ShouldThrow_WhenQuantityIsZero()
         {
             // Arrange
-            var command = new CreateOrderCommand
-                            {
-                                UserId = Guid.NewGuid(),
-                                Items = [new CreateOrderItemDto { ProductId = Guid.NewGuid(), Quantity = 0 }]
-                            };
+            var command = new CreateOrderCommand(Guid.NewGuid(), [new CreateOrderItemDto { ProductId = Guid.NewGuid(), Quantity = 0 }]);
+
             var orderRepository = new Mock<IOrderRepository>();
             var unitOfWork = new Mock<IUnitOfWork>();
             var productService = new Mock<IProductServiceClient>();
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
+            var action = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<InvalidOrderItemException>(action);
@@ -115,18 +103,15 @@ namespace OrderService.Application.Tests
         public async Task Handle_ShouldThrow_WhenQuantityIsNegative()
         {
             // Arrange
-            var command = new CreateOrderCommand
-                            {
-                                UserId = Guid.NewGuid(),
-                                Items = [new CreateOrderItemDto { ProductId = Guid.NewGuid(), Quantity = -1 }]
-                            };
+            var command = new CreateOrderCommand(Guid.NewGuid(), [new CreateOrderItemDto { ProductId = Guid.NewGuid(), Quantity = -1 }]);
+
             var orderRepository = new Mock<IOrderRepository>();
             var unitOfWork = new Mock<IUnitOfWork>();
             var productService = new Mock<IProductServiceClient>();
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
+            var action = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<InvalidOrderItemException>(action);
@@ -137,18 +122,15 @@ namespace OrderService.Application.Tests
             // Arrange
             var userId = Guid.NewGuid();
             var productId = Guid.NewGuid();
-            var command = new CreateOrderCommand
-                            {
-                                UserId = userId,
-                                Items = [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]
-                            };
+            var command = new CreateOrderCommand(userId, [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]);
+
             var orderRepository = new Mock<IOrderRepository>();
             var unitOfWork = new Mock<IUnitOfWork>();
             var productService = new Mock<IProductServiceClient>();
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            await handler.Handle(command, TestContext.Current.CancellationToken);
+            await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
             // Assert
             productService.Verify(x => x.DecreaseStockAsync(productId, 2, TestContext.Current.CancellationToken),Times.Once);
@@ -158,11 +140,8 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var productId = Guid.NewGuid();
-            var command = new CreateOrderCommand
-            {
-                UserId = Guid.NewGuid(),
-                Items =[new CreateOrderItemDto{ProductId = productId,Quantity = 2}]
-            };
+            var command = new CreateOrderCommand(Guid.NewGuid(), [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]);
+
             var orderRepository = new Mock<IOrderRepository>();
             var unitOfWork = new Mock<IUnitOfWork>();
             var productService = new Mock<IProductServiceClient>();
@@ -170,7 +149,7 @@ namespace OrderService.Application.Tests
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
+            var action = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<HttpRequestException>(action);
@@ -184,11 +163,9 @@ namespace OrderService.Application.Tests
             var productA = Guid.NewGuid();
             var productB = Guid.NewGuid();
 
-            var command = new CreateOrderCommand
-            {
-                UserId = Guid.NewGuid(),
-                Items = [new CreateOrderItemDto { ProductId = productA, Quantity = 2 }, new CreateOrderItemDto { ProductId = productB, Quantity = 3 }]
-            };
+            var command = new CreateOrderCommand(Guid.NewGuid(),
+                [new CreateOrderItemDto { ProductId = productA, Quantity = 2 }, new CreateOrderItemDto { ProductId = productB, Quantity = 3 }]
+                );
             var orderRepository = new Mock<IOrderRepository>();
             var unitOfWork = new Mock<IUnitOfWork>();
             var productService = new Mock<IProductServiceClient>();
@@ -197,7 +174,7 @@ namespace OrderService.Application.Tests
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
+            var action = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<HttpRequestException>(action);
@@ -211,11 +188,9 @@ namespace OrderService.Application.Tests
             // Arrange
             var productA = Guid.NewGuid();
             var productB = Guid.NewGuid();
-            var command = new CreateOrderCommand
-            {
-                UserId = Guid.NewGuid(),
-                Items = [new CreateOrderItemDto { ProductId = productA, Quantity = 2 }, new CreateOrderItemDto { ProductId = productB, Quantity = 3 }]
-            };
+            var command = new CreateOrderCommand(Guid.NewGuid(),
+                [new CreateOrderItemDto { ProductId = productA, Quantity = 2 }, new CreateOrderItemDto { ProductId = productB, Quantity = 3 }]
+                );
             var orderRepository = new Mock<IOrderRepository>();
             var unitOfWork = new Mock<IUnitOfWork>();
             var productService = new Mock<IProductServiceClient>();
@@ -227,7 +202,7 @@ namespace OrderService.Application.Tests
             var handler = new CreateOrderCommandHandler(orderRepository.Object, productService.Object, unitOfWork.Object);
 
             // Act
-            var action = () => handler.Handle(command, TestContext.Current.CancellationToken);
+            var action = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
             // Assert
             await Assert.ThrowsAsync<HttpRequestException>(action);

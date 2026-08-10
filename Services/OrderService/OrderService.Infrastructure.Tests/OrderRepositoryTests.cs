@@ -93,9 +93,7 @@ namespace OrderService.Infrastructure.Tests
             var repository = new OrderRepository(context2);
 
             // Act
-            var result = await repository.GetByIdUntrackedAsync(
-                orderId,
-                TestContext.Current.CancellationToken);
+            var result = await repository.GetByIdUntrackedAsync(orderId, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(result);
@@ -136,8 +134,7 @@ namespace OrderService.Infrastructure.Tests
             await connection.OpenAsync(TestContext.Current.CancellationToken);
 
             var options = new DbContextOptionsBuilder<OrderDbContext>()
-                .UseSqlite(connection)
-                .Options;
+                .UseSqlite(connection).Options;
 
             await using var context = new OrderDbContext(options);
 

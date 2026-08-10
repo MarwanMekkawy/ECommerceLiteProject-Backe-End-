@@ -5,9 +5,9 @@ using OrderService.Domain.Orders;
 
 namespace OrderService.Application.Commands
 {
-    public class CreateOrderCommandHandler(IOrderRepository orderRepository, IProductServiceClient productServiceClient, IUnitOfWork uow)
+    public class CreateOrderCommandHandler(IOrderRepository orderRepository, IProductServiceClient productServiceClient, IUnitOfWork uow) : ICommandHandler<CreateOrderCommand>
     {
-        public async Task Handle(CreateOrderCommand command, CancellationToken cancellationToken)
+        public async Task HandleAsync(CreateOrderCommand command, CancellationToken cancellationToken)
         {
             var order = new Order(command.UserId);
             var decreasedItems = new List<CreateOrderItemDto>();
