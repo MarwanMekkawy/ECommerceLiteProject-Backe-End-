@@ -14,8 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OrderService.Domain\OrderService.Domain.csproj" />
-    <ProjectReference Include="..\OrderService.InfraStructure\OrderService.InfraStructure.csproj" />
+    <ProjectReference Include="..\..\OrderService.Domain\OrderService.Domain.csproj" />
+    <ProjectReference Include="..\..\OrderService.InfraStructure\OrderService.InfraStructure.csproj" />
   </ItemGroup>
 
 </Project>
