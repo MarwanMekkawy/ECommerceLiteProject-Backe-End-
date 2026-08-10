@@ -6,9 +6,9 @@ namespace OrderService.Application.Queries
 {
     public class GetOrderByIdAdminQueryHandler(IOrderRepository orderRepository) : IQueryHandler<GetOrderByIdAdminQuery, Order?>
     {
-        public Task<Order?> HandleAsync(GetOrderByIdAdminQuery query, CancellationToken cancellationToken)
+        public async Task<Order?> HandleAsync(GetOrderByIdAdminQuery query, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await orderRepository.GetByIdUntrackedAsync(query.OrderId, cancellationToken);
         }
     }
 }
