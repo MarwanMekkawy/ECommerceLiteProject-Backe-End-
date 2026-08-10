@@ -102,6 +102,151 @@ namespace OrderService.Domain.Tests
 
             Assert.Equal(1, order.Items.Count(x => x.ProductId == productId));
             Assert.Equal(4, order.Items.Single().Quantity);
+        }        
+        [Fact]
+        public void Confirm_ShouldChangeStatusToConfirmed_WhenOrderIsPending()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+
+            // Act
+            order.Confirm();
+
+            // Assert
+            Assert.Equal(OrderStatus.Confirmed, order.Status);
         }
+
+        [Fact]
+        public void Confirm_ShouldThrow_WhenOrderIsAlreadyConfirmed()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            order.Confirm();
+
+            // Act & Assert
+            Assert.Throws<InvalidOrderException>(() => order.Confirm());
+        }
+
+        [Fact]
+        public void Confirm_ShouldThrow_WhenOrderIsCompleted()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            order.Confirm();
+            order.Complete();
+
+            // Act & Assert
+            Assert.Throws<InvalidOrderException>(() => order.Confirm());
+        }
+
+        [Fact]
+        public void Confirm_ShouldThrow_WhenOrderIsCancelled()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            order.Cancel();
+
+            // Act & Assert
+            Assert.Throws<InvalidOrderException>(() => order.Confirm());
+        }
+
+
+        [Fact]
+        public void Complete_ShouldChangeStatusToCompleted_WhenOrderIsConfirmed()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            order.Confirm();
+
+            // Act
+            order.Complete();
+
+            // Assert
+            Assert.Equal(OrderStatus.Completed, order.Status);
+        }
+
+        [Fact]
+        public void Complete_ShouldThrow_WhenOrderIsPending()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+
+            // Act & Assert
+            Assert.Throws<InvalidOrderException>(() => order.Complete());
+        }
+
+        [Fact]
+        public void Complete_ShouldThrow_WhenOrderIsCancelled()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            order.Cancel();
+
+            // Act & Assert
+            Assert.Throws<InvalidOrderException>(() => order.Complete());
+        }
+
+        [Fact]
+        public void Complete_ShouldThrow_WhenOrderIsAlreadyCompleted()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            order.Confirm();
+            order.Complete();
+
+            // Act & Assert
+            Assert.Throws<InvalidOrderException>(() => order.Complete());
+        }
+
+
+        [Fact]
+        public void Cancel_ShouldChangeStatusToCancelled_WhenOrderIsPending()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+
+            // Act
+            order.Cancel();
+
+            // Assert
+            Assert.Equal(OrderStatus.Cancelled, order.Status);
+        }
+
+        [Fact]
+        public void Cancel_ShouldChangeStatusToCancelled_WhenOrderIsConfirmed()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            order.Confirm();
+
+            // Act
+            order.Cancel();
+
+            // Assert
+            Assert.Equal(OrderStatus.Cancelled, order.Status);
+        }
+
+        [Fact]
+        public void Cancel_ShouldThrow_WhenOrderIsAlreadyCompleted()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            order.Confirm();
+            order.Complete();
+
+            // Act & Assert
+            Assert.Throws<InvalidOrderException>(() => order.Cancel());
+        }
+
+        [Fact]
+        public void Cancel_ShouldThrow_WhenOrderIsAlreadyCancelled()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            order.Cancel();
+
+            // Act & Assert
+            Assert.Throws<InvalidOrderException>(() => order.Cancel());
+        }        
     }
 }

@@ -45,5 +45,9 @@ namespace OrderService.Domain.Orders
 
             _items.Add(new OrderItem(Id, productId, quantity));
         }
+
+        public void Confirm() { }
+        public void Complete() { }
+        public void Cancel() { }
     }
 }
