@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using Domain.Exceptions;
+using Moq;
 using OrderService.Application.Commands;
 using OrderService.Domain.Contracts;
 using OrderService.Domain.Exceptions.DomainExceptions;
@@ -41,7 +42,7 @@ namespace OrderService.Application.Tests
             var command = new ConfirmOrderCommand(orderId);
 
             // Act & Assert
-            await Assert.ThrowsAsync<OrderNotFoundException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
+            await Assert.ThrowsAsync<NotFoundException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
             uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 

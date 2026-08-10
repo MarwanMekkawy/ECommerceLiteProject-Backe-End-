@@ -1,12 +1,21 @@
-﻿using OrderService.Application.Abstractions;
+﻿using Domain.Exceptions;
+using OrderService.Application.Abstractions;
+using OrderService.Domain.Contracts;
 
 namespace OrderService.Application.Commands
 {
-    public class CompleteOrderCommandHandler : ICommandHandler<CompleteOrderCommand>
+    public class CompleteOrderCommandHandler(IOrderRepository orderRepository, IUnitOfWork uow) : ICommandHandler<CompleteOrderCommand>
     {
-        public Task HandleAsync(CompleteOrderCommand command, CancellationToken cancellationToken)
+        public async Task HandleAsync(CompleteOrderCommand command, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var order = await orderRepository.GetByIdTrackedAsync(command.OrderId, cancellationToken);
+
+            if (order is null)
+                throw new NotFoundException($"Order with Id {command.OrderId} Was NOT FOUND.");
+
+            order.Complete();
+
+            await uow.SaveChangesAsync(cancellationToken);
         }
     }
 }
