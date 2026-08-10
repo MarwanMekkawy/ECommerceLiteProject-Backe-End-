@@ -1,5 +1,6 @@
 ﻿using Domain.Exceptions;
 using Moq;
+using OrderService.Application.Commands;
 using OrderService.Domain.Contracts;
 using OrderService.Domain.Exceptions.DomainExceptions;
 using OrderService.Domain.Orders;
@@ -15,7 +16,7 @@ namespace OrderService.Application.Tests
             // Arrange
             var order = new Order(Guid.NewGuid());
             var repository = new Mock<IOrderRepository>();
-            repository.Setup(x => x.GetByIdTrackedAsync(order.Id,It.IsAny<CancellationToken>())).ReturnsAsync(order);
+            repository.Setup(x => x.GetByIdTrackedAsync(order.Id, It.IsAny<CancellationToken>())).ReturnsAsync(order);
             var uow = new Mock<IUnitOfWork>();
             var handler = new CancelOrderCommandHandler(repository.Object, uow.Object);
             var command = new CancelOrderCommand(order.Id);
@@ -34,7 +35,7 @@ namespace OrderService.Application.Tests
             // Arrange
             var orderId = Guid.NewGuid();
             var repository = new Mock<IOrderRepository>();
-            repository.Setup(x => x.GetByIdTrackedAsync(orderId,It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
+            repository.Setup(x => x.GetByIdTrackedAsync(orderId, It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
             var uow = new Mock<IUnitOfWork>();
             var handler = new CancelOrderCommandHandler(repository.Object, uow.Object);
             var command = new CancelOrderCommand(orderId);
@@ -49,6 +50,7 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var order = new Order(Guid.NewGuid());
+            order.Confirm();
             order.Complete();
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetByIdTrackedAsync(order.Id, It.IsAny<CancellationToken>())).ReturnsAsync(order);
@@ -58,7 +60,7 @@ namespace OrderService.Application.Tests
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOrderException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
-            uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()),Times.Never);
+            uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }
