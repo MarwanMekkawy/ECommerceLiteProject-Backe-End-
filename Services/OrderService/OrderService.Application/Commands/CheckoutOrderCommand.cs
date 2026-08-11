@@ -1,12 +1,13 @@
 ﻿using OrderService.Application.Abstractions;
+using OrderService.Application.DTOs;
 
 namespace OrderService.Application.Commands
 {
-    public class ConfirmOrderCommand : ICommand
+    public class CheckoutOrderCommand : ICommand<CheckoutOrderDto>
     {
         public Guid OrderId { get; }
 
-        public ConfirmOrderCommand(Guid orderId)
+        public CheckoutOrderCommand(Guid orderId)
         {
             OrderId = orderId;
         }

@@ -10,7 +10,7 @@ namespace OrderService.Application.Extentions.App
         {
             // Commands
             services.AddScoped<CreateOrderCommandHandler>();
-            services.AddScoped<ConfirmOrderCommandHandler>();
+            services.AddScoped<CheckoutOrderCommandHandler>();
             services.AddScoped<CompleteOrderCommandHandler>();
             services.AddScoped<CancelOrderCommandHandler>();
 
