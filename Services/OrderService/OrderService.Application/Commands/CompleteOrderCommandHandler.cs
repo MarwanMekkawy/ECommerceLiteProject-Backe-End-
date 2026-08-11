@@ -14,7 +14,6 @@ namespace OrderService.Application.Commands
                 throw new NotFoundException($"Order with Id {command.OrderId} Was NOT FOUND.");
 
             order.Complete();
-
             await uow.SaveChangesAsync(cancellationToken);
         }
     }

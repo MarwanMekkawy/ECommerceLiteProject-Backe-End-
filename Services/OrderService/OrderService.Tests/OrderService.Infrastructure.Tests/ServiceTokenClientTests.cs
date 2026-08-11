@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Domain.Exceptions;
+using Microsoft.Extensions.Configuration;
 using OrderService.InfraStructure.Clients;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
@@ -124,7 +125,7 @@ namespace OrderService.Infrastructure.Tests
             var client = new ServiceTokenClient(httpClient, configuration, cache);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>( () => client.GetTokenAsync(TestContext.Current.CancellationToken));
+            await Assert.ThrowsAsync<UnauthorizedException>( () => client.GetTokenAsync(TestContext.Current.CancellationToken));
         }
 
 

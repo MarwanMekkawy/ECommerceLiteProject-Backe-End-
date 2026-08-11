@@ -20,7 +20,7 @@ namespace OrderService.Application.Tests
             var order = new Order(Guid.NewGuid());
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
-            var product = new ProductCheckoutDto
+            var product = new ProductDto
             {
                 ProductId = productId,
                 Price = 10,
@@ -71,7 +71,7 @@ namespace OrderService.Application.Tests
             var order = new Order(Guid.NewGuid());
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
-            var product = new ProductCheckoutDto
+            var product = new ProductDto
             {
                 ProductId = productId,
                 Price = 15,
@@ -98,7 +98,7 @@ namespace OrderService.Application.Tests
             var order = new Order(Guid.NewGuid());
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
-            var product = new ProductCheckoutDto
+            var product = new ProductDto
             {
                 ProductId = productId,
                 Price = 10,
@@ -131,13 +131,13 @@ namespace OrderService.Application.Tests
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdUntrackedAsync(order.Id, TestContext.Current.CancellationToken)).ReturnsAsync(order);
             var productService = new Mock<IProductServiceClient>();
-            productService.Setup(x => x.GetProductForCheckoutAsync(productA, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductCheckoutDto
+            productService.Setup(x => x.GetProductForCheckoutAsync(productA, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductDto
             {
                 ProductId = productA,
                 Price = 10,
                 Currency = CurrencyCode.USD
             });
-            productService.Setup(x => x.GetProductForCheckoutAsync(productB, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductCheckoutDto
+            productService.Setup(x => x.GetProductForCheckoutAsync(productB, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductDto
             {
                 ProductId = productB,
                 Price = 5,
@@ -167,13 +167,13 @@ namespace OrderService.Application.Tests
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdUntrackedAsync(order.Id, TestContext.Current.CancellationToken)).ReturnsAsync(order);
             var productService = new Mock<IProductServiceClient>();
-            productService.Setup(x => x.GetProductForCheckoutAsync(productA, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductCheckoutDto
+            productService.Setup(x => x.GetProductForCheckoutAsync(productA, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductDto
             {
                 ProductId = productA,
                 Price = 10,
                 Currency = CurrencyCode.USD
             });
-            productService.Setup(x => x.GetProductForCheckoutAsync(productB, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductCheckoutDto
+            productService.Setup(x => x.GetProductForCheckoutAsync(productB, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductDto
             {
                 ProductId = productB,
                 Price = 5,
@@ -202,7 +202,7 @@ namespace OrderService.Application.Tests
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdUntrackedAsync(order.Id, TestContext.Current.CancellationToken)).ReturnsAsync(order);
             var productService = new Mock<IProductServiceClient>();
-            productService.Setup(x => x.GetProductForCheckoutAsync(productA, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductCheckoutDto
+            productService.Setup(x => x.GetProductForCheckoutAsync(productA, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductDto
             {
                 ProductId = productA,
                 Price = 10,
@@ -224,7 +224,7 @@ namespace OrderService.Application.Tests
             var order = new Order(Guid.NewGuid());
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
-            var product = new ProductCheckoutDto
+            var product = new ProductDto
             {
                 ProductId = productId,
                 Price = 10,
@@ -257,13 +257,13 @@ namespace OrderService.Application.Tests
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdUntrackedAsync(order.Id, TestContext.Current.CancellationToken)).ReturnsAsync(order);
             var productService = new Mock<IProductServiceClient>();
-            productService.Setup(x => x.GetProductForCheckoutAsync(productA, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductCheckoutDto
+            productService.Setup(x => x.GetProductForCheckoutAsync(productA, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductDto
             {
                 ProductId = productA,
                 Price = 10,
                 Currency = CurrencyCode.USD
             });
-            productService.Setup(x => x.GetProductForCheckoutAsync(productB, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductCheckoutDto
+            productService.Setup(x => x.GetProductForCheckoutAsync(productB, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductDto
             {
                 ProductId = productB,
                 Price = 10,

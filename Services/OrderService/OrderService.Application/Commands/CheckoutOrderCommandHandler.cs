@@ -28,6 +28,8 @@ namespace OrderService.Application.Commands
                 foreach (var item in order.Items)
                 {
                     var product = await productServiceClient.GetProductForCheckoutAsync(item.ProductId, cancellationToken);
+                    if (product is null)
+                        throw new NotFoundException($"Product with Id {item.ProductId} Was NOT FOUND.");
 
                     if (currency is null)
                         currency = product.Currency;

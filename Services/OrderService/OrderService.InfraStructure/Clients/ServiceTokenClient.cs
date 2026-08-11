@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Domain.Exceptions;
+using Microsoft.Extensions.Configuration;
 using OrderService.Application.Abstractions;
 using OrderService.InfraStructure.Clients.DTOIdentityContracts;
 using System.IdentityModel.Tokens.Jwt;
@@ -28,7 +29,7 @@ namespace OrderService.InfraStructure.Clients
             var result = await response.Content.ReadFromJsonAsync<ServiceTokenResponse>(cancellationToken);
 
             if (string.IsNullOrWhiteSpace(result?.JwtToken))
-                throw new InvalidOperationException("IdentityService returned an empty service JWT.");
+                throw new UnauthorizedException("IdentityService returned an empty service JWT.");
 
             var jwt = new JwtSecurityTokenHandler().ReadJwtToken(result.JwtToken);
 

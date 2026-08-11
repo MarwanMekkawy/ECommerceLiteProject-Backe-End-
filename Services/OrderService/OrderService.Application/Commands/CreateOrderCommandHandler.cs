@@ -17,7 +17,6 @@ namespace OrderService.Application.Commands
             }
 
             await orderRepository.AddAsync(order, cancellationToken);
-
             await uow.SaveChangesAsync(cancellationToken);
         }
     }
