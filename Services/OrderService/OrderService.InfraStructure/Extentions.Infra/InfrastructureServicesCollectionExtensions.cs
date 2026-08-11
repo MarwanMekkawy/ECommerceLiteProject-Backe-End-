@@ -18,9 +18,12 @@ namespace OrderService.InfraStructure.Extentions.Infra
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            // Product Service Client
+            // Product Clients
             services.AddHttpClient<IProductServiceClient, ProductServiceClient>(
                 client =>{client.BaseAddress = new Uri(config["HttpClients:ProductService:BaseUrl"]!);});
+            services.AddHttpClient<IServiceTokenClient, ServiceTokenClient>(
+                client =>{client.BaseAddress = new Uri(config["HttpClients:IdentityService:BaseUrl"]!);});
+            services.AddSingleton<IServiceTokenCache, ServiceTokenCache>();
 
             return services;
         }
