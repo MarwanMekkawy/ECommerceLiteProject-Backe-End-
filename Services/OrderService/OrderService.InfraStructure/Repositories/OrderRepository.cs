@@ -21,10 +21,19 @@ namespace OrderService.Domain.Contracts
             return await _context.Orders.Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == orderId, cancellationToken);
         }
 
-        public async Task<IReadOnlyList<Order>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        public async Task<Order?> GetByIdAndUserIdUnTrackedAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders.AsNoTracking().Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == orderId && x.UserId == userId, cancellationToken);
+        }
+        public async Task<Order?> GetByIdAndUserIdTrackedAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders.Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == orderId && x.UserId == userId, cancellationToken);
+        }
+
+        public async Task<Order?> GetLatestByUserIdUntrackedAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             return await _context.Orders.AsNoTracking().Include(x => x.Items).Where(x => x.UserId == userId)
-                .OrderByDescending(x => x.CreatedAt).ToListAsync(cancellationToken);
+                .OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<IReadOnlyList<Order>> GetPagedByUserIdAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)

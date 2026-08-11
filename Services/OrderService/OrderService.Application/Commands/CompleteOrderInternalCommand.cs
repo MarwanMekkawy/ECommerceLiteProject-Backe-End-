@@ -2,15 +2,13 @@
 
 namespace OrderService.Application.Commands
 {
-    public class CancelOrderCommand : ICommand
+    public class CompleteOrderInternalCommand : ICommand
     {
         public Guid OrderId { get; }
-        public Guid UserId { get; }
 
-        public CancelOrderCommand(Guid userId, Guid orderId)
+        public CompleteOrderInternalCommand(Guid orderId)
         {
             OrderId = orderId;
-            UserId = userId;
         }
     }
 }

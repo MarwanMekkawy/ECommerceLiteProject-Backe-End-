@@ -2,6 +2,7 @@
 using Moq;
 using OrderService.Application.Commands;
 using OrderService.Domain.Contracts;
+using OrderService.Domain.Enums;
 using OrderService.Domain.Exceptions.DomainExceptions;
 using OrderService.Domain.Orders;
 using Xunit;
@@ -15,12 +16,22 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var order = new Order(Guid.NewGuid());
-            order.Confirm();
+            var productId = Guid.NewGuid();
+            order.AddItem(productId, 1);
+
+            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            {
+                [productId] = (10, CurrencyCode.USD)
+            };
+
+            order.Confirm(productPrices, DateTime.UtcNow);
+
             var repository = new Mock<IOrderRepository>();
-            repository.Setup(x => x.GetByIdTrackedAsync(order.Id,It.IsAny<CancellationToken>())).ReturnsAsync(order);
+            repository.Setup(x => x.GetByIdTrackedAsync(order.Id, It.IsAny<CancellationToken>())).ReturnsAsync(order);
+
             var uow = new Mock<IUnitOfWork>();
-            var handler = new CompleteOrderCommandHandler(repository.Object,uow.Object);
-            var command = new CompleteOrderCommand(order.Id);
+            var handler = new CompleteOrderCommandInternalHandler(repository.Object, uow.Object);
+            var command = new CompleteOrderInternalCommand(order.Id);
 
             // Act
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
@@ -37,8 +48,8 @@ namespace OrderService.Application.Tests
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetByIdTrackedAsync(orderId, It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
             var uow = new Mock<IUnitOfWork>();
-            var handler = new CompleteOrderCommandHandler(repository.Object, uow.Object);
-            var command = new CompleteOrderCommand(orderId);
+            var handler = new CompleteOrderCommandInternalHandler(repository.Object, uow.Object);
+            var command = new CompleteOrderInternalCommand(orderId);
 
             // Act & Assert
             await Assert.ThrowsAsync<NotFoundException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
@@ -52,8 +63,8 @@ namespace OrderService.Application.Tests
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetByIdTrackedAsync(order.Id, It.IsAny<CancellationToken>())).ReturnsAsync(order);
             var uow = new Mock<IUnitOfWork>();
-            var handler = new CompleteOrderCommandHandler(repository.Object, uow.Object);
-            var command = new CompleteOrderCommand(order.Id);
+            var handler = new CompleteOrderCommandInternalHandler(repository.Object, uow.Object);
+            var command = new CompleteOrderInternalCommand(order.Id);
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOrderException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));

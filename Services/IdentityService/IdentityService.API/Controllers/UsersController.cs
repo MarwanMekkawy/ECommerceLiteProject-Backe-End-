@@ -3,9 +3,7 @@ using IdentityService.API.CookiesHelpers;
 using IdentityService.Application.Abstractions;
 using IdentityService.Application.DTOs.UserDTOs;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace IdentityService.API.Controllers
 {

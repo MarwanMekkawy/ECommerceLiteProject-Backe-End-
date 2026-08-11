@@ -1,4 +1,5 @@
-﻿using OrderService.Domain.Exceptions.DomainExceptions;
+﻿using OrderService.Domain.Enums;
+using OrderService.Domain.Exceptions.DomainExceptions;
 
 
 
@@ -11,7 +12,14 @@ namespace OrderService.Domain.Orders
         public int Quantity { get; private set; }
         public Guid OrderId { get; private set; }
 
+        // Price snapshot when the order is confirmed
+        public decimal UnitPrice { get; private set; }
+        public CurrencyCode Currency { get; private set; }
+        public decimal Total { get; private set; }
+
         public Order Order { get; private set; } = null!;
+
+        private OrderItem() { }
 
         public OrderItem(Guid orderId, Guid productId, int quantity)
         {
@@ -36,6 +44,15 @@ namespace OrderService.Domain.Orders
                 throw new InvalidOrderItemException("Quantity must be greater than zero.");
 
             Quantity += quantity;
+        }
+        internal void SetPriceSnapshot(decimal unitPrice, CurrencyCode currency)
+        {
+            if (unitPrice < 0)
+                throw new InvalidOrderItemException("Unit price cannot be negative.");
+
+            UnitPrice = unitPrice;
+            Currency = currency;
+            Total = unitPrice * Quantity;
         }
     }
 }

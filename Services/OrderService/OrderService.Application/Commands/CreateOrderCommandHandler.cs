@@ -1,5 +1,4 @@
 ﻿using OrderService.Application.Abstractions;
-using OrderService.Application.DTOs;
 using OrderService.Domain.Contracts;
 using OrderService.Domain.Orders;
 

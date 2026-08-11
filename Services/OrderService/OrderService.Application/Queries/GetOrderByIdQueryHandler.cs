@@ -8,7 +8,7 @@ namespace OrderService.Application.Queries
     {
         public async Task<Order?> HandleAsync(GetOrderByIdQuery query, CancellationToken cancellationToken)
         {
-            return await orderRepository.GetByIdUntrackedAsync(query.OrderId, cancellationToken);
+            return await orderRepository.GetByIdAndUserIdUnTrackedAsync(query.UserId, query.OrderId, cancellationToken);
         }
     }
 }

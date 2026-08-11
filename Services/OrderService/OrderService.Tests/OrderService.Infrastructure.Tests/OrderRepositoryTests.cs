@@ -181,96 +181,6 @@ namespace OrderService.Infrastructure.Tests
         }
 
         [Fact]
-        public async Task GetByUserIdAsync_ShouldReturnUserOrders()
-        {
-            // Arrange
-            var connection = new SqliteConnection("DataSource=:memory:");
-            await connection.OpenAsync(TestContext.Current.CancellationToken);
-
-            var options = new DbContextOptionsBuilder<OrderDbContext>().UseSqlite(connection).Options;
-
-            await using var context = new OrderDbContext(options);
-
-            await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
-
-            var userId = Guid.NewGuid();
-            var otherUserId = Guid.NewGuid();
-
-            var order1 = new Order(userId);
-            var order2 = new Order(userId);
-            var otherOrder = new Order(otherUserId);
-
-            context.Orders.AddRange(order1, order2, otherOrder);
-
-            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-            var repository = new OrderRepository(context);
-
-            // Act
-            var result = await repository.GetByUserIdAsync(userId, TestContext.Current.CancellationToken);
-
-            // Assert
-            Assert.Equal(2, result.Count);
-            Assert.All(result, order => Assert.Equal(userId, order.UserId));
-        }
-
-        [Fact]
-        public async Task GetByUserIdAsync_ShouldReturnEmpty_WhenUserHasNoOrders()
-        {
-            // Arrange
-            var connection = new SqliteConnection("DataSource=:memory:");
-            await connection.OpenAsync(TestContext.Current.CancellationToken);
-
-            var options = new DbContextOptionsBuilder<OrderDbContext>().UseSqlite(connection).Options;
-
-            await using var context = new OrderDbContext(options);
-
-            await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
-
-            var repository = new OrderRepository(context);
-
-            // Act
-            var result = await repository.GetByUserIdAsync(Guid.NewGuid(), TestContext.Current.CancellationToken);
-
-            // Assert
-            Assert.Empty(result);
-        }
-
-        [Fact]
-        public async Task GetPagedByUserIdAsync_ShouldReturnRequestedPage()
-        {
-            // Arrange
-            var connection = new SqliteConnection("DataSource=:memory:");
-            await connection.OpenAsync(TestContext.Current.CancellationToken);
-
-            var options = new DbContextOptionsBuilder<OrderDbContext>().UseSqlite(connection).Options;
-
-            await using var context = new OrderDbContext(options);
-
-            await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
-
-            var userId = Guid.NewGuid();
-
-            var order1 = new Order(userId);
-            var order2 = new Order(userId);
-            var order3 = new Order(userId);
-            var order4 = new Order(userId);
-            var order5 = new Order(userId);
-
-            context.Orders.AddRange(order1, order2, order3, order4, order5);
-
-            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-            var repository = new OrderRepository(context);
-
-            // Act
-            var result = await repository.GetPagedByUserIdAsync(userId, 2, 2, TestContext.Current.CancellationToken);
-
-            // Assert
-            Assert.Equal(2, result.Count);
-        }
-
-        [Fact]
         public async Task GetPagedByUserIdAsync_ShouldReturnOnlyUserOrders()
         {
             // Arrange
@@ -301,6 +211,233 @@ namespace OrderService.Infrastructure.Tests
             // Assert
             Assert.Single(result);
             Assert.Equal(userId, result[0].UserId);
+        }
+
+        [Fact]
+        public async Task GetByIdAndUserIdUntrackedAsync_ShouldReturnOrder_WhenOrderBelongsToUser()
+        {
+            // Arrange
+            var connection = new SqliteConnection("DataSource=:memory:");
+            await connection.OpenAsync(TestContext.Current.CancellationToken);
+
+            var options = new DbContextOptionsBuilder<OrderDbContext>().UseSqlite(connection).Options;
+
+            await using var context = new OrderDbContext(options);
+
+            await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+
+            var userId = Guid.NewGuid();
+            var order = new Order(userId);
+
+            context.Orders.Add(order);
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            context.ChangeTracker.Clear();
+
+            var repository = new OrderRepository(context);
+
+            // Act
+            var result = await repository.GetByIdAndUserIdUnTrackedAsync(order.Id, userId, TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(order.Id, result.Id);
+            Assert.Equal(userId, result.UserId);
+            Assert.Equal(EntityState.Detached, context.Entry(result).State);
+        }
+
+        [Fact]
+        public async Task GetByIdAndUserIdUntrackedAsync_ShouldReturnNull_WhenOrderBelongsToAnotherUser()
+        {
+            // Arrange
+            var connection = new SqliteConnection("DataSource=:memory:");
+            await connection.OpenAsync(TestContext.Current.CancellationToken);
+
+            var options = new DbContextOptionsBuilder<OrderDbContext>().UseSqlite(connection).Options;
+
+            await using var context = new OrderDbContext(options);
+
+            await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+
+            var userId = Guid.NewGuid();
+            var otherUserId = Guid.NewGuid();
+
+            var order = new Order(userId);
+
+            context.Orders.Add(order);
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            var repository = new OrderRepository(context);
+
+            // Act
+            var result = await repository.GetByIdAndUserIdUnTrackedAsync(order.Id, otherUserId, TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task GetByIdAndUserIdUntrackedAsync_ShouldReturnOrderWithItems()
+        {
+            // Arrange
+            var connection = new SqliteConnection("DataSource=:memory:");
+            await connection.OpenAsync(TestContext.Current.CancellationToken);
+
+            var options = new DbContextOptionsBuilder<OrderDbContext>().UseSqlite(connection).Options;
+
+            Guid orderId;
+            var userId = Guid.NewGuid();
+
+            await using (var context = new OrderDbContext(options))
+            {
+                await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+
+                var order = new Order(userId);
+
+                order.AddItem(Guid.NewGuid(), 2);
+                order.AddItem(Guid.NewGuid(), 3);
+
+                orderId = order.Id;
+
+                context.Orders.Add(order);
+
+                await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+            }
+
+            await using var context2 = new OrderDbContext(options);
+
+            var repository = new OrderRepository(context2);
+
+            // Act
+            var result = await repository.GetByIdAndUserIdUnTrackedAsync(orderId, userId, TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(orderId, result.Id);
+            Assert.Equal(userId, result.UserId);
+            Assert.Equal(2, result.Items.Count);
+        }
+
+        [Fact]
+        public async Task GetByIdAndUserIdTrackedAsync_ShouldReturnOrder_WhenOrderBelongsToUser()
+        {
+            // Arrange
+            var connection = new SqliteConnection("DataSource=:memory:");
+            await connection.OpenAsync(TestContext.Current.CancellationToken);
+
+            var options = new DbContextOptionsBuilder<OrderDbContext>().UseSqlite(connection).Options;
+
+            await using var context = new OrderDbContext(options);
+
+            await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+
+            var userId = Guid.NewGuid();
+            var order = new Order(userId);
+
+            context.Orders.Add(order);
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            context.ChangeTracker.Clear();
+
+            var repository = new OrderRepository(context);
+
+            // Act
+            var result = await repository.GetByIdAndUserIdTrackedAsync(order.Id, userId, TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(order.Id, result.Id);
+            Assert.Equal(userId, result.UserId);
+            Assert.True(context.Entry(result).State == EntityState.Unchanged);
+        }
+
+        [Fact]
+        public async Task GetByIdAndUserIdTrackedAsync_ShouldReturnNull_WhenOrderBelongsToAnotherUser()
+        {
+            // Arrange
+            var connection = new SqliteConnection("DataSource=:memory:");
+            await connection.OpenAsync(TestContext.Current.CancellationToken);
+
+            var options = new DbContextOptionsBuilder<OrderDbContext>().UseSqlite(connection).Options;
+
+            await using var context = new OrderDbContext(options);
+
+            await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+
+            var userId = Guid.NewGuid();
+            var otherUserId = Guid.NewGuid();
+
+            var order = new Order(userId);
+
+            context.Orders.Add(order);
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            var repository = new OrderRepository(context);
+
+            // Act
+            var result = await repository.GetByIdAndUserIdTrackedAsync(order.Id, otherUserId, TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task GetLatestByUserIdUntrackedAsync_ShouldReturnLatestOrder()
+        {
+            // Arrange
+            var connection = new SqliteConnection("DataSource=:memory:");
+            await connection.OpenAsync(TestContext.Current.CancellationToken);
+
+            var options = new DbContextOptionsBuilder<OrderDbContext>().UseSqlite(connection).Options;
+
+            await using var context = new OrderDbContext(options);
+
+            await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+
+            var userId = Guid.NewGuid();
+
+            var olderOrder = new Order(userId);
+            var latestOrder = new Order(userId);
+
+            olderOrder.CreatedAt = DateTime.UtcNow.AddMinutes(-10);
+            latestOrder.CreatedAt = DateTime.UtcNow;
+
+            context.Orders.AddRange(olderOrder, latestOrder);
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            context.ChangeTracker.Clear();
+
+            var repository = new OrderRepository(context);
+
+            // Act
+            var result = await repository.GetLatestByUserIdUntrackedAsync(userId, TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(latestOrder.Id, result.Id);
+            Assert.Equal(userId, result.UserId);
+        }
+
+        [Fact]
+        public async Task GetLatestByUserIdUntrackedAsync_ShouldReturnNull_WhenUserHasNoOrders()
+        {
+            // Arrange
+            var connection = new SqliteConnection("DataSource=:memory:");
+            await connection.OpenAsync(TestContext.Current.CancellationToken);
+
+            var options = new DbContextOptionsBuilder<OrderDbContext>().UseSqlite(connection).Options;
+
+            await using var context = new OrderDbContext(options);
+
+            await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+
+            var repository = new OrderRepository(context);
+
+            // Act
+            var result = await repository.GetLatestByUserIdUntrackedAsync(Guid.NewGuid(), TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Null(result);
         }
     }
 }

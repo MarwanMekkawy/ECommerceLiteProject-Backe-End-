@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using OrderService.Application.Abstractions;
 using OrderService.Application.Commands;
+using OrderService.Application.DTOs;
 using OrderService.Application.Queries;
+using OrderService.Domain.Orders;
 
 namespace OrderService.Application.Extentions.App
 {
@@ -9,16 +12,19 @@ namespace OrderService.Application.Extentions.App
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             // Commands
-            services.AddScoped<CreateOrderCommandHandler>();
-            services.AddScoped<CheckoutOrderCommandHandler>();
-            services.AddScoped<CompleteOrderCommandHandler>();
-            services.AddScoped<CancelOrderCommandHandler>();
+            services.AddScoped<ICommandHandler<CreateOrderCommand>, CreateOrderCommandHandler>();
+            services.AddScoped<ICommandHandler<CheckoutOrderCommand, CheckoutOrderDto>, CheckoutOrderCommandHandler>();
+            services.AddScoped<ICommandHandler<CompleteOrderInternalCommand>, CompleteOrderCommandInternalHandler>();
+            services.AddScoped<ICommandHandler<CancelOrderCommand>, CancelOrderCommandHandler>();
+            services.AddScoped<ICommandHandler<CancelOrderInternalCommand>, CancelOrderInternalCommandHandler>();
+
 
             // Queries
-            services.AddScoped<GetOrderByIdQueryHandler>();
-            services.AddScoped<GetOrdersByUserQueryHandler>();
-            services.AddScoped<GetAllOrdersQueryHandler>();
-            services.AddScoped<GetOrderByIdAdminQueryHandler>();
+            services.AddScoped<IQueryHandler<GetOrderByIdQuery, Order?>, GetOrderByIdQueryHandler>();
+            services.AddScoped<IQueryHandler<GetOrdersByUserQuery, IReadOnlyList<Order>>, GetOrdersByUserQueryHandler>();
+            services.AddScoped<IQueryHandler<GetAllOrdersQuery, IReadOnlyList<Order>>, GetAllOrdersQueryHandler>();
+            services.AddScoped<IQueryHandler<GetLatestOrderQuery, Order?>, GetLatestOrderQueryHandler>();
+            services.AddScoped<IQueryHandler<GetOrderByIdAdminQuery, Order?>, GetOrderByIdAdminQueryHandler>();
           
             return services;
         }

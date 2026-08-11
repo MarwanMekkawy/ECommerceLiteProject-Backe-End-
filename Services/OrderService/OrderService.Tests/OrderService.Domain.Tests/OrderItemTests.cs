@@ -1,4 +1,5 @@
-﻿using OrderService.Domain.Exceptions.DomainExceptions;
+﻿using OrderService.Domain.Enums;
+using OrderService.Domain.Exceptions.DomainExceptions;
 using OrderService.Domain.Orders;
 using Xunit;
 
@@ -17,6 +18,7 @@ namespace OrderService.Domain.Tests
 
             Assert.Throws<InvalidOrderItemException>(action);
         }
+
         [Fact]
         public void Constructor_ShouldThrow_WhenQuantityIsZero()
         {
@@ -28,6 +30,7 @@ namespace OrderService.Domain.Tests
 
             Assert.Throws<InvalidOrderItemException>(action);
         }
+
         [Fact]
         public void Constructor_ShouldThrow_WhenQuantityIsNegative()
         {
@@ -39,6 +42,7 @@ namespace OrderService.Domain.Tests
 
             Assert.Throws<InvalidOrderItemException>(action);
         }
+
         [Fact]
         public void Constructor_ShouldCreateItem_WhenArgumentsAreValid()
         {

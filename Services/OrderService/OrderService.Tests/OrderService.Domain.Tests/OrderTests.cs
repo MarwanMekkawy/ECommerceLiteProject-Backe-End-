@@ -1,7 +1,7 @@
-﻿using OrderService.Domain.Exceptions.DomainExceptions;
+﻿using OrderService.Domain.Enums;
+using OrderService.Domain.Exceptions.DomainExceptions;
 using OrderService.Domain.Orders;
 using Xunit;
-using Xunit.Runner.Common;
 
 namespace OrderService.Domain.Tests
 {
@@ -9,13 +9,14 @@ namespace OrderService.Domain.Tests
     {
         [Fact]
         public void Constructor_ShouldThrow_WhenUserIdIsEmpty()
-        {            
+        {
             var userId = Guid.Empty;
 
             var action = () => new Order(userId);
-            
+
             Assert.Throws<InvalidOrderException>(action);
         }
+
         [Fact]
         public void AddItem_ShouldThrow_WhenProductIdIsEmpty()
         {
@@ -25,6 +26,7 @@ namespace OrderService.Domain.Tests
 
             Assert.Throws<InvalidOrderItemException>(action);
         }
+
         [Fact]
         public void AddItem_ShouldIncreaseQuantity_WhenItemExists()
         {
@@ -38,6 +40,7 @@ namespace OrderService.Domain.Tests
             Assert.Equal(productId, item.ProductId);
             Assert.Equal(5, item.Quantity);
         }
+
         [Fact]
         public void AddItem_ShouldThrow_WhenQuantityIsZero()
         {
@@ -48,6 +51,7 @@ namespace OrderService.Domain.Tests
 
             Assert.Throws<InvalidOrderItemException>(action);
         }
+
         [Fact]
         public void AddItem_ShouldThrow_WhenQuantityIsNegative()
         {
@@ -58,15 +62,7 @@ namespace OrderService.Domain.Tests
 
             Assert.Throws<InvalidOrderItemException>(action);
         }
-        [Fact]
-        public void CreateOrder_WithEmptyUserId_ShouldThrow()
-        {
-            var userId = Guid.Empty;
 
-            var action = () => new Order(userId);
-
-            Assert.Throws<InvalidOrderException>(action);
-        }
         [Fact]
         public void CreateOrder_ShouldCreatePendingOrder_WhenUserIdIsValid()
         {
@@ -78,6 +74,7 @@ namespace OrderService.Domain.Tests
             Assert.Equal(OrderStatus.Pending, order.Status);
             Assert.NotEqual(Guid.Empty, order.Id);
         }
+
         [Fact]
         public void AddItem_ShouldAddItem_WhenProductDoesNotExist()
         {
@@ -90,30 +87,85 @@ namespace OrderService.Domain.Tests
             Assert.Equal(1, order.Items.Count(x => x.ProductId == productId));
             Assert.Equal(2, order.Items.Single().Quantity);
         }
-        [Fact]
-        public void AddItem_ShouldIncreaseQuantity_WhenProductAlreadyExists()
-        {
-            var userId = Guid.NewGuid();
-            var productId = Guid.NewGuid();
 
-            var order = new Order(userId);
-            order.AddItem(productId, 2);
-            order.AddItem(productId, 2);
-
-            Assert.Equal(1, order.Items.Count(x => x.ProductId == productId));
-            Assert.Equal(4, order.Items.Single().Quantity);
-        }        
         [Fact]
         public void Confirm_ShouldChangeStatusToConfirmed_WhenOrderIsPending()
         {
             // Arrange
             var order = new Order(Guid.NewGuid());
+            var productId = Guid.NewGuid();
+            order.AddItem(productId, 2);
+
+            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            {
+                [productId] = (10, CurrencyCode.USD)
+            };
 
             // Act
-            order.Confirm();
+            order.Confirm(productPrices, DateTime.UtcNow);
 
             // Assert
             Assert.Equal(OrderStatus.Confirmed, order.Status);
+            Assert.Equal(20, order.Total);
+            Assert.Equal(CurrencyCode.USD, order.Currency);
+            Assert.NotNull(order.ConfirmedAt);
+            Assert.NotNull(order.PaymentExpiresAt);
+        }
+
+        [Fact]
+        public void Confirm_ShouldSnapshotItemPrice_WhenOrderIsPending()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            var productId = Guid.NewGuid();
+            order.AddItem(productId, 2);
+
+            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            {
+                [productId] = (15, CurrencyCode.USD)
+            };
+
+            // Act
+            order.Confirm(productPrices, DateTime.UtcNow);
+
+            // Assert
+            var item = order.Items.Single();
+            Assert.Equal(15, item.UnitPrice);
+            Assert.Equal(CurrencyCode.USD, item.Currency);
+            Assert.Equal(30, item.Total);
+        }
+
+        [Fact]
+        public void Confirm_ShouldSetPaymentExpirationToThreeDays_WhenOrderIsPending()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            var productId = Guid.NewGuid();
+            order.AddItem(productId, 1);
+
+            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            {
+                [productId] = (10, CurrencyCode.USD)
+            };
+
+            // Act
+            order.Confirm(productPrices, DateTime.UtcNow);
+
+            // Assert
+            Assert.NotNull(order.ConfirmedAt);
+            Assert.NotNull(order.PaymentExpiresAt);
+            Assert.Equal(3, (order.PaymentExpiresAt!.Value - order.ConfirmedAt!.Value).TotalDays);
+        }
+
+        [Fact]
+        public void Confirm_ShouldThrow_WhenOrderHasNoItems()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>();
+
+            // Act & Assert
+            Assert.Throws<InvalidOrderException>(() => order.Confirm(productPrices, DateTime.UtcNow));
         }
 
         [Fact]
@@ -121,10 +173,18 @@ namespace OrderService.Domain.Tests
         {
             // Arrange
             var order = new Order(Guid.NewGuid());
-            order.Confirm();
+            var productId = Guid.NewGuid();
+            order.AddItem(productId, 1);
+
+            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            {
+                [productId] = (10, CurrencyCode.USD)
+            };
+
+            order.Confirm(productPrices, DateTime.UtcNow);
 
             // Act & Assert
-            Assert.Throws<InvalidOrderException>(() => order.Confirm());
+            Assert.Throws<InvalidOrderException>(() => order.Confirm(productPrices, DateTime.UtcNow));
         }
 
         [Fact]
@@ -132,11 +192,19 @@ namespace OrderService.Domain.Tests
         {
             // Arrange
             var order = new Order(Guid.NewGuid());
-            order.Confirm();
+            var productId = Guid.NewGuid();
+            order.AddItem(productId, 1);
+
+            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            {
+                [productId] = (10, CurrencyCode.USD)
+            };
+
+            order.Confirm(productPrices, DateTime.UtcNow);
             order.Complete();
 
             // Act & Assert
-            Assert.Throws<InvalidOrderException>(() => order.Confirm());
+            Assert.Throws<InvalidOrderException>(() => order.Confirm(productPrices, DateTime.UtcNow));
         }
 
         [Fact]
@@ -146,17 +214,26 @@ namespace OrderService.Domain.Tests
             var order = new Order(Guid.NewGuid());
             order.Cancel();
 
-            // Act & Assert
-            Assert.Throws<InvalidOrderException>(() => order.Confirm());
-        }
+            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>();
 
+            // Act & Assert
+            Assert.Throws<InvalidOrderException>(() => order.Confirm(productPrices, DateTime.UtcNow));
+        }
 
         [Fact]
         public void Complete_ShouldChangeStatusToCompleted_WhenOrderIsConfirmed()
         {
             // Arrange
             var order = new Order(Guid.NewGuid());
-            order.Confirm();
+            var productId = Guid.NewGuid();
+            order.AddItem(productId, 1);
+
+            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            {
+                [productId] = (10, CurrencyCode.USD)
+            };
+
+            order.Confirm(productPrices, DateTime.UtcNow);
 
             // Act
             order.Complete();
@@ -191,13 +268,20 @@ namespace OrderService.Domain.Tests
         {
             // Arrange
             var order = new Order(Guid.NewGuid());
-            order.Confirm();
+            var productId = Guid.NewGuid();
+            order.AddItem(productId, 1);
+
+            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            {
+                [productId] = (10, CurrencyCode.USD)
+            };
+
+            order.Confirm(productPrices, DateTime.UtcNow);
             order.Complete();
 
             // Act & Assert
             Assert.Throws<InvalidOrderException>(() => order.Complete());
         }
-
 
         [Fact]
         public void Cancel_ShouldChangeStatusToCancelled_WhenOrderIsPending()
@@ -217,7 +301,15 @@ namespace OrderService.Domain.Tests
         {
             // Arrange
             var order = new Order(Guid.NewGuid());
-            order.Confirm();
+            var productId = Guid.NewGuid();
+            order.AddItem(productId, 1);
+
+            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            {
+                [productId] = (10, CurrencyCode.USD)
+            };
+
+            order.Confirm(productPrices, DateTime.UtcNow);
 
             // Act
             order.Cancel();
@@ -231,7 +323,15 @@ namespace OrderService.Domain.Tests
         {
             // Arrange
             var order = new Order(Guid.NewGuid());
-            order.Confirm();
+            var productId = Guid.NewGuid();
+            order.AddItem(productId, 1);
+
+            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            {
+                [productId] = (10, CurrencyCode.USD)
+            };
+
+            order.Confirm(productPrices, DateTime.UtcNow);
             order.Complete();
 
             // Act & Assert
@@ -247,6 +347,7 @@ namespace OrderService.Domain.Tests
 
             // Act & Assert
             Assert.Throws<InvalidOrderException>(() => order.Cancel());
-        }        
+        }
+
     }
 }

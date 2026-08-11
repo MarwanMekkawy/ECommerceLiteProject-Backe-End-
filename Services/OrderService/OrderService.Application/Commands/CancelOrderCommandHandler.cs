@@ -8,7 +8,7 @@ namespace OrderService.Application.Commands
     {
         public async Task HandleAsync(CancelOrderCommand command, CancellationToken cancellationToken)
         {
-            var order = await orderRepository.GetByIdTrackedAsync(command.OrderId, cancellationToken);
+            var order = await orderRepository.GetByIdAndUserIdTrackedAsync(command.OrderId, command.UserId, cancellationToken);
 
             if (order is null)
                 throw new NotFoundException($"Order with Id {command.OrderId} Was NOT FOUND.");
