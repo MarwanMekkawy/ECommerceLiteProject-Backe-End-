@@ -118,7 +118,7 @@ namespace OrderService.API.Controllers
         /// <param name="item">The product and quantity to add to the cart.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the item was added successfully.</returns>
-        [HttpPost("items")]
+        [HttpPost("item")]
         [Authorize]
         public async Task<IActionResult> AddOrderItem([FromBody] CreateOrderItemDto item, CancellationToken cancellationToken = default)
         {
