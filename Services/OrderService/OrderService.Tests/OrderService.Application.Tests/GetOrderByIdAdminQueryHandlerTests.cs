@@ -14,7 +14,7 @@ namespace OrderService.Application.Tests
             // Arrange
             var order = new Order(Guid.NewGuid());
             var repository = new Mock<IOrderRepository>();
-            repository.Setup(x => x.GetByIdUntrackedAsync(order.Id, It.IsAny<CancellationToken>())).ReturnsAsync(order);
+            repository.Setup(x => x.GetByIdUnTrackedAsync(order.Id, It.IsAny<CancellationToken>())).ReturnsAsync(order);
             var handler = new GetOrderByIdAdminQueryHandler(repository.Object);
             var query = new GetOrderByIdAdminQuery(order.Id);
 
@@ -24,7 +24,7 @@ namespace OrderService.Application.Tests
             // Assert
             Assert.NotNull(result);
             Assert.Same(order, result);
-            repository.Verify(x => x.GetByIdUntrackedAsync(order.Id, It.IsAny<CancellationToken>()), Times.Once);
+            repository.Verify(x => x.GetByIdUnTrackedAsync(order.Id, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -33,7 +33,7 @@ namespace OrderService.Application.Tests
             // Arrange
             var orderId = Guid.NewGuid();
             var repository = new Mock<IOrderRepository>();
-            repository.Setup(x => x.GetByIdUntrackedAsync(orderId, It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
+            repository.Setup(x => x.GetByIdUnTrackedAsync(orderId, It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
             var handler = new GetOrderByIdAdminQueryHandler(repository.Object);
             var query = new GetOrderByIdAdminQuery(orderId);
 
@@ -42,7 +42,7 @@ namespace OrderService.Application.Tests
 
             // Assert
             Assert.Null(result);
-            repository.Verify(x => x.GetByIdUntrackedAsync(orderId, It.IsAny<CancellationToken>()), Times.Once);
+            repository.Verify(x => x.GetByIdUnTrackedAsync(orderId, It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

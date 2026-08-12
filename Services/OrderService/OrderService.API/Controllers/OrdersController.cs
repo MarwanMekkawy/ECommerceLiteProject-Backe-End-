@@ -5,7 +5,6 @@ using OrderService.Application.Abstractions;
 using OrderService.Application.Commands;
 using OrderService.Application.DTOs;
 using OrderService.Application.Queries;
-using OrderService.Domain.Orders;
 
 namespace OrderService.API.Controllers
 {
@@ -24,11 +23,11 @@ namespace OrderService.API.Controllers
         ICommandHandler<AddOrderItemCommand> addOrderItemHandler,
         ICommandHandler<DecreaseOrderItemCommand> decreaseOrderItemHandler,
         ICommandHandler<IncreaseOrderItemCommand> increaseOrderItemHandler,
-        IQueryHandler<GetOrderByIdQuery, Order?> getOrderByIdHandler,
-        IQueryHandler<GetOrdersByUserQuery, IReadOnlyList<Order>> getOrdersByUserHandler,
-        IQueryHandler<GetLatestOrderQuery, Order?> getLatestOrderHandler,
-        IQueryHandler<GetAllOrdersQuery, IReadOnlyList<Order>> getAllOrdersHandler,
-        IQueryHandler<GetOrderByIdAdminQuery, Order?> getOrderByIdAdminHandler)
+        IQueryHandler<GetOrderByIdQuery, OrderResponseDto?> getOrderByIdHandler,
+        IQueryHandler<GetOrdersByUserQuery, IReadOnlyList<OrderResponseDto>> getOrdersByUserHandler,
+        IQueryHandler<GetLatestOrderQuery, OrderResponseDto?> getLatestOrderHandler,
+        IQueryHandler<GetAllOrdersQuery, IReadOnlyList<OrderResponseDto>> getAllOrdersHandler,
+        IQueryHandler<GetOrderByIdAdminQuery, OrderResponseDto?> getOrderByIdAdminHandler)
         : ControllerBase
     {
         /// <summary>

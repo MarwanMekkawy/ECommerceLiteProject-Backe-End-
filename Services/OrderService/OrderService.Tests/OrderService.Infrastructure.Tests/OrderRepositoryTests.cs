@@ -30,7 +30,7 @@ namespace OrderService.Infrastructure.Tests
             var repository = new OrderRepository(context);
 
             // Act
-            var result = await repository.GetByIdUntrackedAsync(order.Id, TestContext.Current.CancellationToken);
+            var result = await repository.GetByIdUnTrackedAsync(order.Id, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(result);
@@ -52,7 +52,7 @@ namespace OrderService.Infrastructure.Tests
             var repository = new OrderRepository(context);
 
             // Act
-            var result = await repository.GetByIdUntrackedAsync(Guid.NewGuid(), TestContext.Current.CancellationToken);
+            var result = await repository.GetByIdUnTrackedAsync(Guid.NewGuid(), TestContext.Current.CancellationToken);
 
             // Assert
             Assert.Null(result);
@@ -93,7 +93,7 @@ namespace OrderService.Infrastructure.Tests
             var repository = new OrderRepository(context2);
 
             // Act
-            var result = await repository.GetByIdUntrackedAsync(orderId, TestContext.Current.CancellationToken);
+            var result = await repository.GetByIdUnTrackedAsync(orderId, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(result);
@@ -412,7 +412,7 @@ namespace OrderService.Infrastructure.Tests
             var repository = new OrderRepository(context);
 
             // Act
-            var result = await repository.GetLatestByUserIdUntrackedAsync(userId, TestContext.Current.CancellationToken);
+            var result = await repository.GetLatestByUserIdUnTrackedAsync(userId, TestContext.Current.CancellationToken);
 
             // Assert
             Assert.NotNull(result);
@@ -436,7 +436,7 @@ namespace OrderService.Infrastructure.Tests
             var repository = new OrderRepository(context);
 
             // Act
-            var result = await repository.GetLatestByUserIdUntrackedAsync(Guid.NewGuid(), TestContext.Current.CancellationToken);
+            var result = await repository.GetLatestByUserIdUnTrackedAsync(Guid.NewGuid(), TestContext.Current.CancellationToken);
 
             // Assert
             Assert.Null(result);

@@ -11,7 +11,7 @@ namespace OrderService.Domain.Contracts
             await _context.Orders.AddAsync(order, cancellationToken);
         }
 
-        public async Task<Order?> GetByIdUntrackedAsync(Guid orderId, CancellationToken cancellationToken = default)
+        public async Task<Order?> GetByIdUnTrackedAsync(Guid orderId, CancellationToken cancellationToken = default)
         {
             return await _context.Orders.AsNoTracking().Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == orderId, cancellationToken);
         }
@@ -30,7 +30,7 @@ namespace OrderService.Domain.Contracts
             return await _context.Orders.Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == orderId && x.UserId == userId, cancellationToken);
         }
 
-        public async Task<Order?> GetLatestByUserIdUntrackedAsync(Guid userId, CancellationToken cancellationToken = default)
+        public async Task<Order?> GetLatestByUserIdUnTrackedAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             return await _context.Orders.AsNoTracking().Include(x => x.Items).Where(x => x.UserId == userId)
                 .OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync(cancellationToken);

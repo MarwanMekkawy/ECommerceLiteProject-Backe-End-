@@ -8,8 +8,8 @@ namespace OrderService.Application.MappingProfiles
     {
         public OrderProfile()
         {
-            CreateMap<Order, OrderDto>();
-            CreateMap<OrderItem, OrderItemDto>();
+            CreateMap<Order, OrderResponseDto>();
+            CreateMap<OrderItem, OrderItemResponseDto>();
         }
     }
 }

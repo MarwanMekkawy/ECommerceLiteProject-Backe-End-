@@ -9,7 +9,7 @@ namespace OrderService.Application.Queries
     {
         public async Task<OrderResponseDto?> HandleAsync(GetOrderByIdAdminQuery query, CancellationToken cancellationToken = default)
         {
-            var order = await orderRepository.GetByIdUntrackedAsync(query.OrderId, cancellationToken);
+            var order = await orderRepository.GetByIdUnTrackedAsync(query.OrderId, cancellationToken);
 
             return mapper.Map<OrderResponseDto>(order);
         }

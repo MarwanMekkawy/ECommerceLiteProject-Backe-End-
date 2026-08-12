@@ -10,7 +10,7 @@ namespace OrderService.Application.Queries
     {
         public async Task<OrderResponseDto?> HandleAsync(GetLatestOrderQuery query, CancellationToken cancellationToken)
         {
-            var order = await orderRepository.GetLatestByUserIdUntrackedAsync(query.UserId, cancellationToken);
+            var order = await orderRepository.GetLatestByUserIdUnTrackedAsync(query.UserId, cancellationToken);
 
             return mapper.Map<OrderResponseDto>(order);
         }

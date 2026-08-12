@@ -23,7 +23,7 @@ namespace OrderService.Application.Tests
 
             var repository = new Mock<IOrderRepository>();
 
-            repository.Setup(x => x.GetLatestByUserIdUntrackedAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(order);
+            repository.Setup(x => x.GetLatestByUserIdUnTrackedAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(order);
 
             var handler = new GetLatestOrderQueryHandler(repository.Object);
 
@@ -35,7 +35,7 @@ namespace OrderService.Application.Tests
             // Assert
             Assert.NotNull(result);
             Assert.Same(order, result);
-            repository.Verify(x => x.GetLatestByUserIdUntrackedAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
+            repository.Verify(x => x.GetLatestByUserIdUnTrackedAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace OrderService.Application.Tests
 
             var repository = new Mock<IOrderRepository>();
 
-            repository.Setup(x => x.GetLatestByUserIdUntrackedAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
+            repository.Setup(x => x.GetLatestByUserIdUnTrackedAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
 
             var handler = new GetLatestOrderQueryHandler(repository.Object);
 
@@ -57,7 +57,7 @@ namespace OrderService.Application.Tests
 
             // Assert
             Assert.Null(result);
-            repository.Verify(x => x.GetLatestByUserIdUntrackedAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
+            repository.Verify(x => x.GetLatestByUserIdUnTrackedAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }
