@@ -1,6 +1,6 @@
-﻿using Domain.Exceptions;
-using OrderService.Application.Abstractions;
+﻿using OrderService.Application.Abstractions;
 using OrderService.Domain.Contracts;
+using OrderService.Domain.Orders;
 
 namespace OrderService.Application.Commands
 {
@@ -8,10 +8,14 @@ namespace OrderService.Application.Commands
     {
         public async Task HandleAsync(AddOrderItemCommand command, CancellationToken cancellationToken)
         {
-            var order = await orderRepository.GetByIdAndUserIdTrackedAsync(command.OrderId, command.UserId, cancellationToken);
+            var order = await orderRepository.GetPendingByUserIdTrackedAsync(command.UserId, cancellationToken);
 
             if (order is null)
-                throw new NotFoundException($"Order with Id {command.OrderId} was NOT FOUND.");
+            {
+                order = new Order(command.UserId);
+
+                await orderRepository.AddAsync(order, cancellationToken);
+            }
 
             order.AddItem(command.ProductId, command.Quantity);
 

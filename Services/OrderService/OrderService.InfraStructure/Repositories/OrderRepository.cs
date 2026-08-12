@@ -36,6 +36,12 @@ namespace OrderService.Domain.Contracts
                 .OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync(cancellationToken);
         }
 
+        public async Task<Order?> GetPendingByUserIdTrackedAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Orders.Include(x => x.Items)
+                .FirstOrDefaultAsync(x => x.UserId == userId && x.Status == OrderStatus.Pending, cancellationToken);
+        }
+
         public async Task<IReadOnlyList<Order>> GetPagedByUserIdAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             return await _context.Orders.AsNoTracking().Include(x => x.Items).Where(x => x.UserId == userId)

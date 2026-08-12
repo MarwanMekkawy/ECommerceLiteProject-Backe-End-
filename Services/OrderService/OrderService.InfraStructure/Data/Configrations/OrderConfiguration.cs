@@ -32,6 +32,11 @@ namespace OrderService.InfraStructure.Data.Configrations
             builder.Property(x => x.PaymentExpiresAt)
                 .IsRequired(false);
 
+            //user can have only one Pending order at a time
+            builder.HasIndex(x => x.UserId)
+                .IsUnique()
+                .HasFilter($"[Status] = {(int)OrderStatus.Pending}");
+
             builder.HasMany(x => x.Items)
                 .WithOne(x => x.Order)
                 .HasForeignKey(x => x.OrderId)

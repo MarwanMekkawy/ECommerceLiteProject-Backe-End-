@@ -402,6 +402,8 @@ namespace OrderService.Infrastructure.Tests
             olderOrder.CreatedAt = DateTime.UtcNow.AddMinutes(-10);
             latestOrder.CreatedAt = DateTime.UtcNow;
 
+            olderOrder.Cancel();
+
             context.Orders.AddRange(olderOrder, latestOrder);
             await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -435,6 +437,93 @@ namespace OrderService.Infrastructure.Tests
 
             // Act
             var result = await repository.GetLatestByUserIdUntrackedAsync(Guid.NewGuid(), TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Null(result);
+        }
+        [Fact]
+        public async Task GetPendingByUserIdTrackedAsync_ShouldReturnPendingOrder_WhenOrderExists()
+        {
+            // Arrange
+            var connection = new SqliteConnection("DataSource=:memory:");
+            await connection.OpenAsync(TestContext.Current.CancellationToken);
+
+            var options = new DbContextOptionsBuilder<OrderDbContext>().UseSqlite(connection).Options;
+
+            await using var context = new OrderDbContext(options);
+
+            await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+
+            var userId = Guid.NewGuid();
+            var order = new Order(userId);
+
+            context.Orders.Add(order);
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            context.ChangeTracker.Clear();
+
+            var repository = new OrderRepository(context);
+
+            // Act
+            var result = await repository.GetPendingByUserIdTrackedAsync(userId, TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(order.Id, result.Id);
+            Assert.Equal(userId, result.UserId);
+            Assert.Equal(OrderStatus.Pending, result.Status);
+            Assert.Equal(EntityState.Unchanged, context.Entry(result).State);
+        }
+
+
+        [Fact]
+        public async Task GetPendingByUserIdTrackedAsync_ShouldReturnNull_WhenPendingOrderDoesNotExist()
+        {
+            // Arrange
+            var connection = new SqliteConnection("DataSource=:memory:");
+            await connection.OpenAsync(TestContext.Current.CancellationToken);
+
+            var options = new DbContextOptionsBuilder<OrderDbContext>().UseSqlite(connection).Options;
+
+            await using var context = new OrderDbContext(options);
+
+            await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+
+            var repository = new OrderRepository(context);
+
+            // Act
+            var result = await repository.GetPendingByUserIdTrackedAsync(Guid.NewGuid(), TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Null(result);
+        }
+
+
+        [Fact]
+        public async Task GetPendingByUserIdTrackedAsync_ShouldReturnNull_WhenUserOnlyHasNonPendingOrders()
+        {
+            // Arrange
+            var connection = new SqliteConnection("DataSource=:memory:");
+            await connection.OpenAsync(TestContext.Current.CancellationToken);
+
+            var options = new DbContextOptionsBuilder<OrderDbContext>().UseSqlite(connection).Options;
+
+            await using var context = new OrderDbContext(options);
+
+            await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+
+            var userId = Guid.NewGuid();
+            var order = new Order(userId);
+
+            order.Cancel();
+
+            context.Orders.Add(order);
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            var repository = new OrderRepository(context);
+
+            // Act
+            var result = await repository.GetPendingByUserIdTrackedAsync(userId,TestContext.Current.CancellationToken);
 
             // Assert
             Assert.Null(result);

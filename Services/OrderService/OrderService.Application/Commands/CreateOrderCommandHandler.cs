@@ -8,15 +8,21 @@ namespace OrderService.Application.Commands
     {
         public async Task HandleAsync(CreateOrderCommand command, CancellationToken cancellationToken)
         {
-            var order = new Order(command.UserId);
+            var order = await orderRepository.GetPendingByUserIdTrackedAsync(command.UserId, cancellationToken);
+
+            if (order is null)
+            {
+                order = new Order(command.UserId);
+
+                await orderRepository.AddAsync(order, cancellationToken);
+            }
 
             foreach (var item in command.Items)
             {
                 order.AddItem(item.ProductId, item.Quantity);
             }
 
-            await orderRepository.AddAsync(order, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
         }
-    }
+    }   
 }

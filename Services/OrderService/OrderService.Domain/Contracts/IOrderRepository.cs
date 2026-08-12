@@ -10,6 +10,7 @@ namespace OrderService.Domain.Contracts
         Task<Order?> GetByIdAndUserIdUnTrackedAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default);
         Task<Order?> GetByIdAndUserIdTrackedAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default);
         Task<Order?> GetLatestByUserIdUntrackedAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<Order?> GetPendingByUserIdTrackedAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<Order>> GetPagedByUserIdAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<Order>> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     }

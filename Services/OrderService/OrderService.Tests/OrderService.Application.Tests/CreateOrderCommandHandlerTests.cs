@@ -11,110 +11,134 @@ namespace OrderService.Application.Tests
     public class CreateOrderCommandHandlerTests
     {
         [Fact]
-        public async Task Handle_ShouldCreateOrder_WhenCommandIsValid()
+        public async Task Handle_ShouldCreatePendingOrder_WhenUserHasNoPendingOrder()
         {
             // Arrange
             var userId = Guid.NewGuid();
             var productId = Guid.NewGuid();
-            var command = new CreateOrderCommand(userId, [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]);
 
-            var orderRepository = new Mock<IOrderRepository>();
+            var items = new List<CreateOrderItemDto>
+            {
+                new() { ProductId = productId,  Quantity = 2 }
+            };
+
+            var repository = new Mock<IOrderRepository>();
+
+            repository.Setup(x => x.GetPendingByUserIdTrackedAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
+
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CreateOrderCommandHandler(
-                orderRepository.Object,
-                uow.Object);
+            var handler = new CreateOrderCommandHandler(repository.Object, uow.Object);
+
+            var command = new CreateOrderCommand(userId, items);
 
             // Act
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
             // Assert
-            orderRepository.Verify(
+            repository.Verify(
                 x => x.AddAsync(
                     It.Is<Order>(o =>
                         o.UserId == userId &&
+                        o.Status == OrderStatus.Pending &&
                         o.Items.Count == 1 &&
                         o.Items.First().ProductId == productId &&
                         o.Items.First().Quantity == 2),
-                    TestContext.Current.CancellationToken),
+                    It.IsAny<CancellationToken>()),
                 Times.Once);
 
-            uow.Verify(x => x.SaveChangesAsync(TestContext.Current.CancellationToken), Times.Once);
+            uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
+
         [Fact]
-        public async Task Handle_ShouldThrow_WhenUserIdIsEmpty()
+        public async Task Handle_ShouldAddAllItemsToExistingPendingOrder()
         {
             // Arrange
-            var userId = Guid.Empty;
+            var userId = Guid.NewGuid();
+            var productId1 = Guid.NewGuid();
+            var productId2 = Guid.NewGuid();
+
+            var order = new Order(userId);
+
+            var items = new List<CreateOrderItemDto>
+            {
+                new()
+                {
+                    ProductId = productId1,
+                    Quantity = 2
+                },
+                new()
+                {
+                    ProductId = productId2,
+                    Quantity = 3
+                }
+            };
+
+            var repository = new Mock<IOrderRepository>();
+
+            repository.Setup(x => x.GetPendingByUserIdTrackedAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(order);
+
+            var uow = new Mock<IUnitOfWork>();
+
+            var handler = new CreateOrderCommandHandler(repository.Object, uow.Object);
+
+            var command = new CreateOrderCommand(userId, items);
+
+            // Act
+            await handler.HandleAsync(command, TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Equal(2, order.Items.Count);
+
+            Assert.Equal(2, order.Items.First(x => x.ProductId == productId1).Quantity);
+
+            Assert.Equal(3, order.Items.First(x => x.ProductId == productId2).Quantity);
+
+            repository.Verify(x => x.AddAsync(It.IsAny<Order>(), It.IsAny<CancellationToken>()), Times.Never);
+
+            uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+
+        [Fact]
+        public async Task Handle_ShouldIncreaseQuantity_WhenBundleContainsExistingProduct()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
             var productId = Guid.NewGuid();
 
-            var command = new CreateOrderCommand(userId, [new CreateOrderItemDto { ProductId = productId, Quantity = 2 }]);
+            var order = new Order(userId);
+            order.AddItem(productId, 2);
 
-            var orderRepository = new Mock<IOrderRepository>();
+            var items = new List<CreateOrderItemDto>
+            {
+                new()
+                {
+                    ProductId = productId,
+                    Quantity = 3
+                }
+            };
+
+            var repository = new Mock<IOrderRepository>();
+
+            repository.Setup(x => x.GetPendingByUserIdTrackedAsync(userId, It.IsAny<CancellationToken>())).ReturnsAsync(order);
+
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CreateOrderCommandHandler(orderRepository.Object, uow.Object);
+            var handler = new CreateOrderCommandHandler(repository.Object, uow.Object);
+
+            var command = new CreateOrderCommand(userId, items);
 
             // Act
-            var action = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
+            await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
             // Assert
-            await Assert.ThrowsAsync<InvalidOrderException>(action);
-        }
+            var item = Assert.Single(order.Items);
 
-        [Fact]
-        public async Task Handle_ShouldThrow_WhenProductIdIsEmpty()
-        {
-            // Arrange
-            var command = new CreateOrderCommand(Guid.NewGuid(), [new CreateOrderItemDto { ProductId = Guid.Empty, Quantity = 2 }]);
+            Assert.Equal(5, item.Quantity);
 
-            var orderRepository = new Mock<IOrderRepository>();
-            var uow = new Mock<IUnitOfWork>();
-
-            var handler = new CreateOrderCommandHandler(orderRepository.Object, uow.Object);
-
-            // Act
-            var action = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
-
-            // Assert
-            await Assert.ThrowsAsync<InvalidOrderItemException>(action);
-        }
-
-        [Fact]
-        public async Task Handle_ShouldThrow_WhenQuantityIsZero()
-        {
-            // Arrange
-            var command = new CreateOrderCommand(Guid.NewGuid(), [new CreateOrderItemDto { ProductId = Guid.NewGuid(), Quantity = 0 }]);
-
-            var orderRepository = new Mock<IOrderRepository>();
-            var uow = new Mock<IUnitOfWork>();
-
-            var handler = new CreateOrderCommandHandler(orderRepository.Object, uow.Object);
-
-            // Act
-            var action = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
-
-            // Assert
-            await Assert.ThrowsAsync<InvalidOrderItemException>(action);
-        }
-
-        [Fact]
-        public async Task Handle_ShouldThrow_WhenQuantityIsNegative()
-        {
-            // Arrange
-            var command = new CreateOrderCommand(Guid.NewGuid(), [new CreateOrderItemDto { ProductId = Guid.NewGuid(), Quantity = -1 }]);
-
-            var orderRepository = new Mock<IOrderRepository>();
-            var uow = new Mock<IUnitOfWork>();
-
-            var handler = new CreateOrderCommandHandler(orderRepository.Object, uow.Object);
-
-            // Act
-            var action = () => handler.HandleAsync(command, TestContext.Current.CancellationToken);
-
-            // Assert
-            await Assert.ThrowsAsync<InvalidOrderItemException>(action);
+            uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

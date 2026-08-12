@@ -90,11 +90,14 @@ namespace OrderService.API.Controllers
         }
 
         /// <summary>
-        /// Creates a new order for the currently authenticated user.
+        /// Adds multiple products to the currently authenticated user's cart.
+        /// If the user does not have a pending order, one is created automatically.
+        /// If a pending order already exists, the specified items are added to it.
+        /// Existing products have their quantities increased.
         /// </summary>
-        /// <param name="items">The items to include in the order.</param>
+        /// <param name="items">The products and quantities to add to the cart.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
-        /// <returns>No content if the order was created successfully.</returns>
+        /// <returns>No content if the items were added successfully.</returns>
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> CreateUserOrder([FromBody] List<CreateOrderItemDto> items, CancellationToken cancellationToken = default)
@@ -109,21 +112,20 @@ namespace OrderService.API.Controllers
         }
 
         /// <summary>
-        /// Adds a single product item to the user's existing order.
-        /// If the product already exists in the order, its quantity is increased.
-        /// If the product does not exist, a new order item is added.
+        /// Adds a single product to the currently authenticated user's cart.
+        /// If the user does not have a pending order, one is created automatically.
+        /// If the product already exists in the cart, its quantity is increased.
         /// </summary>
-        /// <param name="orderId">The ID of the order.</param>
-        /// <param name="item">The product and quantity to add.</param>
+        /// <param name="item">The product and quantity to add to the cart.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the item was added successfully.</returns>
-        [HttpPost("{orderId:guid}/items")]
+        [HttpPost("items")]
         [Authorize]
-        public async Task<IActionResult> AddOrderItem(Guid orderId, [FromBody] CreateOrderItemDto item, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> AddOrderItem([FromBody] CreateOrderItemDto item, CancellationToken cancellationToken = default)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 
-            var command = new AddOrderItemCommand(claims.UserId, orderId, item.ProductId, item.Quantity);
+            var command = new AddOrderItemCommand(claims.UserId, item.ProductId, item.Quantity);
 
             await addOrderItemHandler.HandleAsync(command, cancellationToken);
 
