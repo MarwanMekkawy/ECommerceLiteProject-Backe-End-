@@ -1,14 +1,17 @@
-﻿using OrderService.Application.Abstractions;
+﻿using AutoMapper;
+using OrderService.Application.Abstractions;
+using OrderService.Application.DTOs;
 using OrderService.Domain.Contracts;
-using OrderService.Domain.Orders;
 
 namespace OrderService.Application.Queries
 {
-    public class GetOrdersByUserQueryHandler(IOrderRepository orderRepository) : IQueryHandler<GetOrdersByUserQuery, IReadOnlyList<Order>>
+    public class GetOrdersByUserQueryHandler(IOrderRepository orderRepository, IMapper mapper) : IQueryHandler<GetOrdersByUserQuery, IReadOnlyList<OrderResponseDto>>
     {
-        public async Task<IReadOnlyList<Order>> HandleAsync(GetOrdersByUserQuery query, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<OrderResponseDto>> HandleAsync(GetOrdersByUserQuery query, CancellationToken cancellationToken)
         {
-            return await orderRepository.GetPagedByUserIdAsync(query.UserId, query.PageNumber, query.PageSize, cancellationToken);
+            var orders = await orderRepository.GetPagedByUserIdAsync(query.UserId, query.PageNumber, query.PageSize, cancellationToken);
+
+            return mapper.Map<IReadOnlyList<OrderResponseDto>>(orders);
         }
     }
 }

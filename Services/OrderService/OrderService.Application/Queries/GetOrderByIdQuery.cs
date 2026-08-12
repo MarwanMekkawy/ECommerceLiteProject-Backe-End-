@@ -1,9 +1,9 @@
 ﻿using OrderService.Application.Abstractions;
-using OrderService.Domain.Orders;
+using OrderService.Application.DTOs;
 
 namespace OrderService.Application.Queries
 {
-    public class GetOrderByIdQuery : IQuery<Order?>
+    public class GetOrderByIdQuery : IQuery<OrderResponseDto?>
     {
         public Guid OrderId { get; }
         public Guid UserId { get; }

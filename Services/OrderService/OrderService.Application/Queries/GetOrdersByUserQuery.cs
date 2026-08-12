@@ -1,9 +1,9 @@
 ﻿using OrderService.Application.Abstractions;
-using OrderService.Domain.Orders;
+using OrderService.Application.DTOs;
 
 namespace OrderService.Application.Queries
 {
-    public class GetOrdersByUserQuery : IQuery<IReadOnlyList<Order>>
+    public class GetOrdersByUserQuery : IQuery<IReadOnlyList<OrderResponseDto>>
     {
         public Guid UserId { get; }
         public int PageNumber { get; }

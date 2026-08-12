@@ -2,6 +2,7 @@
 using OrderService.Application.Abstractions;
 using OrderService.Application.Commands;
 using OrderService.Application.DTOs;
+using OrderService.Application.MappingProfiles;
 using OrderService.Application.Queries;
 using OrderService.Domain.Orders;
 
@@ -28,7 +29,9 @@ namespace OrderService.Application.Extentions.App
             services.AddScoped<IQueryHandler<GetAllOrdersQuery, IReadOnlyList<Order>>, GetAllOrdersQueryHandler>();
             services.AddScoped<IQueryHandler<GetLatestOrderQuery, Order?>, GetLatestOrderQueryHandler>();
             services.AddScoped<IQueryHandler<GetOrderByIdAdminQuery, Order?>, GetOrderByIdAdminQueryHandler>();
-          
+
+            services.AddAutoMapper(cfg => { cfg.AddMaps(typeof(AutoMapperMarker).Assembly); });
+
             return services;
         }
     }

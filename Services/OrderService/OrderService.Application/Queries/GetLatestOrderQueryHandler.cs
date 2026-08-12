@@ -1,15 +1,18 @@
-﻿using OrderService.Application.Abstractions;
+﻿using AutoMapper;
+using OrderService.Application.Abstractions;
+using OrderService.Application.DTOs;
 using OrderService.Domain.Contracts;
-using OrderService.Domain.Orders;
 
 
 namespace OrderService.Application.Queries
 {
-    public class GetLatestOrderQueryHandler(IOrderRepository orderRepository) : IQueryHandler<GetLatestOrderQuery, Order?>
+    public class GetLatestOrderQueryHandler(IOrderRepository orderRepository, IMapper mapper) : IQueryHandler<GetLatestOrderQuery, OrderResponseDto?>
     {
-        public async Task<Order?> HandleAsync(GetLatestOrderQuery query, CancellationToken cancellationToken)
+        public async Task<OrderResponseDto?> HandleAsync(GetLatestOrderQuery query, CancellationToken cancellationToken)
         {
-            return await orderRepository.GetLatestByUserIdUntrackedAsync(query.UserId, cancellationToken);
+            var order = await orderRepository.GetLatestByUserIdUntrackedAsync(query.UserId, cancellationToken);
+
+            return mapper.Map<OrderResponseDto>(order);
         }
     }
 }
