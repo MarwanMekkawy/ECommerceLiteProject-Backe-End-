@@ -45,6 +45,17 @@ namespace OrderService.Domain.Orders
 
             Quantity += quantity;
         }
+        internal void DecreaseQuantity(int quantity)
+        {
+            if (quantity <= 0)
+                throw new InvalidOrderItemException("Quantity must be greater than zero.");
+
+            if (quantity > Quantity)
+                throw new InvalidOrderItemException("Cannot remove more than the current quantity.");
+
+            Quantity -= quantity;
+        }
+
         internal void SetPriceSnapshot(decimal unitPrice, CurrencyCode currency)
         {
             if (unitPrice < 0)
@@ -53,6 +64,6 @@ namespace OrderService.Domain.Orders
             UnitPrice = unitPrice;
             Currency = currency;
             Total = unitPrice * Quantity;
-        }
+        }  
     }
 }

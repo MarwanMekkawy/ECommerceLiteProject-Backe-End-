@@ -349,5 +349,81 @@ namespace OrderService.Domain.Tests
             Assert.Throws<InvalidOrderException>(() => order.Cancel());
         }
 
+        [Fact]
+        public void RemoveItem_ShouldDecreaseQuantity_WhenQuantityIsLessThanCurrentQuantity()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            var productId = Guid.NewGuid();
+
+            order.AddItem(productId, 5);
+
+            // Act
+            order.RemoveItem(productId, 2);
+
+            // Assert
+            var item = order.Items.First();
+
+            Assert.Equal(3, item.Quantity);
+        }
+
+        [Fact]
+        public void RemoveItem_ShouldRemoveItem_WhenQuantityReachesZero()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            var productId = Guid.NewGuid();
+
+            order.AddItem(productId, 2);
+
+            // Act
+            order.RemoveItem(productId, 2);
+
+            // Assert
+            Assert.Empty(order.Items);
+        }
+
+        [Fact]
+        public void RemoveItem_ShouldThrow_WhenProductDoesNotExist()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+
+            // Act & Assert
+            Assert.Throws<InvalidOrderItemException>(() => order.RemoveItem(Guid.NewGuid(), 1));
+        }
+
+        [Fact]
+        public void RemoveItem_ShouldThrow_WhenQuantityIsGreaterThanCurrentQuantity()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            var productId = Guid.NewGuid();
+
+            order.AddItem(productId, 2);
+
+            // Act & Assert
+            Assert.Throws<InvalidOrderItemException>(() => order.RemoveItem(productId, 3));
+        }
+
+        [Fact]
+        public void RemoveItem_ShouldThrow_WhenOrderIsNotPending()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            var productId = Guid.NewGuid();
+
+            order.AddItem(productId, 2);
+
+            var prices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            {
+                [productId] = (10, CurrencyCode.USD)
+            };
+
+            order.Confirm(prices, DateTime.UtcNow);
+
+            // Act & Assert
+            Assert.Throws<InvalidOrderException>(() => order.RemoveItem(productId, 1));
+        }
     }
 }

@@ -56,5 +56,23 @@ namespace OrderService.Domain.Tests
             Assert.Equal(productId, item.ProductId);
             Assert.Equal(quantity, item.Quantity);
         }
+
+        [Fact]
+        public void AddItem_ShouldIncreaseQuantity_WhenProductAlreadyExists()
+        {
+            // Arrange
+            var order = new Order(Guid.NewGuid());
+            var productId = Guid.NewGuid();
+
+            order.AddItem(productId, 2);
+
+            // Act
+            order.AddItem(productId, 3);
+
+            // Assert
+            var item = order.Items.First();
+
+            Assert.Equal(5, item.Quantity);
+        }
     }
 }
