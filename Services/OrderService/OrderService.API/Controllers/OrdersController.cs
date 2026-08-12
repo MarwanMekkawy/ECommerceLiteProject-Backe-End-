@@ -21,6 +21,9 @@ namespace OrderService.API.Controllers
         ICommandHandler<CompleteOrderInternalCommand> completeOrderInternalHandler,
         ICommandHandler<CancelOrderCommand> cancelOrderHandler,
         ICommandHandler<CancelOrderInternalCommand> cancelOrderInternalHandler,
+        ICommandHandler<AddOrderItemCommand> addOrderItemHandler,
+        ICommandHandler<DecreaseOrderItemCommand> decreaseOrderItemHandler,
+        ICommandHandler<IncreaseOrderItemCommand> increaseOrderItemHandler,
         IQueryHandler<GetOrderByIdQuery, Order?> getOrderByIdHandler,
         IQueryHandler<GetOrdersByUserQuery, IReadOnlyList<Order>> getOrdersByUserHandler,
         IQueryHandler<GetLatestOrderQuery, Order?> getLatestOrderHandler,
@@ -101,6 +104,73 @@ namespace OrderService.API.Controllers
             var command = new CreateOrderCommand(claims.UserId, items);
 
             await createOrderHandler.HandleAsync(command, cancellationToken);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Adds a single product item to the user's existing order.
+        /// If the product already exists in the order, its quantity is increased.
+        /// If the product does not exist, a new order item is added.
+        /// </summary>
+        /// <param name="orderId">The ID of the order.</param>
+        /// <param name="item">The product and quantity to add.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>No content if the item was added successfully.</returns>
+        [HttpPost("{orderId:guid}/items")]
+        [Authorize]
+        public async Task<IActionResult> AddOrderItem(Guid orderId, [FromBody] CreateOrderItemDto item, CancellationToken cancellationToken = default)
+        {
+            var claims = UserClaimsFactory.ExtractFrom(User);
+
+            var command = new AddOrderItemCommand(claims.UserId, orderId, item.ProductId, item.Quantity);
+
+            await addOrderItemHandler.HandleAsync(command, cancellationToken);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Increases the quantity of an existing product in the user's order.
+        /// The product must already exist in the order; otherwise, an exception is thrown.
+        /// </summary>
+        /// <param name="orderId">The ID of the order.</param>
+        /// <param name="productId">The ID of the product to increase.</param>
+        /// <param name="quantity">The quantity to add.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>No content if the quantity was increased successfully.</returns>
+        [HttpPost("{orderId:guid}/items/{productId:guid}/increase")]
+        [Authorize]
+        public async Task<IActionResult> IncreaseOrderItem(Guid orderId, Guid productId, [FromBody] int quantity, CancellationToken cancellationToken = default)
+        {
+            var claims = UserClaimsFactory.ExtractFrom(User);
+
+            var command = new IncreaseOrderItemCommand(claims.UserId, orderId, productId, quantity);
+
+            await increaseOrderItemHandler.HandleAsync(command, cancellationToken);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Decreases the quantity of an existing product in the user's order.
+        /// The product must already exist in the order.
+        /// If the quantity reaches zero, the order item is removed.
+        /// </summary>
+        /// <param name="orderId">The ID of the order.</param>
+        /// <param name="productId">The ID of the product to decrease.</param>
+        /// <param name="quantity">The quantity to remove.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>No content if the quantity was decreased successfully.</returns>
+        [HttpPost("{orderId:guid}/items/{productId:guid}/decrease")]
+        [Authorize]
+        public async Task<IActionResult> DecreaseOrderItem(Guid orderId, Guid productId, [FromBody] int quantity, CancellationToken cancellationToken = default)
+        {
+            var claims = UserClaimsFactory.ExtractFrom(User);
+
+            var command = new DecreaseOrderItemCommand(claims.UserId, orderId, productId, quantity);
+
+            await decreaseOrderItemHandler.HandleAsync(command, cancellationToken);
 
             return NoContent();
         }
@@ -201,7 +271,7 @@ namespace OrderService.API.Controllers
             return Ok(orders);
         }
 
-        //service-service endpoints
+        //service-service endpoints  //@ add [Authorize] with service authintication
         /// <summary>
         /// Completes an order through an internal service-to-service request.
         /// </summary>

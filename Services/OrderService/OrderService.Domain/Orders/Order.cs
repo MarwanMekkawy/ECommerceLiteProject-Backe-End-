@@ -54,8 +54,22 @@ namespace OrderService.Domain.Orders
 
             _items.Add(new OrderItem(Id, productId, quantity));
         }
-        // remove items from the order
-        public void RemoveItem(Guid productId, int quantity)
+
+        public void IncreaseItem(Guid productId, int quantity)
+        {
+            if (Status != OrderStatus.Pending)
+                throw new InvalidOrderException("Items can only be modified on pending orders.");
+
+            var existingItem = _items.FirstOrDefault(x => x.ProductId == productId);
+
+            if (existingItem is null)
+                throw new InvalidOrderItemException("Product does not exist in the order.");
+
+            existingItem.IncreaseQuantity(quantity);
+        }
+
+        // decrease items from the order and remove if count = 0
+        public void DecreaseItem(Guid productId, int quantity)
         {
             if (productId == Guid.Empty)
                 throw new InvalidOrderItemException("ProductId cannot be empty.");
@@ -76,6 +90,7 @@ namespace OrderService.Domain.Orders
             if (existingItem.Quantity == 0)
                 _items.Remove(existingItem);
         }
+
         // confirm the order before payment and snapshot its total price
         public void Confirm(IReadOnlyDictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)> productPrices, DateTime confirmedAt)
         {

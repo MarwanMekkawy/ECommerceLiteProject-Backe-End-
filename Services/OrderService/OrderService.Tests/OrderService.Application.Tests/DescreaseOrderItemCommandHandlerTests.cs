@@ -7,7 +7,7 @@ using Xunit;
 
 namespace OrderService.Application.Tests
 {
-    public class RemoveOrderItemCommandHandlerTests
+    public class DescreaseOrderItemCommandHandlerTests
     {
         [Fact]
         public async Task Handle_ShouldDecreaseItemQuantity_WhenOrderExists()
@@ -25,9 +25,9 @@ namespace OrderService.Application.Tests
 
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new RemoveOrderItemCommandHandler(repository.Object, uow.Object);
+            var handler = new DecreaseOrderItemCommandHandler(repository.Object, uow.Object);
 
-            var command = new RemoveOrderItemCommand(userId, order.Id, productId, 2);
+            var command = new DecreaseOrderItemCommand(userId, order.Id, productId, 2);
 
             // Act
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
@@ -55,9 +55,9 @@ namespace OrderService.Application.Tests
 
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new RemoveOrderItemCommandHandler(repository.Object, uow.Object);
+            var handler = new DecreaseOrderItemCommandHandler(repository.Object, uow.Object);
 
-            var command = new RemoveOrderItemCommand(userId, order.Id, productId, 2);
+            var command = new DecreaseOrderItemCommand(userId, order.Id, productId, 2);
 
             // Act
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
@@ -81,9 +81,9 @@ namespace OrderService.Application.Tests
 
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new RemoveOrderItemCommandHandler(repository.Object, uow.Object);
+            var handler = new DecreaseOrderItemCommandHandler(repository.Object, uow.Object);
 
-            var command = new RemoveOrderItemCommand(userId, orderId, Guid.NewGuid(), 1);
+            var command = new DecreaseOrderItemCommand(userId, orderId, Guid.NewGuid(), 1);
 
             // Act & Assert
             await Assert.ThrowsAsync<NotFoundException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));

@@ -18,7 +18,8 @@ namespace OrderService.Application.Extentions.App
             services.AddScoped<ICommandHandler<CancelOrderCommand>, CancelOrderCommandHandler>();
             services.AddScoped<ICommandHandler<CancelOrderInternalCommand>, CancelOrderInternalCommandHandler>();
             services.AddScoped<ICommandHandler<AddOrderItemCommand>, AddOrderItemCommandHandler>();
-            services.AddScoped<ICommandHandler<RemoveOrderItemCommand>, RemoveOrderItemCommandHandler>();
+            services.AddScoped<ICommandHandler<DecreaseOrderItemCommand>, DecreaseOrderItemCommandHandler>();
+            services.AddScoped<ICommandHandler<IncreaseOrderItemCommand>, IncreaseOrderItemCommandHandler>();
 
 
             // Queries

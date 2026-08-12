@@ -359,7 +359,7 @@ namespace OrderService.Domain.Tests
             order.AddItem(productId, 5);
 
             // Act
-            order.RemoveItem(productId, 2);
+            order.DecreaseItem(productId, 2);
 
             // Assert
             var item = order.Items.First();
@@ -377,7 +377,7 @@ namespace OrderService.Domain.Tests
             order.AddItem(productId, 2);
 
             // Act
-            order.RemoveItem(productId, 2);
+            order.DecreaseItem(productId, 2);
 
             // Assert
             Assert.Empty(order.Items);
@@ -390,7 +390,7 @@ namespace OrderService.Domain.Tests
             var order = new Order(Guid.NewGuid());
 
             // Act & Assert
-            Assert.Throws<InvalidOrderItemException>(() => order.RemoveItem(Guid.NewGuid(), 1));
+            Assert.Throws<InvalidOrderItemException>(() => order.DecreaseItem(Guid.NewGuid(), 1));
         }
 
         [Fact]
@@ -403,7 +403,7 @@ namespace OrderService.Domain.Tests
             order.AddItem(productId, 2);
 
             // Act & Assert
-            Assert.Throws<InvalidOrderItemException>(() => order.RemoveItem(productId, 3));
+            Assert.Throws<InvalidOrderItemException>(() => order.DecreaseItem(productId, 3));
         }
 
         [Fact]
@@ -423,7 +423,7 @@ namespace OrderService.Domain.Tests
             order.Confirm(prices, DateTime.UtcNow);
 
             // Act & Assert
-            Assert.Throws<InvalidOrderException>(() => order.RemoveItem(productId, 1));
+            Assert.Throws<InvalidOrderException>(() => order.DecreaseItem(productId, 1));
         }
     }
 }

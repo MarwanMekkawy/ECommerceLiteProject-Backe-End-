@@ -4,16 +4,16 @@ using OrderService.Domain.Contracts;
 
 namespace OrderService.Application.Commands
 {
-    public class AddOrderItemCommandHandler(IOrderRepository orderRepository, IUnitOfWork uow) : ICommandHandler<AddOrderItemCommand>
+    public class DecreaseOrderItemCommandHandler(IOrderRepository orderRepository, IUnitOfWork uow) : ICommandHandler<DecreaseOrderItemCommand>
     {
-        public async Task HandleAsync(AddOrderItemCommand command, CancellationToken cancellationToken)
+        public async Task HandleAsync(DecreaseOrderItemCommand command, CancellationToken cancellationToken)
         {
             var order = await orderRepository.GetByIdAndUserIdTrackedAsync(command.OrderId, command.UserId, cancellationToken);
 
             if (order is null)
                 throw new NotFoundException($"Order with Id {command.OrderId} was NOT FOUND.");
 
-            order.AddItem(command.ProductId, command.Quantity);
+            order.DecreaseItem(command.ProductId, command.Quantity);
 
             await uow.SaveChangesAsync(cancellationToken);
         }
