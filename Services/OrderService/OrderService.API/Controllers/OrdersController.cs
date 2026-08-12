@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OrderService.API.ApiClaimsFactory;
 using OrderService.Application.Abstractions;
 using OrderService.Application.Commands;
@@ -8,6 +9,10 @@ using OrderService.Domain.Orders;
 
 namespace OrderService.API.Controllers
 {
+    /// <summary>
+    /// Provides endpoints for retrieving and managing orders for authenticated users,
+    /// administrators, and internal service-to-service operations.
+    /// </summary>
     [Route("api/v1/orders")]
     [ApiController]
     public class OrdersController(
@@ -20,10 +25,18 @@ namespace OrderService.API.Controllers
         IQueryHandler<GetOrdersByUserQuery, IReadOnlyList<Order>> getOrdersByUserHandler,
         IQueryHandler<GetLatestOrderQuery, Order?> getLatestOrderHandler,
         IQueryHandler<GetAllOrdersQuery, IReadOnlyList<Order>> getAllOrdersHandler,
-        IQueryHandler<GetOrderByIdAdminQuery, Order?> getOrderByIdAdminHandler) 
+        IQueryHandler<GetOrderByIdAdminQuery, Order?> getOrderByIdAdminHandler)
         : ControllerBase
     {
+        /// <summary>
+        /// Retrieves a paginated list of orders belonging to the currently authenticated user.
+        /// </summary>
+        /// <param name="pageNumber">The page number to retrieve. Defaults to 1.</param>
+        /// <param name="pageSize">The number of orders per page. Defaults to 5.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>A paginated list of the current user's orders.</returns>
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetCurrentUserOrders(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
@@ -35,7 +48,13 @@ namespace OrderService.API.Controllers
             return Ok(orders);
         }
 
+        /// <summary>
+        /// Retrieves the latest order belonging to the currently authenticated user.
+        /// </summary>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>The latest order, or <see cref="NotFoundResult"/> if no order exists.</returns>
         [HttpGet("latest")]
+        [Authorize]
         public async Task<IActionResult> GetCurrentUserLatestOrder(CancellationToken cancellationToken = default)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
@@ -48,7 +67,14 @@ namespace OrderService.API.Controllers
         }
 
 
+        /// <summary>
+        /// Retrieves an order by its unique identifier for the currently authenticated user.
+        /// </summary>
+        /// <param name="orderId">The unique identifier of the order.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>The requested order, or <see cref="NotFoundResult"/> if the order does not exist.</returns>
         [HttpGet("{orderId:guid}")]
+        [Authorize]
         public async Task<IActionResult> GetCurrentUserOrderById(Guid orderId, CancellationToken cancellationToken = default)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
@@ -60,7 +86,14 @@ namespace OrderService.API.Controllers
             return order is null ? NotFound() : Ok(order);
         }
 
+        /// <summary>
+        /// Creates a new order for the currently authenticated user.
+        /// </summary>
+        /// <param name="items">The items to include in the order.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>No content if the order was created successfully.</returns>
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateUserOrder([FromBody] List<CreateOrderItemDto> items, CancellationToken cancellationToken = default)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
@@ -72,7 +105,14 @@ namespace OrderService.API.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Checks out an order belonging to the currently authenticated user.
+        /// </summary>
+        /// <param name="orderId">The unique identifier of the order to check out.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>The checkout result.</returns>
         [HttpPost("{orderId:guid}/checkout")]
+        [Authorize]
         public async Task<IActionResult> CheckOutOrder(Guid orderId, CancellationToken cancellationToken = default)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
@@ -84,7 +124,14 @@ namespace OrderService.API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Cancels an order belonging to the currently authenticated user.
+        /// </summary>
+        /// <param name="orderId">The unique identifier of the order to cancel.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>No content if the order was cancelled successfully.</returns>
         [HttpPost("{orderId:guid}/cancel")]
+        [Authorize]
         public async Task<IActionResult> CancelOrder(Guid orderId, CancellationToken cancellationToken = default)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
@@ -97,7 +144,16 @@ namespace OrderService.API.Controllers
         }
 
         //Admin
+        /// <summary>
+        /// Retrieves a paginated list of all orders.
+        /// This endpoint is intended for administrator use.
+        /// </summary>
+        /// <param name="pageNumber">The page number to retrieve. Defaults to 1.</param>
+        /// <param name="pageSize">The number of orders per page. Defaults to 5.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>A paginated list of all orders.</returns>
         [HttpGet("admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllOrders(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
         {
             var query = new GetAllOrdersQuery(pageNumber, pageSize);
@@ -107,7 +163,15 @@ namespace OrderService.API.Controllers
             return Ok(orders);
         }
 
+        /// <summary>
+        /// Retrieves an order by its unique identifier.
+        /// This endpoint is intended for administrator use.
+        /// </summary>
+        /// <param name="orderId">The unique identifier of the order.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>The requested order, or <see cref="NotFoundResult"/> if the order does not exist.</returns>
         [HttpGet("admin/{orderId:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetOrderById(Guid orderId, CancellationToken cancellationToken = default)
         {
             var query = new GetOrderByIdAdminQuery(orderId);
@@ -117,7 +181,17 @@ namespace OrderService.API.Controllers
             return order is null ? NotFound() : Ok(order);
         }
 
+        /// <summary>
+        /// Retrieves a paginated list of orders belonging to a specified user.
+        /// This endpoint is intended for administrator use.
+        /// </summary>
+        /// <param name="userId">The unique identifier of the user whose orders should be retrieved.</param>
+        /// <param name="pageNumber">The page number to retrieve. Defaults to 1.</param>
+        /// <param name="pageSize">The number of orders per page. Defaults to 5.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>A paginated list of the user's orders.</returns>
         [HttpGet("admin/user/{userId:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetOrdersByUser(Guid userId, int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
         {
             var query = new GetOrdersByUserQuery(userId, pageNumber, pageSize);
@@ -128,6 +202,12 @@ namespace OrderService.API.Controllers
         }
 
         //service-service endpoints
+        /// <summary>
+        /// Completes an order through an internal service-to-service request.
+        /// </summary>
+        /// <param name="orderId">The unique identifier of the order to complete.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>No content if the order was completed successfully.</returns>
         [HttpPost("{orderId:guid}/complete-internal")]
         public async Task<IActionResult> CompleteOrderInternal(Guid orderId, CancellationToken cancellationToken = default)
         {
@@ -138,6 +218,13 @@ namespace OrderService.API.Controllers
             return NoContent();
         }
 
+        //@ ========= probably delete the endpoint if i dont use it cuz the only internal cancellation will be automatic after order expiration =========
+        /// <summary>
+        /// Cancels an order through an internal service-to-service request.
+        /// </summary>
+        /// <param name="orderId">The unique identifier of the order to cancel.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>No content if the order was cancelled successfully.</returns>
         [HttpPost("{orderId:guid}/cancel-internal")]
         public async Task<IActionResult> CancelOrderInternal(Guid orderId, CancellationToken cancellationToken = default)
         {
@@ -147,5 +234,6 @@ namespace OrderService.API.Controllers
 
             return NoContent();
         }
+        // ==============================================================================================================================================
     }
 }
