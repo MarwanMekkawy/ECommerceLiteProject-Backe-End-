@@ -1,4 +1,6 @@
-﻿using Moq;
+﻿using AutoMapper;
+using Moq;
+using OrderService.Application.DTOs;
 using OrderService.Application.Queries;
 using OrderService.Domain.Contracts;
 using OrderService.Domain.Orders;
@@ -15,7 +17,12 @@ namespace OrderService.Application.Tests
             var orders = new List<Order> { new Order(Guid.NewGuid()), new Order(Guid.NewGuid()) };
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetPagedAsync(1, 10, It.IsAny<CancellationToken>())).ReturnsAsync(orders);
-            var handler = new GetAllOrdersQueryHandler(repository.Object);
+
+            var mapper = new Mock<IMapper>();
+            var orderDtos = new List<OrderResponseDto> { new OrderResponseDto(), new OrderResponseDto() };
+            mapper.Setup(x => x.Map<IReadOnlyList<OrderResponseDto>>(orders)).Returns(orderDtos);
+
+            var handler = new GetAllOrdersQueryHandler(repository.Object, mapper.Object);
             var query = new GetAllOrdersQuery(1, 10);
 
             // Act
@@ -23,10 +30,11 @@ namespace OrderService.Application.Tests
 
             // Assert
             Assert.Equal(2, result.Count);
-            Assert.Same(orders[0], result[0]);
-            Assert.Same(orders[1], result[1]);
+            Assert.Same(orderDtos[0], result[0]);
+            Assert.Same(orderDtos[1], result[1]);
 
             repository.Verify(x => x.GetPagedAsync(1, 10, It.IsAny<CancellationToken>()), Times.Once);
+            mapper.Verify(x => x.Map<IReadOnlyList<OrderResponseDto>>(orders), Times.Once);
         }
 
         [Fact]
@@ -35,7 +43,11 @@ namespace OrderService.Application.Tests
             // Arrange
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetPagedAsync(1, 10, It.IsAny<CancellationToken>())).ReturnsAsync([]);
-            var handler = new GetAllOrdersQueryHandler(repository.Object);
+
+            var mapper = new Mock<IMapper>();
+            mapper.Setup(x => x.Map<IReadOnlyList<OrderResponseDto>>(It.IsAny<IReadOnlyList<Order>>())).Returns([]);
+
+            var handler = new GetAllOrdersQueryHandler(repository.Object, mapper.Object);
             var query = new GetAllOrdersQuery(1, 10);
 
             // Act
@@ -52,7 +64,11 @@ namespace OrderService.Application.Tests
             // Arrange
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetPagedAsync(3, 20, It.IsAny<CancellationToken>())).ReturnsAsync([]);
-            var handler = new GetAllOrdersQueryHandler(repository.Object);
+
+            var mapper = new Mock<IMapper>();
+            mapper.Setup(x => x.Map<IReadOnlyList<OrderResponseDto>>(It.IsAny<List<Order>>())).Returns([]);
+
+            var handler = new GetAllOrdersQueryHandler(repository.Object, mapper.Object);
             var query = new GetAllOrdersQuery(3, 20);
 
             // Act

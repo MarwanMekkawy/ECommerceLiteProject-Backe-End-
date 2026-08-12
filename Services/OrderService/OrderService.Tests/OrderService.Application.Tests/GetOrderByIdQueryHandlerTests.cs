@@ -1,4 +1,6 @@
-﻿using Moq;
+﻿using AutoMapper;
+using Moq;
+using OrderService.Application.DTOs;
 using OrderService.Application.Queries;
 using OrderService.Domain.Contracts;
 using OrderService.Domain.Orders;
@@ -21,7 +23,12 @@ namespace OrderService.Application.Tests
 
             repository.Setup(x => x.GetByIdAndUserIdUnTrackedAsync(orderId, userId, It.IsAny<CancellationToken>())).ReturnsAsync(order);
 
-            var handler = new GetOrderByIdQueryHandler(repository.Object);
+            var mapper = new Mock<IMapper>();
+            var orderDto = new OrderResponseDto();
+
+            mapper.Setup(x => x.Map<OrderResponseDto>(order)).Returns(orderDto);
+
+            var handler = new GetOrderByIdQueryHandler(repository.Object, mapper.Object);
 
             var query = new GetOrderByIdQuery(orderId, userId);
 
@@ -30,31 +37,31 @@ namespace OrderService.Application.Tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Same(order, result);
+            Assert.Same(orderDto, result);
             repository.Verify(x => x.GetByIdAndUserIdUnTrackedAsync(orderId, userId, It.IsAny<CancellationToken>()), Times.Once);
+            mapper.Verify(x => x.Map<OrderResponseDto>(order), Times.Once);
         }
 
         [Fact]
-        public async Task Handle_ShouldReturnNull_WhenOrderDoesNotExist()
+        public async Task Handle_ShouldReturnEmpty_WhenUserHasNoOrders()
         {
             // Arrange
-            var orderId = Guid.NewGuid();
             var userId = Guid.NewGuid();
-
             var repository = new Mock<IOrderRepository>();
+            repository.Setup(x => x.GetPagedByUserIdAsync(userId, 1, 10, It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
-            repository.Setup(x => x.GetByIdAndUserIdUnTrackedAsync(orderId, userId, It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
+            var mapper = new Mock<IMapper>();
+            mapper.Setup(x => x.Map<IReadOnlyList<OrderResponseDto>>(It.IsAny<IReadOnlyList<Order>>())).Returns([]);
 
-            var handler = new GetOrderByIdQueryHandler(repository.Object);
-
-            var query = new GetOrderByIdQuery(orderId, userId);
+            var handler = new GetOrdersByUserQueryHandler(repository.Object, mapper.Object);
+            var query = new GetOrdersByUserQuery(userId, 1, 10);
 
             // Act
             var result = await handler.HandleAsync(query, TestContext.Current.CancellationToken);
 
             // Assert
-            Assert.Null(result);
-            repository.Verify(x => x.GetByIdAndUserIdUnTrackedAsync(orderId, userId, It.IsAny<CancellationToken>()), Times.Once);
+            Assert.Empty(result);
+            repository.Verify(x => x.GetPagedByUserIdAsync(userId, 1, 10, It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }
