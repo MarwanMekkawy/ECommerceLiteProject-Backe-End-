@@ -203,7 +203,7 @@ namespace ProductService.API.Controllers
             var command = new IncreaseStockCommand(id, quantity);
 
             await increaseStock.HandleAsync(command, cancellationToken);
-
+            Console.WriteLine($"++++++++++++++++{quantity}");
             return Ok();
         }
 
@@ -221,7 +221,7 @@ namespace ProductService.API.Controllers
             var command = new DecreaseStockCommand(id, quantity);
 
             await decreaseStock.HandleAsync(command, cancellationToken);
-
+            Console.WriteLine($"---------------{quantity}");
             return Ok();
         }
 

@@ -56,10 +56,8 @@ namespace IdentityService.API
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = builder.Configuration["Jwt:Issuer"],
                         ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
                     };
-
                     // Authentication error msgs
                     options.Events = new JwtBearerEvents
                     {
@@ -78,7 +76,6 @@ namespace IdentityService.API
                             return context.Response.WriteAsJsonAsync(new { error = "You are not authorized or Verified to perform this action." });
                         }                        
                     };
-
                 });
 
             builder.Services.AddAuthorization(

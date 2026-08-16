@@ -52,7 +52,7 @@ namespace ProductService.Domain.Entities
                 throw new ArgumentException("Quantity must be greater than zero.");
 
             if (quantity > StockQuantity)
-                throw new InvalidOperationException("Insufficient stock.");
+                throw new InvalidOperationException($"Insufficient stock of [{Name}].");
 
             StockQuantity -= quantity;
         }
@@ -60,7 +60,7 @@ namespace ProductService.Domain.Entities
         public void Activate()
         {
             if (IsActive)
-                throw new InvalidOperationException("Product is already active.");
+                throw new InvalidOperationException($"[{Name}] Product is already active.");
 
             IsActive = true;
         }
@@ -68,7 +68,7 @@ namespace ProductService.Domain.Entities
         public void Deactivate()
         {
             if (!IsActive)
-                throw new InvalidOperationException("Product is already inactive.");
+                throw new InvalidOperationException($"[{Name}] Product is already inactive.");
 
             IsActive = false;
         }

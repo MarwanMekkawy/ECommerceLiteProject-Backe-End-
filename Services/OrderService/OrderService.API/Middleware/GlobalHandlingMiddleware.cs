@@ -1,0 +1,51 @@
+﻿using Domain.Exceptions;
+using IdentityService.Domain.Exceptions;
+using OrderService.Domain.Exceptions.DomainExceptions;
+using System.Net;
+using System.Text.Json;
+
+namespace OrderService.API.Middleware
+{
+    public class GlobalHandlingMiddleware(RequestDelegate _next, ILogger<GlobalHandlingMiddleware> _logger)
+    {
+        public async Task InvokeAsync(HttpContext context)
+        {
+            try
+            {
+                await _next(context);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Something went wrong");
+                if (context.Response.HasStarted)   throw;
+                await HandleExceptionAsync(context, ex);
+            }
+        }
+        private Task HandleExceptionAsync(HttpContext context, Exception ex)
+        {
+            context.Response.StatusCode = ex switch
+            {
+                NotFoundException => (int)HttpStatusCode.NotFound,
+                BadRequestException => (int)HttpStatusCode.BadRequest,
+                ConflictException => (int)HttpStatusCode.Conflict,
+                ForbiddenException => (int)HttpStatusCode.Forbidden,
+                UnauthorizedException => (int)HttpStatusCode.Unauthorized,
+                InternalServerErrorException => (int)HttpStatusCode.InternalServerError,
+                InvalidTokenException => (int)HttpStatusCode.Unauthorized,
+                TooManyRequestsException => (int)HttpStatusCode.TooManyRequests,
+                ArgumentException=> (int)HttpStatusCode.BadRequest,
+                InvalidOperationException=>(int)HttpStatusCode.Conflict,
+                //Domain Exceptions
+                InvalidOrderException => (int)HttpStatusCode.BadRequest,
+                InvalidOrderItemException => (int)HttpStatusCode.BadRequest,
+                OrderStateException => (int)HttpStatusCode.Conflict,
+                _ => (int)HttpStatusCode.InternalServerError,
+            };
+
+            context.Response.ContentType = "application/json";
+
+            var result = JsonSerializer.Serialize(new { error = ex.Message });
+            return context.Response.WriteAsync(result);
+        }
+    }
+}

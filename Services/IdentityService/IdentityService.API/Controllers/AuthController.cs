@@ -3,7 +3,6 @@ using IdentityService.Application.Abstractions;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.DTOs.AuthDTOs;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.API.Controllers
