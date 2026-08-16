@@ -76,7 +76,6 @@ namespace IdentityService.API
                             return context.Response.WriteAsJsonAsync(new { error = "You are not authorized or Verified to perform this action." });
                         }                        
                     };
-
                 });
 
             builder.Services.AddAuthorization(

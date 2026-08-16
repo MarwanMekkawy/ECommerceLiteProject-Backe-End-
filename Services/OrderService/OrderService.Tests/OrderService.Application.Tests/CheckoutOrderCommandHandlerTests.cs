@@ -24,7 +24,7 @@ namespace OrderService.Application.Tests
 
             var product = new ProductDto
             {
-                ProductId = productId,
+                id = productId,
                 Price = 10,
                 Currency = CurrencyCode.USD
             };
@@ -134,7 +134,7 @@ namespace OrderService.Application.Tests
 
             var product = new ProductDto
             {
-                ProductId = productId,
+                id = productId,
                 Price = 10,
                 Currency = CurrencyCode.USD
             };
@@ -169,7 +169,7 @@ namespace OrderService.Application.Tests
 
             var product = new ProductDto
             {
-                ProductId = productId,
+                id = productId,
                 Price = 25,
                 Currency = CurrencyCode.USD
             };
@@ -208,7 +208,7 @@ namespace OrderService.Application.Tests
 
             var product = new ProductDto
             {
-                ProductId = productId,
+                id = productId,
                 Price = 10,
                 Currency = CurrencyCode.USD
             };
@@ -245,7 +245,7 @@ namespace OrderService.Application.Tests
 
             var product = new ProductDto
             {
-                ProductId = productId,
+                id = productId,
                 Price = 10,
                 Currency = CurrencyCode.USD
             };
@@ -280,7 +280,7 @@ namespace OrderService.Application.Tests
 
             var product = new ProductDto
             {
-                ProductId = productId,
+                id = productId,
                 Price = 10,
                 Currency = CurrencyCode.USD
             };
@@ -324,13 +324,13 @@ namespace OrderService.Application.Tests
             var productServiceClient = new Mock<IProductServiceClient>();
             productServiceClient.Setup(x => x.GetProductForCheckoutAsync(productA, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductDto
             {
-                ProductId = productA,
+                id = productA,
                 Price = 10,
                 Currency = CurrencyCode.USD
             });
             productServiceClient.Setup(x => x.GetProductForCheckoutAsync(productB, TestContext.Current.CancellationToken)).ReturnsAsync(new ProductDto
             {
-                ProductId = productB,
+                id = productB,
                 Price = 20,
                 Currency = CurrencyCode.USD
             });

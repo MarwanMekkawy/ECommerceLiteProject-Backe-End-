@@ -68,7 +68,6 @@ namespace OrderService.API.Controllers
             return order is null ? NotFound() : Ok(order);
         }
 
-
         /// <summary>
         /// Retrieves an order by its unique identifier for the currently authenticated user.
         /// </summary>

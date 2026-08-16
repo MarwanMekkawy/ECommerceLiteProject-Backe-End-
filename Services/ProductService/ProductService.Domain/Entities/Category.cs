@@ -44,7 +44,7 @@ namespace ProductService.Domain.Entities
         public void Activate()
         {
             if (IsActive)
-                throw new InvalidOperationException("Category is already active.");
+                throw new InvalidOperationException($"[{Name}] Category is already active.");
 
             IsActive = true;
         }
@@ -52,7 +52,7 @@ namespace ProductService.Domain.Entities
         public void Deactivate()
         {
             if (!IsActive)
-                throw new InvalidOperationException("Category is already inactive.");
+                throw new InvalidOperationException($"[{Name}] Category is already inactive.");
 
             IsActive = false;
         }

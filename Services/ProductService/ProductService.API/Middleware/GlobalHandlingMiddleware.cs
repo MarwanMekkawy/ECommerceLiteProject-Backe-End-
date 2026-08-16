@@ -15,7 +15,8 @@ namespace ProductService.API.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Something went wrong:{ex.Message}");
+                _logger.LogError(ex, "Something went wrong");
+                if (context.Response.HasStarted)   throw;
                 await HandleExceptionAsync(context, ex);
             }
         }

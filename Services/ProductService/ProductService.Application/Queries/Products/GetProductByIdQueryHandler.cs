@@ -13,10 +13,10 @@ namespace ProductService.Application.Queries.Products
             var product = await productRepository.GetByIdUntrackedAsync(query.ProductId, cancellationToken);
 
             if (product is null)
-                throw new NotFoundException("Product not found.");
+                throw new NotFoundException($"Product No. [{query.ProductId}] not found.");
 
             if (!query.IncludeInactive && (!product.IsActive || !product.Category.IsActive))
-                throw new NotFoundException("Product not found.");
+                throw new NotFoundException($"Product No. [{query.ProductId}] not found.");
 
             return new ProductDto
             {

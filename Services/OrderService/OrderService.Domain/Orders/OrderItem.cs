@@ -2,7 +2,6 @@
 using OrderService.Domain.Exceptions.DomainExceptions;
 
 
-
 namespace OrderService.Domain.Orders
 {
     public class OrderItem

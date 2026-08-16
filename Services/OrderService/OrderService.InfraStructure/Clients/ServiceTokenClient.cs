@@ -4,6 +4,7 @@ using OrderService.Application.Abstractions;
 using OrderService.InfraStructure.Clients.DTOIdentityContracts;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace OrderService.InfraStructure.Clients
 {
@@ -22,9 +23,15 @@ namespace OrderService.InfraStructure.Clients
                 ClientSecret = configuration["OrderService:ServiceSecret"]!
             };
 
-            var response = await httpClient.PostAsJsonAsync("oauth/service-token", request, cancellationToken);
+            var response = await httpClient.PostAsJsonAsync("auth/oauth/service-token", request, cancellationToken);
 
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync(cancellationToken);
+                using var document = JsonDocument.Parse(json);
+                var error = document.RootElement.GetProperty("error").GetString();
+                throw new Exception(error ?? "Request failed");
+            }
 
             var result = await response.Content.ReadFromJsonAsync<ServiceTokenResponse>(cancellationToken);
 

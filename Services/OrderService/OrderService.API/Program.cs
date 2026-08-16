@@ -63,10 +63,9 @@ namespace OrderService.API
                         {
                             context.Response.StatusCode = StatusCodes.Status403Forbidden;
 
-                            return context.Response.WriteAsJsonAsync(new { error = "You are not authorized or Verified to perform this action." });
+                            return context.Response.WriteAsJsonAsync(new { error = "You are not authorized to perform this action." });
                         }
                     };
-
                 });
 
             builder.Services.AddAuthorization();

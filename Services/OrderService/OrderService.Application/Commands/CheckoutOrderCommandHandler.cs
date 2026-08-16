@@ -16,7 +16,7 @@ namespace OrderService.Application.Commands
             var order = await orderRepository.GetByIdAndUserIdTrackedAsync(command.OrderId, command.UserId, cancellationToken);
 
             if (order is null)
-                throw new NotFoundException($"Order with Id {command.OrderId} Was NOT FOUND.");
+                throw new NotFoundException($"Order with Id [{command.OrderId}] Was NOT FOUND.");
 
             if (order.Status != OrderStatus.Pending)
                 throw new InvalidOrderException("Only pending orders can be checked out.");
@@ -34,7 +34,7 @@ namespace OrderService.Application.Commands
                     var product = await productServiceClient.GetProductForCheckoutAsync(item.ProductId, cancellationToken);
 
                     if (product is null)
-                        throw new NotFoundException($"Product with Id {item.ProductId} Was NOT FOUND.");
+                        throw new NotFoundException($"Product with Id [{item.ProductId}] Was NOT FOUND.");
 
                     productPrices[item.ProductId] = (product.Price, product.Currency);
 
