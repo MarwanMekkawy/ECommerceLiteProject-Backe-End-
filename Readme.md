@@ -11,6 +11,7 @@ Features, architecture, integrations, and service communication are still active
 
 ## 🏗️ Project Status
 
+
 | Service | Status |
 |---|---|
 | 🔐 Identity Service |     🟢 **Fully Implemented** |
