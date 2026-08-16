@@ -13,14 +13,14 @@ Features, architecture, integrations, and service communication are still active
 
 | Service | Status |
 |---|---|
-| 🔐 Identity Service | 🟢 **Fully Implemented** |
-| 📦 Product Service | 🟡 **Implemented — Still Under Development** |
-| 🛒 Order Service | 🟡 **Implemented — Still Under Development** |
+| 🔐 Identity Service |     🟢 **Fully Implemented** |
+| 📦 Product Service |      🟡 **Implemented — Still Under Development** |
+| 🛒 Order Service |        🟡 **Implemented — Still Under Development** |
 | 🔔 Notification Service | 🔴 **Not Implemented** |
-| 💳 Payment Service | 🔴 **Not Implemented** |
-| 🌐 API Gateway | 🔴 **Not Implemented** |
-| 🐳 Dockerization | 🔴 **Not Implemented Yet** |
-| 🔗 Service Integration | 🟡 **Ongoing** |
-| 📚 Documentation | 🟡 **Ongoing** |
+| 💳 Payment Service |      🔴 **Not Implemented** |
+| 🌐 API Gateway |          🔴 **Not Implemented** |
+| 🐳 Dockerization |        🔴 **Not Implemented Yet** |
+| 🔗 Service Integration |  🟡 **Ongoing** |
+| 📚 Documentation |        🟡 **Ongoing** |
 
 ---
