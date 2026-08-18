@@ -8,6 +8,8 @@ namespace OrderService.Application.DTOs
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public OrderStatus Status { get; set; }
+        public bool IsCancelledDueToExpiry { get; set; }
+        public DateTime? ExpiresAt { get; set; }
         public decimal Total { get; set; }
         public CurrencyCode Currency { get; set; }
         public DateTime CreatedAt { get; set; }

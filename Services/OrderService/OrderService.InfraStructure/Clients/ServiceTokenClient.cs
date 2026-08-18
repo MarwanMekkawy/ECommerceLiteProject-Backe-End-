@@ -28,9 +28,14 @@ namespace OrderService.InfraStructure.Clients
             if (!response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync(cancellationToken);
-                using var document = JsonDocument.Parse(json);
-                var error = document.RootElement.GetProperty("error").GetString();
-                throw new Exception(error ?? "Request failed");
+                string? error = null;
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    using var document = JsonDocument.Parse(json);
+
+                    if (document.RootElement.TryGetProperty("error", out var errorProperty)) error = errorProperty.GetString();
+                }
+                throw new HttpRequestException(error ?? $"Identity Service returned {(int)response.StatusCode}.");
             }
 
             var result = await response.Content.ReadFromJsonAsync<ServiceTokenResponse>(cancellationToken);

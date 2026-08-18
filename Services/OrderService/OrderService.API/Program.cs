@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using OrderService.API.BackgroundTasks;
 using OrderService.API.Middleware;
 using OrderService.Application.Extentions.App;
 using OrderService.InfraStructure.Extentions.Infra;
@@ -19,6 +20,9 @@ namespace OrderService.API
 
             // Add Di Services extentions
             builder.Services.AddInfrastructureServices(builder.Configuration).AddApplicationServices();
+
+            // Register the background cleaning expired pending orders
+            builder.Services.AddHostedService<CancelExpiredOrdersBackgroundService>();
 
             // Add services to the container.
             builder.Services.AddControllers()

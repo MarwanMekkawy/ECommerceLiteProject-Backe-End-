@@ -109,7 +109,7 @@ namespace OrderService.Domain.Tests
             Assert.Equal(20, order.Total);
             Assert.Equal(CurrencyCode.USD, order.Currency);
             Assert.NotNull(order.ConfirmedAt);
-            Assert.NotNull(order.PaymentExpiresAt);
+            Assert.NotNull(order.ExpiresAt);
         }
 
         [Fact]
@@ -153,8 +153,8 @@ namespace OrderService.Domain.Tests
 
             // Assert
             Assert.NotNull(order.ConfirmedAt);
-            Assert.NotNull(order.PaymentExpiresAt);
-            Assert.Equal(3, (order.PaymentExpiresAt!.Value - order.ConfirmedAt!.Value).TotalDays);
+            Assert.NotNull(order.ExpiresAt);
+            Assert.Equal(3, (order.ExpiresAt!.Value - order.ConfirmedAt!.Value).TotalDays);
         }
 
         [Fact]
