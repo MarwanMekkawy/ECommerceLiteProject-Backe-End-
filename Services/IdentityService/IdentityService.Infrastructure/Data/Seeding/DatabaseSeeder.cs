@@ -58,7 +58,7 @@ namespace IdentityService.Infrastructure.Data.Seeding
         private static async Task SeedServicesAsync
             (IdentityDbContext context, IConfiguration configuration, IOneTimeTokenService oTTokenService, ILogger logger)
         {
-            var services = configuration.GetSection("servicesSecrets");
+            var services = configuration.GetSection("ClientsCredentials");
 
             if(!services.Exists())
                 logger.LogInformation("===============> No Configrations Were Found. <===============");
