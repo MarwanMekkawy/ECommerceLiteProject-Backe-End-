@@ -34,7 +34,7 @@ namespace OrderService.API
 
                     options.IncludeXmlComments(xmlPath);
                 });
-
+            //====== Auth JWT config ======//
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -48,7 +48,7 @@ namespace OrderService.API
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
                     };
-                    // Authentication error msgs
+                    // Human bearer Authentication error msgs
                     options.Events = new JwtBearerEvents
                     {
                         OnChallenge = context =>

@@ -6,6 +6,7 @@ using ProductService.Infrastructure;
 using ProductService.Infrastructure.Data.Seeding;
 using ProductService.Infrastructure.Extentions.Infra;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -37,7 +38,7 @@ namespace ProductService.API
                     options.IncludeXmlComments(xmlPath);
                 });
 
-            // Auth service config //
+            //====== Auth JWT config ======//
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -55,7 +56,7 @@ namespace ProductService.API
                     ValidAudience = builder.Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
                 };
-                // Authentication error msgs
+                // Human bearer Authentication error msgs
                 options.Events = new JwtBearerEvents
                 {
                     OnChallenge = context =>
@@ -65,7 +66,6 @@ namespace ProductService.API
 
                         return context.Response.WriteAsJsonAsync(new { error = "Authentication required." });
                     },
-
                     OnForbidden = context =>
                     {
                         context.Response.StatusCode = StatusCodes.Status403Forbidden;
@@ -76,6 +76,10 @@ namespace ProductService.API
             })
             .AddJwtBearer("ServiceJwt", options =>
             {
+                var rsa = RSA.Create();
+                rsa.ImportFromPem(builder.Configuration["JwtForServiceClient:PublicKey"]!.Replace("\\n", "\n"));
+                var key = new RsaSecurityKey(rsa);
+
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -84,7 +88,20 @@ namespace ProductService.API
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
                     ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtForServiceClient:Secret"]!))
+                    IssuerSigningKey = key
+                };
+                // Service bearer Authentication error msgs
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = async context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = 401;
+                        await context.Response.WriteAsJsonAsync(new
+                        {
+                            error = "Invalid or expired authentication token."
+                        });
+                    }
                 };
             });
 

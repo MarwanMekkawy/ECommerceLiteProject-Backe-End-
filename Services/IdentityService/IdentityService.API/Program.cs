@@ -44,7 +44,7 @@ namespace IdentityService.API
                 });
 
 
-            // Auth service config //
+            //====== Auth JWT config ======//
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -58,7 +58,7 @@ namespace IdentityService.API
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
                     };
-                    // Authentication error msgs
+                    // Human bearer Authentication error msgs
                     options.Events = new JwtBearerEvents
                     {
                         OnChallenge = context =>
