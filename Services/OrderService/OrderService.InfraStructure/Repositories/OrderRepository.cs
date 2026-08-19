@@ -56,7 +56,7 @@ namespace OrderService.Domain.Contracts
 
         public async Task<IReadOnlyList<Order>> GetConfirmedOrdersPastExpiryDateAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.Orders.Where(x => x.ExpiresAt <= DateTime.UtcNow && x.Status == OrderStatus.Confirmed).ToListAsync(cancellationToken);
+            return await _context.Orders.Include(x => x.Items).Where(x => x.ExpiresAt <= DateTime.UtcNow && x.Status == OrderStatus.Confirmed).ToListAsync(cancellationToken);
         }
     }
 }
