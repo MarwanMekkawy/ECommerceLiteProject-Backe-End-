@@ -16,7 +16,7 @@ Features, architecture, integrations, and service communication are still active
 | 🔐 Identity Service |     🟢 **Fully Implemented** |
 | 📦 Product Service |      🟡 **Implemented — Still Under Development** |
 | 🛒 Order Service |        🟡 **Implemented — Still Under Development** |
-| 🔔 Notification Service | 🔴 **Not Implemented** |
+| 🔔 Notification Service | 🔴 **Ongoing** |
 | 💳 Payment Service |      🔴 **Not Implemented** |
 | 🌐 API Gateway |          🔴 **Not Implemented** |
 | 🐳 Dockerization |        🔴 **Not Implemented Yet** |
