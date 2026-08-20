@@ -9,6 +9,9 @@ jobs:
   test-order-service:
     name: OrderService Tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Services/OrderService
 
     steps:
       - name: Checkout repository
