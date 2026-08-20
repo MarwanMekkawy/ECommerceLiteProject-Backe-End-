@@ -15,7 +15,7 @@ Features, architecture, integrations, and service communication are still active
 |---|---|
 | 🔐 Identity Service |     🟢 **Fully Implemented** |
 | 📦 Product Service |      🟡 **Implemented — Still Under Development** |
-| 🛒 Order Service |        🟡 **Implemented — Still Under Development** |
+| 🛒 Order Service |        🟡 **Implemented — Still Under Development** | [![OrderService Tests](https://github.com/MarwanMekkawy/ECommerceLiteProject-Backe-End-/actions/workflows/order-service-ci.yml/badge.svg?branch=orderService)](https://github.com/MarwanMekkawy/ECommerceLiteProject-Backe-End-/actions/workflows/order-service-ci.yml)
 | 🔔 Notification Service | 🔴 **Ongoing** |
 | 💳 Payment Service |      🔴 **Not Implemented** |
 | 🌐 API Gateway |          🔴 **Not Implemented** |
