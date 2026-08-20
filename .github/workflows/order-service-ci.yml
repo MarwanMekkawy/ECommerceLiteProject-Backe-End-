@@ -1,0 +1,35 @@
+name: OrderService CI
+
+on:
+  push:
+    branches:
+      - orderService
+
+jobs:
+  test-order-service:
+    name: OrderService Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run Application tests
+        run: dotnet test OrderService.Tests/OrderService.Application.Tests/OrderService.Application.Tests.csproj --no-build --configuration Release
+
+      - name: Run Domain tests
+        run: dotnet test OrderService.Tests/OrderService.Domain.Tests/OrderService.Domain.Tests.csproj --no-build --configuration Release
+
+      - name: Run Infrastructure tests
+        run: dotnet test OrderService.Tests/OrderService.Infrastructure.Tests/OrderService.Infrastructure.Tests.csproj --no-build --configuration Release

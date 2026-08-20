@@ -4,7 +4,7 @@ using OrderService.Domain.Contracts;
 
 namespace OrderService.Application.Commands
 {
-    public class CompleteOrderCommandInternalHandler(IOrderRepository orderRepository, IUnitOfWork uow) : ICommandHandler<CompleteOrderInternalCommand>
+    public class CompleteOrderInternalCommandHandler(IOrderRepository orderRepository, IUnitOfWork uow) : ICommandHandler<CompleteOrderInternalCommand>
     {
         public async Task HandleAsync(CompleteOrderInternalCommand command, CancellationToken cancellationToken)
         {
