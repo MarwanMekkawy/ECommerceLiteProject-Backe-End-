@@ -10,6 +10,10 @@ namespace PaymentService.Domain.Contracts
 
         Task<Payment?> GetByStripePaymentIntentIdAsync(string paymentIntentId, CancellationToken cancellationToken = default);
 
+        Task<Payment?> GetByStripeRefundIdAsync(string RefundId, CancellationToken cancellationToken = default);
+
+        Task<List<Payment>> GetSucceededPaymentsWithUnconfirmedOrderAsync(CancellationToken cancellationToken = default);
+
         Task AddAsync(Payment payment, CancellationToken cancellationToken = default);
 
         Task SaveChangesAsync(CancellationToken cancellationToken = default);

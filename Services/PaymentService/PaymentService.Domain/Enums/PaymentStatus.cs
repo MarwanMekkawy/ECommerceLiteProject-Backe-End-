@@ -7,6 +7,8 @@
         Processing,
         Succeeded,
         Failed,
-        Cancelled
+        Cancelled,
+        Refunding,
+        Refunded
     }
 }

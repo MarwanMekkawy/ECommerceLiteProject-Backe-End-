@@ -25,6 +25,17 @@ namespace PaymentService.Infrastructure.Clients.Stripe
             return new StripePaymentResultDto { PaymentIntentId = paymentIntent.Id, ClientSecret = paymentIntent.ClientSecret };
         }
 
+        public async Task<string> CreateRefundAsync(string paymentIntentId, CancellationToken cancellationToken = default)
+        {
+            var refundService = new RefundService();
+
+            var options = new RefundCreateOptions { PaymentIntent = paymentIntentId };
+
+            var refund = await refundService.CreateAsync(options, cancellationToken: cancellationToken);
+
+            return refund.Id;
+        }
+
         public StripeWebhookEventDto ConstructWebhookEvent(string json, string stripeSignature)
         {
             var webhookSecret = _configuration["Stripe:WebhookSecret"] ?? throw new InvalidOperationException("Stripe webhook secret is not configured.");

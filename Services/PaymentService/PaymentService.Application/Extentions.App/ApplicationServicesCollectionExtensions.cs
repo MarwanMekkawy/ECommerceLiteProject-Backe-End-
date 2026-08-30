@@ -10,6 +10,8 @@ namespace PaymentService.Application.Extentions.App
         {
             services.AddScoped<IPaymentAppService, PaymentAppService>();
 
+            services.AddScoped<IRetryCompleteingPayedOrderOrRefundService, RetryCompleteingPayedOrderOrRefundService>();
+
             return services;
         }
     }

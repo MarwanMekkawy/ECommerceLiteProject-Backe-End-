@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PaymentService.Domain.Contracts;
 using PaymentService.Domain.Entities;
+using PaymentService.Domain.Enums;
 
 namespace PaymentService.Infrastructure.Repositories
 {
@@ -19,6 +20,16 @@ namespace PaymentService.Infrastructure.Repositories
         public async Task<Payment?> GetByStripePaymentIntentIdAsync(string paymentIntentId, CancellationToken cancellationToken = default)
         {
             return await _context.Payments.FirstOrDefaultAsync(x=> x.StripePaymentIntentId == paymentIntentId, cancellationToken);
+        }
+
+        public async Task<Payment?> GetByStripeRefundIdAsync(string RefundId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Payments.FirstOrDefaultAsync(x => x.StripeRefundId == RefundId, cancellationToken);
+        }
+
+        public async Task<List<Payment>> GetSucceededPaymentsWithUnconfirmedOrderAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.Payments.Where(x => x.Status == PaymentStatus.Succeeded && !x.IsOrderCompletionConfirmed).ToListAsync(cancellationToken);
         }
 
         public async Task AddAsync(Payment payment, CancellationToken cancellationToken = default)

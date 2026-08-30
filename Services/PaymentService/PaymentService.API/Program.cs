@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using PaymentService.API.BackgroundTasks;
 using PaymentService.API.Middlewere;
 using PaymentService.Application.Extentions.App;
 using PaymentService.Infrastructure.Extentions.Infra;
@@ -18,6 +19,9 @@ namespace PaymentService.API
 
             // Add Di Services extentions
             builder.Services.AddInfrastructureServices(builder.Configuration).AddApplicationServices();
+
+            // Register the {background} retry to complete paid orders or refund them
+            builder.Services.AddHostedService<RetryCompletingOrRefundingBackgroundService>();
 
             // Add services to the container.
             builder.Services.AddControllers()

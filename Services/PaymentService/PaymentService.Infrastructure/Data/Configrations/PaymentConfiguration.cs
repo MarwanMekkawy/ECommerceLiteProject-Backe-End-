@@ -20,14 +20,31 @@ namespace PaymentService.Infrastructure.Data.Configrations
                 .HasConversion<string>()
                 .IsRequired();
 
+            builder.Property(x => x.IsOrderCompletionConfirmed)
+                .IsRequired();
+
+            builder.Property(x => x.OrderCompletionReattempts)
+                .IsRequired();
+
+            builder.Property(x => x.NextOrderCompletionAttemptAt);
+
             builder.Property(x => x.StripePaymentIntentId)
                 .HasMaxLength(100);
 
-            builder.Property(x => x.FailureReason)
-                .HasMaxLength(500);
+            builder.Property(x => x.StripeRefundId)
+                .HasMaxLength(100);
 
             builder.Property(x => x.CreatedAt)
                 .IsRequired();
+
+            builder.Property(x => x.SucceededAt);
+
+            builder.Property(x => x.FailedAt);
+
+            builder.Property(x => x.RefundedAt);
+
+            builder.Property(x => x.FailureReason)
+                .HasMaxLength(500);
 
             builder.OwnsOne(x => x.Amount, money =>
             {
