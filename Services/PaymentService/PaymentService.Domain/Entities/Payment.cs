@@ -36,6 +36,12 @@ namespace PaymentService.Domain.Entities
             Status = PaymentStatus.Pending;
             CreatedAt = DateTime.UtcNow;
         }
+
+        public void SetStripePaymentIntentId(string stripePaymentIntentId)
+        {
+            StripePaymentIntentId = stripePaymentIntentId;
+        }
+
         public void MarkAsRequiresAction()
         {
             Status = PaymentStatus.RequiresAction;

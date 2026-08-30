@@ -1,23 +1,34 @@
-﻿using PaymentService.Domain.Contracts;
+﻿using Microsoft.EntityFrameworkCore;
+using PaymentService.Domain.Contracts;
 using PaymentService.Domain.Entities;
 
 namespace PaymentService.Infrastructure.Repositories
 {
-    public class PaymentRepository : IPaymentRepository
+    public class PaymentRepository(PaymentDbContext _context) : IPaymentRepository
     {
-        public Task<Payment?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<Payment?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _context.Payments.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public Task<Payment?> GetByOrderIdAsync(Guid orderId, CancellationToken cancellationToken = default)
+        public async Task<Payment?> GetByOrderIdAsync(Guid orderId, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _context.Payments.FirstOrDefaultAsync(x => x.OrderId == orderId, cancellationToken);
         }
 
-        public Task AddAsync(Payment payment, CancellationToken cancellationToken = default)
+        public async Task<Payment?> GetByStripePaymentIntentIdAsync(string paymentIntentId, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await _context.Payments.FirstOrDefaultAsync(x=> x.StripePaymentIntentId == paymentIntentId, cancellationToken);
+        }
+
+        public async Task AddAsync(Payment payment, CancellationToken cancellationToken = default)
+        {
+            await _context.Payments.AddAsync(payment, cancellationToken);
+        }
+
+        public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

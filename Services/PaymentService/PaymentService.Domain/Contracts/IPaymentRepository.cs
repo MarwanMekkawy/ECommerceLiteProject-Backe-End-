@@ -8,6 +8,10 @@ namespace PaymentService.Domain.Contracts
 
         Task<Payment?> GetByOrderIdAsync(Guid orderId, CancellationToken cancellationToken = default);
 
+        Task<Payment?> GetByStripePaymentIntentIdAsync(string paymentIntentId, CancellationToken cancellationToken = default);
+
         Task AddAsync(Payment payment, CancellationToken cancellationToken = default);
+
+        Task SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }
