@@ -25,7 +25,6 @@ namespace OrderService.InfraStructure.Data.Migrations
             modelBuilder.Entity("OrderService.Domain.Orders.Order", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("ConfirmedAt")
@@ -37,8 +36,11 @@ namespace OrderService.InfraStructure.Data.Migrations
                     b.Property<int>("Currency")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("PaymentExpiresAt")
+                    b.Property<DateTime?>("ExpiresAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsCancelledDueToExpiry")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -62,7 +64,6 @@ namespace OrderService.InfraStructure.Data.Migrations
             modelBuilder.Entity("OrderService.Domain.Orders.OrderItem", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Currency")

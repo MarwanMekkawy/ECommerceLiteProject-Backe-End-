@@ -30,7 +30,7 @@ namespace OrderService.Application.Tests
 
             var handler = new GetOrderByIdQueryHandler(repository.Object, mapper.Object);
 
-            var query = new GetOrderByIdQuery(orderId, userId);
+            var query = new GetOrderByIdQuery(userId, orderId);
 
             // Act
             var result = await handler.HandleAsync(query, TestContext.Current.CancellationToken);

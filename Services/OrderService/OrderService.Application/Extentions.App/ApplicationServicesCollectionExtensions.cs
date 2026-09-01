@@ -4,7 +4,7 @@ using OrderService.Application.Commands;
 using OrderService.Application.DTOs;
 using OrderService.Application.MappingProfiles;
 using OrderService.Application.Queries;
-using OrderService.Domain.Orders;
+using OrderService.Application.Services;
 
 namespace OrderService.Application.Extentions.App
 {
@@ -15,7 +15,7 @@ namespace OrderService.Application.Extentions.App
             // Commands
             services.AddScoped<ICommandHandler<CreateOrderCommand>, CreateOrderCommandHandler>();
             services.AddScoped<ICommandHandler<CheckoutOrderCommand, CheckoutOrderDto>, CheckoutOrderCommandHandler>();
-            services.AddScoped<ICommandHandler<CompleteOrderInternalCommand>, CompleteOrderCommandInternalHandler>();
+            services.AddScoped<ICommandHandler<CompleteOrderInternalCommand>, CompleteOrderInternalCommandHandler>();
             services.AddScoped<ICommandHandler<CancelOrderCommand>, CancelOrderCommandHandler>();
             services.AddScoped<ICommandHandler<CancelOrderInternalCommand>, CancelOrderInternalCommandHandler>();
             services.AddScoped<ICommandHandler<AddOrderItemCommand>, AddOrderItemCommandHandler>();
@@ -31,6 +31,8 @@ namespace OrderService.Application.Extentions.App
             services.AddScoped<IQueryHandler<GetOrderByIdAdminQuery, OrderResponseDto?>, GetOrderByIdAdminQueryHandler>();
 
             services.AddAutoMapper(cfg => { cfg.AddMaps(typeof(AutoMapperMarker).Assembly); });
+
+            services.AddScoped<ICancelExpiredOrdersService, CancelExpiredOrdersService>();
 
             return services;
         }

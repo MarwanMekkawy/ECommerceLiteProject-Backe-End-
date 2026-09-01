@@ -10,7 +10,7 @@ namespace ProductService.Infrastructure.Extentions.Infra
         public static IServiceCollection AddAppDbContext(this IServiceCollection services, IConfiguration config)
         {
             services.AddDbContext<ProductDbContext>(options =>
-            { options.UseSqlServer(config.GetConnectionString("SqlServerConnection")); }
+            { options.UseSqlServer(config.GetConnectionString("ProductSqlServerConnection")); }
             );
 
             return services;

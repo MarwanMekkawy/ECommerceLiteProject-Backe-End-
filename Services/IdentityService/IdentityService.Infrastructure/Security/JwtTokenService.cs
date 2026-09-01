@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 
@@ -22,7 +23,11 @@ namespace IdentityService.Infrastructure.Security
                 new Claim("emailVerified", user.IsEmailConfirmed ? "true" : "false")
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!));
+            var secret = configuration["Jwt:Secret"];
+            if (string.IsNullOrWhiteSpace(secret))
+                throw new InvalidOperationException("JWT secret is missing from configuration.");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
@@ -75,8 +80,28 @@ namespace IdentityService.Infrastructure.Security
                 new Claim("token_type", "service")
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtForServiceClient:Secret"]!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var privateKey = configuration["JwtForServiceClient:PrivateKey"];
+            if (string.IsNullOrWhiteSpace(privateKey))
+                throw new InvalidOperationException("JWT service client private key is missing from configuration.");
+
+            using var rsa = RSA.Create();
+
+            try
+            {
+                rsa.ImportFromPem(privateKey.Replace("\\n", "\n"));
+            }
+            catch (ArgumentException ex)
+            {
+                throw new InvalidOperationException("JWT service client private key is invalid or has an invalid PEM format.", ex);
+            }
+            catch (CryptographicException ex)
+            {
+                throw new InvalidOperationException("JWT service client private key could not be imported.", ex);
+            }
+
+            var key = new RsaSecurityKey(rsa);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
 
             var token = new JwtSecurityToken(
                 issuer: configuration["Jwt:Issuer"],

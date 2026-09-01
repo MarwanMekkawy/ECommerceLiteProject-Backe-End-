@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using OrderService.Domain.Contracts;
+using OrderService.Domain.Enums;
 using OrderService.Domain.Orders;
 using OrderService.InfraStructure;
 using Xunit;
@@ -527,6 +528,46 @@ namespace OrderService.Infrastructure.Tests
 
             // Assert
             Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task GetConfirmedOrdersPastExpiryDateAsync_ShouldReturnExpiredConfirmedOrder()
+        {
+            // Arrange
+            var connection = new SqliteConnection("DataSource=:memory:");
+            await connection.OpenAsync(TestContext.Current.CancellationToken);
+
+            var options = new DbContextOptionsBuilder<OrderDbContext>()
+                .UseSqlite(connection).Options;
+
+            await using var context = new OrderDbContext(options);
+
+            await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+
+            var order = new Order(Guid.NewGuid());
+            var productId = Guid.NewGuid();
+
+            order.AddItem(productId, 2);
+
+            order.Confirm(
+                new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+                {
+                    [productId] = (100m, CurrencyCode.USD)
+                },
+                DateTime.UtcNow.AddDays(-4));
+
+            context.Orders.Add(order);
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+            var repository = new OrderRepository(context);
+
+            // Act
+            var result = await repository.GetConfirmedOrdersPastExpiryDateAsync(
+                TestContext.Current.CancellationToken);
+
+            // Assert
+            Assert.Single(result);
+            Assert.Equal(order.Id, result[0].Id);
         }
     }
 }

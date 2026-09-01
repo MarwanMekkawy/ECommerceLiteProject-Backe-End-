@@ -1,4 +1,5 @@
-﻿using OrderService.Domain.Enums;
+﻿using Domain.Exceptions;
+using OrderService.Domain.Enums;
 using OrderService.Domain.Exceptions.DomainExceptions;
 
 
@@ -15,7 +16,8 @@ namespace OrderService.Domain.Orders
         public decimal Total { get; private set; }
         public CurrencyCode Currency { get; private set; }
         public DateTime? ConfirmedAt { get; private set; }
-        public DateTime? PaymentExpiresAt { get; private set; }
+        public DateTime? ExpiresAt { get; private set; }
+        public bool IsCancelledDueToExpiry { get; private set; } = false;
 
         public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
 
@@ -125,7 +127,7 @@ namespace OrderService.Domain.Orders
             Currency = currency!.Value;
             ConfirmedAt = confirmedAt;
             // confirmed order keeps snapshot for prices at the time of buying for 3 days window to pay
-            PaymentExpiresAt = confirmedAt.Add(TimeSpan.FromDays(3)); 
+            ExpiresAt = confirmedAt.Add(TimeSpan.FromDays(3)); 
 
             Status = OrderStatus.Confirmed;
         }
@@ -134,6 +136,8 @@ namespace OrderService.Domain.Orders
         {
             if (Status != OrderStatus.Confirmed)
                 throw new InvalidOrderException("Only confirmed orders can be completed.");
+            if (ExpiresAt.HasValue && DateTime.UtcNow >= ExpiresAt.Value)
+                throw new ConflictException($"Order expired at {ExpiresAt:O} and can no longer be completed.");
 
             Status = OrderStatus.Completed;
         }
@@ -143,6 +147,15 @@ namespace OrderService.Domain.Orders
             if (Status != OrderStatus.Pending && Status != OrderStatus.Confirmed)
                 throw new InvalidOrderException("Only pending or confirmed orders can be cancelled.");
 
+            Status = OrderStatus.Cancelled;
+        }
+
+        public void Expire()
+        {
+            if (Status != OrderStatus.Confirmed)
+                throw new InvalidOrderException("Only confirmed orders can expire.");
+
+            IsCancelledDueToExpiry = true;
             Status = OrderStatus.Cancelled;
         }
     }

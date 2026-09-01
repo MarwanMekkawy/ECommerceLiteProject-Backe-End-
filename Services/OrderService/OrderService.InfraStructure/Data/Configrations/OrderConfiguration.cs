@@ -32,8 +32,11 @@ namespace OrderService.InfraStructure.Data.Configrations
             builder.Property(x => x.ConfirmedAt)
                 .IsRequired(false);
 
-            builder.Property(x => x.PaymentExpiresAt)
+            builder.Property(x => x.ExpiresAt)
                 .IsRequired(false);
+
+            builder.Property(x => x.IsCancelledDueToExpiry)
+                .IsRequired();    
 
             //user can have only one Pending order at a time
             builder.HasIndex(x => x.UserId)

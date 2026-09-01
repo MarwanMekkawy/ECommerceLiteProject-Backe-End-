@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using OrderService.API.BackgroundTasks;
 using OrderService.API.Middleware;
 using OrderService.Application.Extentions.App;
 using OrderService.InfraStructure.Extentions.Infra;
@@ -20,6 +21,9 @@ namespace OrderService.API
             // Add Di Services extentions
             builder.Services.AddInfrastructureServices(builder.Configuration).AddApplicationServices();
 
+            // Register the {background} cleaning expired pending orders
+            builder.Services.AddHostedService<CancelExpiredOrdersBackgroundService>();
+
             // Add services to the container.
             builder.Services.AddControllers()
                 .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
@@ -34,7 +38,7 @@ namespace OrderService.API
 
                     options.IncludeXmlComments(xmlPath);
                 });
-
+            //====== Auth JWT config ======//
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -48,7 +52,7 @@ namespace OrderService.API
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
                     };
-                    // Authentication error msgs
+                    // Human bearer Authentication error msgs
                     options.Events = new JwtBearerEvents
                     {
                         OnChallenge = context =>

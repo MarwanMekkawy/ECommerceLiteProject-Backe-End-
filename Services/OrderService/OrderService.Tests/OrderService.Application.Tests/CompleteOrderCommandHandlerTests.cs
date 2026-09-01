@@ -30,7 +30,7 @@ namespace OrderService.Application.Tests
             repository.Setup(x => x.GetByIdTrackedAsync(order.Id, It.IsAny<CancellationToken>())).ReturnsAsync(order);
 
             var uow = new Mock<IUnitOfWork>();
-            var handler = new CompleteOrderCommandInternalHandler(repository.Object, uow.Object);
+            var handler = new CompleteOrderInternalCommandHandler(repository.Object, uow.Object);
             var command = new CompleteOrderInternalCommand(order.Id);
 
             // Act
@@ -48,7 +48,7 @@ namespace OrderService.Application.Tests
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetByIdTrackedAsync(orderId, It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
             var uow = new Mock<IUnitOfWork>();
-            var handler = new CompleteOrderCommandInternalHandler(repository.Object, uow.Object);
+            var handler = new CompleteOrderInternalCommandHandler(repository.Object, uow.Object);
             var command = new CompleteOrderInternalCommand(orderId);
 
             // Act & Assert
@@ -63,7 +63,7 @@ namespace OrderService.Application.Tests
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetByIdTrackedAsync(order.Id, It.IsAny<CancellationToken>())).ReturnsAsync(order);
             var uow = new Mock<IUnitOfWork>();
-            var handler = new CompleteOrderCommandInternalHandler(repository.Object, uow.Object);
+            var handler = new CompleteOrderInternalCommandHandler(repository.Object, uow.Object);
             var command = new CompleteOrderInternalCommand(order.Id);
 
             // Act & Assert

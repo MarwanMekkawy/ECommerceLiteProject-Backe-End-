@@ -9,7 +9,7 @@ namespace OrderService.InfraStructure.Extentions.Infra
         public static IServiceCollection AddAppDbContext(this IServiceCollection services, IConfiguration config)
         {
             services.AddDbContext<OrderDbContext>(options =>
-            { options.UseSqlServer(config.GetConnectionString("SqlServerConnection")); }
+            { options.UseSqlServer(config.GetConnectionString("OrderSqlServerConnection")); }
             );
 
             return services;

@@ -230,8 +230,8 @@ namespace OrderService.Application.Tests
 
             // Assert
             Assert.NotNull(order.ConfirmedAt);
-            Assert.NotNull(order.PaymentExpiresAt);
-            Assert.Equal(3, (order.PaymentExpiresAt.Value - order.ConfirmedAt.Value).TotalDays);
+            Assert.NotNull(order.ExpiresAt);
+            Assert.Equal(3, (order.ExpiresAt.Value - order.ConfirmedAt.Value).TotalDays);
         }
 
         [Fact]
