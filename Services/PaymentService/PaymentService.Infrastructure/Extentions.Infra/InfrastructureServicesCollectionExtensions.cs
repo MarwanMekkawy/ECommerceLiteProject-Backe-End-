@@ -17,6 +17,9 @@ namespace PaymentService.Infrastructure.Extentions.Infra
             //DbContext Connection String 
             services.AddAppDbContext(config);
 
+            //stripe global configrations
+            StripeConfiguration.ApiKey = config["Stripe:SecretKey"] ?? throw new InvalidOperationException("Stripe secret key is not configured.");
+
             // DI registering
             services.AddScoped<PaymentIntentService>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();

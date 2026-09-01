@@ -9,7 +9,6 @@ namespace PaymentService.Application.Extentions.App
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             services.AddScoped<IPaymentAppService, PaymentAppService>();
-
             services.AddScoped<IRetryCompleteingPayedOrderOrRefundService, RetryCompleteingPayedOrderOrRefundService>();
 
             return services;
