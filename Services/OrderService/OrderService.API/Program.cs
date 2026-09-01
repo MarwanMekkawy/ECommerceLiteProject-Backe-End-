@@ -21,7 +21,7 @@ namespace OrderService.API
             // Add Di Services extentions
             builder.Services.AddInfrastructureServices(builder.Configuration).AddApplicationServices();
 
-            // Register the background cleaning expired pending orders
+            // Register the {background} cleaning expired pending orders
             builder.Services.AddHostedService<CancelExpiredOrdersBackgroundService>();
 
             // Add services to the container.
