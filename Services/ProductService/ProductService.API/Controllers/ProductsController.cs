@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProductService.Application.Abstractions;
 using ProductService.Application.Commands.Products;
 using ProductService.Application.DTOs;
 using ProductService.Application.Queries.Products;
-using System.Threading;
 
 namespace ProductService.API.Controllers
 {
@@ -203,7 +201,6 @@ namespace ProductService.API.Controllers
             var command = new IncreaseStockCommand(id, quantity);
 
             await increaseStock.HandleAsync(command, cancellationToken);
-            Console.WriteLine($"++++++++++++++++{quantity}");
             return Ok();
         }
 
@@ -221,7 +218,6 @@ namespace ProductService.API.Controllers
             var command = new DecreaseStockCommand(id, quantity);
 
             await decreaseStock.HandleAsync(command, cancellationToken);
-            Console.WriteLine($"---------------{quantity}");
             return Ok();
         }
 
