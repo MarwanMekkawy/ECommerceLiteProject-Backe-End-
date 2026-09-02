@@ -29,6 +29,19 @@ namespace PaymentService.Infrastructure.Clients.Stripe
             return new StripePaymentResultDto { PaymentIntentId = paymentIntent.Id, ClientSecret = paymentIntent.ClientSecret };
         }
 
+        public async Task<StripePaymentResultDto> ConfirmFailedPaymentIntentAsync(string paymentIntentId, CancellationToken cancellationToken = default)
+        {
+            var options = new PaymentIntentConfirmOptions();
+
+            var paymentIntent = await _paymentIntentService.ConfirmAsync(paymentIntentId, options, cancellationToken: cancellationToken);
+
+            return new StripePaymentResultDto
+            {
+                PaymentIntentId = paymentIntent.Id,
+                ClientSecret = paymentIntent.ClientSecret
+            };
+        }
+
         public async Task<string> CreateRefundAsync(string paymentIntentId, CancellationToken cancellationToken = default)
         {
 
