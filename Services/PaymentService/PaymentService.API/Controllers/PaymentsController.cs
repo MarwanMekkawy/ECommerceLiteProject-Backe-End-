@@ -77,8 +77,8 @@ namespace PaymentService.API.Controllers
         /// The payment is first marked as <see cref="PaymentStatus.RefundInitiated"/> and saved before the refund request is sent to Stripe.
         /// Stripe then processes the refund asynchronously and sends webhook events that update the payment to its final refund status.
         /// </remarks>
-        [Authorize(Roles = "Admin")]
         [HttpPost("admin/{paymentId}/refund")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RefundPayment(Guid paymentId, CancellationToken cancellationToken)
         {
             await paymentAppService.RefundPaymentAsync(paymentId, cancellationToken);
