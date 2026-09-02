@@ -6,6 +6,7 @@ namespace OrderService.Domain.Orders
         Pending,
         Confirmed,
         Completed,
-        Cancelled
+        Cancelled,
+        CancelledAndRefunded
     }
 }

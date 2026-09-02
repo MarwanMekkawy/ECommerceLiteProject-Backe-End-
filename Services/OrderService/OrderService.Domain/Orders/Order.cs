@@ -142,14 +142,16 @@ namespace OrderService.Domain.Orders
             Status = OrderStatus.Completed;
         }
 
-        public void Cancel()
+        // cancel order with or without refund
+        public void Cancel(bool cancelledWithRefund = false)
         {
             if (Status != OrderStatus.Pending && Status != OrderStatus.Confirmed)
                 throw new InvalidOrderException("Only pending or confirmed orders can be cancelled.");
 
-            Status = OrderStatus.Cancelled;
+            Status = cancelledWithRefund ? OrderStatus.CancelledAndRefunded : OrderStatus.Cancelled;
         }
 
+        // cancel expired orders
         public void Expire()
         {
             if (Status != OrderStatus.Confirmed)
