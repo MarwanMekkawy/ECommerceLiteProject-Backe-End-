@@ -13,6 +13,7 @@ namespace PaymentService.API.BackgroundTasks
                 var retryService = scope.ServiceProvider.GetRequiredService<IRetryCompleteingPayedOrderOrRefundService>();
 
                 await retryService.RetryCompletingOrRefunding(stoppingToken);
+                await retryService.RetryCancellingRefundedOrders(stoppingToken);
 
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }

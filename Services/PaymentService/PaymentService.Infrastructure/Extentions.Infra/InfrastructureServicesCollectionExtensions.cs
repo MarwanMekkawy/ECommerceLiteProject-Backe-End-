@@ -22,6 +22,7 @@ namespace PaymentService.Infrastructure.Extentions.Infra
 
             // DI registering
             services.AddScoped<PaymentIntentService>();
+            services.AddScoped<RefundService>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IStripePaymentClient, StripePaymentClient>();
 

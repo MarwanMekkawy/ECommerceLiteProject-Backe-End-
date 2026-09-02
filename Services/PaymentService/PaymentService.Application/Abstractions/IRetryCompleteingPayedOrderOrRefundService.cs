@@ -3,5 +3,6 @@
     public interface IRetryCompleteingPayedOrderOrRefundService 
     {
         Task RetryCompletingOrRefunding(CancellationToken cancellationToken);
+        Task RetryCancellingRefundedOrders(CancellationToken cancellationToken);
     }
 }

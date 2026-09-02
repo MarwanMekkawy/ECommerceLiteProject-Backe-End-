@@ -29,7 +29,16 @@ namespace PaymentService.Infrastructure.Repositories
 
         public async Task<List<Payment>> GetSucceededPaymentsWithUnconfirmedOrderAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.Payments.Where(x => x.Status == PaymentStatus.Succeeded && !x.IsOrderCompletionConfirmed).ToListAsync(cancellationToken);
+            return await _context.Payments.Where
+                (x => x.Status == PaymentStatus.Succeeded && !x.IsOrderCompletionConfirmed && (x.NextOrderCompletionAttemptAt == null || x.NextOrderCompletionAttemptAt <= DateTime.UtcNow))
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<Payment>> GetRefundedPaymentsWithUnconfirmedOrderCancellationAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.Payments.Where(x => x.Status == PaymentStatus.Refunded && !x.IsOrderCancellationDueToRefundConfirmed &&
+                x.OrderCancellationReattempts < 5 && (x.NextOrderCancellationAttemptAt == null || x.NextOrderCancellationAttemptAt <= DateTime.UtcNow))
+                .ToListAsync(cancellationToken);
         }
 
         public async Task AddAsync(Payment payment, CancellationToken cancellationToken = default)

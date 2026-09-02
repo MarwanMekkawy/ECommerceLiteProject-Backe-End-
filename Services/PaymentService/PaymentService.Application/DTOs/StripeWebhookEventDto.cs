@@ -9,5 +9,7 @@
         public string? FailureReason { get; set; }
 
         public string RefundId { get; set; } = string.Empty;
+
+        public string? RefundStatus { get; set; }
     }
 }

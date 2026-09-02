@@ -6,7 +6,7 @@ using Stripe;
 
 namespace PaymentService.Infrastructure.Clients.Stripe
 {
-    public class StripePaymentClient(PaymentIntentService _paymentIntentService, IConfiguration _configuration) : IStripePaymentClient
+    public class StripePaymentClient(PaymentIntentService _paymentIntentService, RefundService _refundService, IConfiguration _configuration) : IStripePaymentClient
     {
         public async Task<StripePaymentResultDto> CreatePaymentIntentAsync(decimal amount, CurrencyCode currency, Guid paymentId, CancellationToken cancellationToken = default)
         {
@@ -14,6 +14,10 @@ namespace PaymentService.Infrastructure.Clients.Stripe
             {
                 Amount = (long)(amount * 100),
                 Currency = currency.ToString().ToLowerInvariant(),
+                AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
+                {
+                    Enabled = true
+                },
                 Metadata = new Dictionary<string, string>
                 {
                     ["PaymentId"] = paymentId.ToString()
@@ -27,11 +31,10 @@ namespace PaymentService.Infrastructure.Clients.Stripe
 
         public async Task<string> CreateRefundAsync(string paymentIntentId, CancellationToken cancellationToken = default)
         {
-            var refundService = new RefundService();
 
             var options = new RefundCreateOptions { PaymentIntent = paymentIntentId };
 
-            var refund = await refundService.CreateAsync(options, cancellationToken: cancellationToken);
+            var refund = await _refundService.CreateAsync(options, cancellationToken: cancellationToken);
 
             return refund.Id;
         }
@@ -43,11 +46,13 @@ namespace PaymentService.Infrastructure.Clients.Stripe
             var stripeEvent = EventUtility.ConstructEvent(json, stripeSignature, webhookSecret);
 
             var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+            var refund = stripeEvent.Data.Object as Refund;
 
             return new StripeWebhookEventDto
             {
                 Type = stripeEvent.Type,
                 PaymentIntentId = paymentIntent?.Id ?? string.Empty,
+                RefundStatus = refund?.Status,
                 FailureReason = paymentIntent?.LastPaymentError?.Message
             };
         }

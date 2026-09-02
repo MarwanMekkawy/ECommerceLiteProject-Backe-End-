@@ -8,7 +8,10 @@
         Succeeded,
         Failed,
         Cancelled,
-        Refunding,
-        Refunded
+
+        RefundInitiated,
+        RefundingByStripe,
+        Refunded,
+        RefundFailed
     }
 }
