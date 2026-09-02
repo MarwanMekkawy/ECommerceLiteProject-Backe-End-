@@ -19,7 +19,7 @@ namespace OrderService.API.Controllers
         ICommandHandler<CheckoutOrderCommand, CheckoutOrderDto> checkoutOrderHandler,
         ICommandHandler<CompleteOrderInternalCommand> completeOrderInternalHandler,
         ICommandHandler<CancelOrderCommand> cancelOrderHandler,
-        ICommandHandler<CancelOrderInternalCommand> cancelOrderInternalHandler,
+        ICommandHandler<CancelRefundedOrderInternalCommand> cancelOrderInternalHandler,
         ICommandHandler<AddOrderItemCommand> addOrderItemHandler,
         ICommandHandler<DecreaseOrderItemCommand> decreaseOrderItemHandler,
         ICommandHandler<IncreaseOrderItemCommand> increaseOrderItemHandler,
@@ -288,22 +288,21 @@ namespace OrderService.API.Controllers
             return NoContent();
         }
 
-        //@ ========= probably delete the endpoint if i dont use it cuz the only internal cancellation will be automatic after order expiration =========
+        //service-service endpoints  //@ add [Authorize] with service authintication
         /// <summary>
-        /// Cancels an order through an internal service-to-service request.
+        /// Cancels an order after its payment has been refunded through an internal service-to-service request.
         /// </summary>
         /// <param name="orderId">The unique identifier of the order to cancel.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
-        /// <returns>No content if the order was cancelled successfully.</returns>
+        /// <returns>No content if the order was cancelled and marked as refunded successfully.</returns>
         [HttpPost("{orderId:guid}/cancel-internal")]
-        public async Task<IActionResult> CancelOrderInternal(Guid orderId, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> CancelRefundedOrderInternal(Guid orderId, CancellationToken cancellationToken = default)
         {
-            var command = new CancelOrderInternalCommand(orderId);
+            var command = new CancelRefundedOrderInternalCommand(orderId);
 
             await cancelOrderInternalHandler.HandleAsync(command, cancellationToken);
 
             return NoContent();
         }
-        // ==============================================================================================================================================
     }
 }

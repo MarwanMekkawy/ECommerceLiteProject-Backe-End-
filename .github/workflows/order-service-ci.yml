@@ -5,6 +5,12 @@ on:
     branches:
       - orderService
 
+  pull_request:
+    types:
+      - closed
+    branches:
+      - orderService
+
 jobs:
   test-order-service:
     name: OrderService Tests

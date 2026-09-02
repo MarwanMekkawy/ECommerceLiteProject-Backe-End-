@@ -17,7 +17,7 @@ namespace OrderService.Application.Extentions.App
             services.AddScoped<ICommandHandler<CheckoutOrderCommand, CheckoutOrderDto>, CheckoutOrderCommandHandler>();
             services.AddScoped<ICommandHandler<CompleteOrderInternalCommand>, CompleteOrderInternalCommandHandler>();
             services.AddScoped<ICommandHandler<CancelOrderCommand>, CancelOrderCommandHandler>();
-            services.AddScoped<ICommandHandler<CancelOrderInternalCommand>, CancelOrderInternalCommandHandler>();
+            services.AddScoped<ICommandHandler<CancelRefundedOrderInternalCommand>, CancelRefundedOrderInternalCommandHandler>();
             services.AddScoped<ICommandHandler<AddOrderItemCommand>, AddOrderItemCommandHandler>();
             services.AddScoped<ICommandHandler<DecreaseOrderItemCommand>, DecreaseOrderItemCommandHandler>();
             services.AddScoped<ICommandHandler<IncreaseOrderItemCommand>, IncreaseOrderItemCommandHandler>();

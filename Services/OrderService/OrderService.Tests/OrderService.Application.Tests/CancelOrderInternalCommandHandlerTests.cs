@@ -29,15 +29,15 @@ namespace OrderService.Application.Tests
 
             repository.Setup(x => x.GetByIdTrackedAsync(orderId, It.IsAny<CancellationToken>())).ReturnsAsync(order);
 
-            var handler = new CancelOrderInternalCommandHandler(repository.Object, uow.Object);
+            var handler = new CancelRefundedOrderInternalCommandHandler(repository.Object, uow.Object);
 
-            var command = new CancelOrderInternalCommand(orderId);
+            var command = new CancelRefundedOrderInternalCommand(orderId);
 
             // Act
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
             // Assert
-            Assert.Equal(OrderStatus.Cancelled, order.Status);
+            Assert.Equal(OrderStatus.CancelledAndRefunded, order.Status);
             repository.Verify(x => x.GetByIdTrackedAsync(orderId, It.IsAny<CancellationToken>()), Times.Once);
             uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -53,9 +53,9 @@ namespace OrderService.Application.Tests
 
             repository.Setup(x => x.GetByIdTrackedAsync(orderId, It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
 
-            var handler = new CancelOrderInternalCommandHandler(repository.Object, uow.Object);
+            var handler = new CancelRefundedOrderInternalCommandHandler(repository.Object, uow.Object);
 
-            var command = new CancelOrderInternalCommand(orderId);
+            var command = new CancelRefundedOrderInternalCommand(orderId);
 
             // Act & Assert
             await Assert.ThrowsAsync<NotFoundException>(() =>
