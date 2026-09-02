@@ -20,10 +20,13 @@ namespace PaymentService.Infrastructure.Extentions.Infra
             //stripe global configrations
             StripeConfiguration.ApiKey = config["Stripe:SecretKey"] ?? throw new InvalidOperationException("Stripe secret key is not configured.");
 
-            // DI registering
-            services.AddScoped<PaymentIntentService>();
-            services.AddScoped<RefundService>();
+            // DI registering         
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IProcessedStripeEventRepository, ProcessedStripeEventRepository>();
+
+            services.AddScoped<RefundService>();
+            services.AddScoped<PaymentIntentService>();
             services.AddScoped<IStripePaymentClient, StripePaymentClient>();
 
             // Clients

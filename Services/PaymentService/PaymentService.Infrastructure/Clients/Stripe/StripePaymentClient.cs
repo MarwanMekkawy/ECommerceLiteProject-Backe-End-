@@ -50,10 +50,12 @@ namespace PaymentService.Infrastructure.Clients.Stripe
 
             return new StripeWebhookEventDto
             {
+                EventId = stripeEvent.Id,
                 Type = stripeEvent.Type,
                 PaymentIntentId = paymentIntent?.Id ?? string.Empty,
+                RefundId = refund?.Id ?? string.Empty,
                 RefundStatus = refund?.Status,
-                FailureReason = paymentIntent?.LastPaymentError?.Message
+                FailureReason = paymentIntent?.LastPaymentError?.Message ?? refund?.FailureReason
             };
         }
     }

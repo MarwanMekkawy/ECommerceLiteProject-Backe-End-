@@ -8,6 +8,7 @@ namespace PaymentService.Infrastructure
         public PaymentDbContext(DbContextOptions<PaymentDbContext> options) : base(options) {}
 
         public DbSet<Payment> Payments {  get; set; }
+        public DbSet<ProcessedStripeEvent> ProcessedStripeEvents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
