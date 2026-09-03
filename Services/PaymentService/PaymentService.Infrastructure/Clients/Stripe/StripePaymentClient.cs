@@ -43,7 +43,7 @@ namespace PaymentService.Infrastructure.Clients.Stripe
         {
             var webhookSecret = _configuration["Stripe:WebhookSecret"] ?? throw new InvalidOperationException("Stripe webhook secret is not configured.");
 
-            var stripeEvent = EventUtility.ConstructEvent(json, stripeSignature, webhookSecret);
+            var stripeEvent = EventUtility.ConstructEvent(json, stripeSignature, webhookSecret, throwOnApiVersionMismatch: false);
 
             var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
             var refund = stripeEvent.Data.Object as Refund;

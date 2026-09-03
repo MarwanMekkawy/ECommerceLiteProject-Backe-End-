@@ -82,12 +82,21 @@ namespace PaymentService.Application.Services
             if (payment.Status != PaymentStatus.RefundInitiated && payment.Status != PaymentStatus.RefundingByStripe)
                 return;
 
-            if (refundStatus == "succeeded")
-                payment.MarkAsRefunded(refundId);
-            else if (refundStatus == "failed")
-                payment.MarkAsRefundFailedRequiresAdminAttention(refundId);
-            else
-                payment.MarkAsRefunding();
+            switch (refundStatus)
+            {
+                case "succeeded":
+                    payment.MarkAsRefunded(refundId);
+                    break;
+
+                case "pending":
+                case "requires_action":
+                    payment.MarkAsRefunding();
+                    break;
+
+                case "failed":
+                    payment.MarkAsRefundFailedRequiresAdminAttention(refundId);
+                    break;
+            }
         }
         private async Task HandleRefundUpdatedAsync(string refundId, string? refundStatus, CancellationToken cancellationToken)
         {
@@ -96,12 +105,25 @@ namespace PaymentService.Application.Services
             if (payment is null)
                 throw new InvalidOperationException("Payment not found.");
 
-            if (refundStatus == "succeeded")
+            switch (refundStatus)
             {
-                if (payment.Status == PaymentStatus.Refunded || payment.Status == PaymentStatus.RefundFailed)
-                    return;
+                case "succeeded":
+                    if (payment.Status != PaymentStatus.Refunded)
+                        payment.MarkAsRefunded(refundId);
+                    break;
 
-                payment.MarkAsRefunded(refundId);
+                case "pending":
+                case "requires_action":
+                    if (payment.Status != PaymentStatus.Refunded &&
+                        payment.Status != PaymentStatus.RefundFailed)
+                    {
+                        payment.MarkAsRefunding();
+                    }
+                    break;
+
+                case "failed":
+                    payment.MarkAsRefundFailedRequiresAdminAttention(refundId);
+                    break;
             }
         }
         private async Task HandleRefundFailedAsync(string refundId, string? failureReason, CancellationToken cancellationToken)
@@ -111,7 +133,7 @@ namespace PaymentService.Application.Services
             if (payment is null)
                 throw new InvalidOperationException("Payment not found.");
 
-            if (payment.Status == PaymentStatus.Refunded || payment.Status == PaymentStatus.RefundFailed)
+            if (payment.Status == PaymentStatus.RefundFailed)
                 return;
 
             payment.MarkAsRefundFailedRequiresAdminAttention(refundId, failureReason);
@@ -149,7 +171,6 @@ namespace PaymentService.Application.Services
             return new CreatePaymentResponseDto { PaymentId = payment.Id, ClientSecret = stripeResult.ClientSecret, Status = payment.Status };
         }
 
-        // {Not-Used} so far 
         public async Task RefundPaymentAsync(Guid paymentId, CancellationToken cancellationToken = default)
         {
             var payment = await _unitOfWork.Payments.GetByIdAsync(paymentId, cancellationToken);
