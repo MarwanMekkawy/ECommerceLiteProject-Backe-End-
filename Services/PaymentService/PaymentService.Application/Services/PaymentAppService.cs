@@ -149,26 +149,6 @@ namespace PaymentService.Application.Services
             return new CreatePaymentResponseDto { PaymentId = payment.Id, ClientSecret = stripeResult.ClientSecret, Status = payment.Status };
         }
 
-        public async Task<CreatePaymentResponseDto> RetryPaymentAsync(Guid paymentId, Guid userId, CancellationToken cancellationToken = default)
-        {
-            var payment = await _unitOfWork.Payments.GetByIdAsync(paymentId, cancellationToken);
-
-            if (payment is null)
-                throw new InvalidOperationException("Payment not found.");
-
-            if (payment.UserId != userId)
-                throw new UnauthorizedAccessException("You are not authorized to retry this payment.");
-
-            if (payment.Status != PaymentStatus.Failed)
-                throw new InvalidOperationException("Only failed payments can be retried.");
-
-            var stripeResult = await _stripePaymentClient.ConfirmFailedPaymentIntentAsync(payment.StripePaymentIntentId!, cancellationToken);
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return new CreatePaymentResponseDto {PaymentId = payment.Id, ClientSecret = stripeResult.ClientSecret, Status = payment.Status };
-        }
-
         // {Not-Used} so far 
         public async Task RefundPaymentAsync(Guid paymentId, CancellationToken cancellationToken = default)
         {

@@ -3,7 +3,7 @@ using PaymentService.Domain.Contracts;
 
 namespace PaymentService.Application.Services
 {
-    public class RetryCompleteingPayedOrderOrRefundService(IPaymentRepository _paymentRepository, IOrderServiceClient _orderServiceClient, IStripePaymentClient _stripePaymentClient) 
+    public class RetryCompleteingOrCancellingOrdersService(IPaymentRepository _paymentRepository, IOrderServiceClient _orderServiceClient, IStripePaymentClient _stripePaymentClient) 
         : IRetryCompleteingPayedOrderOrRefundService
     {
         public async Task RetryCompletingOrRefunding(CancellationToken cancellationToken)

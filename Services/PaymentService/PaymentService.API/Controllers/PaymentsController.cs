@@ -26,30 +26,7 @@ namespace PaymentService.API.Controllers
             var result = await paymentAppService.CreatePaymentAsync(request.OrderId, request.UserId, request.Amount, request.Currency, cancellationToken);
 
             return Ok(result);
-        }
-
-        /// <summary>
-        /// Retries a failed payment by confirming the existing Stripe PaymentIntent associated with the payment.
-        /// </summary>
-        /// <param name="paymentId">The identifier of the payment to retry.</param>
-        /// <param name="cancellationToken">A token to cancel the request.</param>
-        /// <returns>The payment details, including the payment identifier, Stripe client secret, and current payment status.</returns>
-        /// <remarks>
-        /// The payment must belong to the authenticated user and have a status of <see cref="PaymentStatus.Failed"/>.
-        /// The existing Stripe PaymentIntent is reused rather than creating a new PaymentIntent.
-        /// The retry may succeed, fail again, require additional customer action, or enter processing.
-        /// The final payment state is handled through Stripe webhook events.
-        /// </remarks>
-        [HttpPost("{paymentId}/retry")]
-        [Authorize]
-        public async Task<ActionResult<CreatePaymentResponseDto>> RetryPayment(Guid paymentId, CancellationToken cancellationToken)
-        {
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-            var result = await paymentAppService.RetryPaymentAsync(paymentId, userId, cancellationToken);
-
-            return Ok(result);
-        }
+        }      
 
         /// <summary>
         /// Handles webhook events sent by Stripe and updates the corresponding payment.
