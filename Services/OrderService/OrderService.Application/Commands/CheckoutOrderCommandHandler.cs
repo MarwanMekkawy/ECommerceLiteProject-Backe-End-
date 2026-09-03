@@ -8,7 +8,7 @@ using OrderService.Domain.Orders;
 
 namespace OrderService.Application.Commands
 {
-    public class CheckoutOrderCommandHandler(IOrderRepository orderRepository, IProductServiceClient productServiceClient, IUnitOfWork uow)  
+    public class CheckoutOrderCommandHandler(IOrderRepository orderRepository, IProductServiceClient productServiceClient, IPaymentServiceClient paymentServiceClient, IUnitOfWork uow)
         : ICommandHandler<CheckoutOrderCommand, CheckoutOrderDto>
     {
         public async Task<CheckoutOrderDto> HandleAsync(CheckoutOrderCommand command, CancellationToken cancellationToken)
@@ -46,8 +46,10 @@ namespace OrderService.Application.Commands
                 // Confirm order and snapshot prices
                 order.Confirm(productPrices, DateTime.UtcNow);
 
-                await uow.SaveChangesAsync(cancellationToken);
+                var paymentResult = await paymentServiceClient.CreatePaymentAsync(order.Id, order.UserId, order.Total, order.Currency, cancellationToken);
 
+                await uow.SaveChangesAsync(cancellationToken);
+                
                 // Return checkout result
                 return new CheckoutOrderDto
                 {
@@ -55,7 +57,11 @@ namespace OrderService.Application.Commands
                     Items = order.Items.Select(item => new CheckoutOrderItemDto
                     { ProductId = item.ProductId, Quantity = item.Quantity, UnitPrice = item.UnitPrice, Total = item.Total }).ToList(),
                     Total = order.Total,
-                    Currency = order.Currency
+                    Currency = order.Currency,
+
+                    PaymentId = paymentResult.PaymentId, 
+                    ClientSecret = paymentResult.ClientSecret, 
+                    PaymentStatus = paymentResult.Status
                 };
             }
             catch

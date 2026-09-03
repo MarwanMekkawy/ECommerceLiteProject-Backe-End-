@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OrderService.Application.Abstractions;
 using OrderService.Domain.Contracts;
 using OrderService.InfraStructure.Clients;
+using OrderService.InfraStructure.Clients.PaymentServiceClient;
 using OrderService.InfraStructure.Repositories;
 
 namespace OrderService.InfraStructure.Extentions.Infra
@@ -19,6 +20,9 @@ namespace OrderService.InfraStructure.Extentions.Infra
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // Clients
+            
+            services.AddHttpClient<IPaymentServiceClient, PaymentServiceClient>(
+                client => { client.BaseAddress = new Uri(config["HttpClients:PaymentService:BaseUrl"]!); });
             services.AddHttpClient<IProductServiceClient, ProductServiceClient>(
                 client =>{client.BaseAddress = new Uri(config["HttpClients:ProductService:BaseUrl"]!);});
             services.AddHttpClient<IServiceTokenClient, ServiceTokenClient>(

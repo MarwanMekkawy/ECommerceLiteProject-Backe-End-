@@ -8,5 +8,9 @@ namespace OrderService.Application.DTOs
         public IReadOnlyList<CheckoutOrderItemDto> Items { get; set; } = [];
         public decimal Total { get; set; }
         public CurrencyCode Currency { get; set; }
+
+        public Guid PaymentId { get; set; }
+        public string ClientSecret { get; set; } = null!;
+        public string PaymentStatus { get; set; } = null!;
     }
 }

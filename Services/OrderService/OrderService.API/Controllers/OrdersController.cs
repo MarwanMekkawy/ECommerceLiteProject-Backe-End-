@@ -176,11 +176,12 @@ namespace OrderService.API.Controllers
         }
 
         /// <summary>
-        /// Checks out an order belonging to the currently authenticated user.
+        /// Checks out an order belonging to the currently authenticated user,
+        /// confirms the order, reserves the required stock, and initiates its payment.
         /// </summary>
         /// <param name="orderId">The unique identifier of the order to check out.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
-        /// <returns>The checkout result.</returns>
+        /// <returns>The checkout result containing the confirmed order details and payment information.</returns>
         [HttpPost("{orderId:guid}/checkout")]
         [Authorize]
         public async Task<IActionResult> CheckOutOrder(Guid orderId, CancellationToken cancellationToken = default)
@@ -213,7 +214,7 @@ namespace OrderService.API.Controllers
             return NoContent();
         }
 
-        //Admin
+        // Admin ==================================================================================================
         /// <summary>
         /// Retrieves a paginated list of all orders.
         /// This endpoint is intended for administrator use.
@@ -270,8 +271,7 @@ namespace OrderService.API.Controllers
 
             return Ok(orders);
         }
-
-        //service-service endpoints  //@ add [Authorize] with service authintication
+        // service to service ===================================================================================
         /// <summary>
         /// Completes an order through an internal service-to-service request.
         /// </summary>
@@ -279,6 +279,7 @@ namespace OrderService.API.Controllers
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the order was completed successfully.</returns>
         [HttpPost("{orderId:guid}/complete-internal")]
+        [Authorize(AuthenticationSchemes = "ServiceJwt")]
         public async Task<IActionResult> CompleteOrderInternal(Guid orderId, CancellationToken cancellationToken = default)
         {
             var command = new CompleteOrderInternalCommand(orderId);
@@ -288,7 +289,6 @@ namespace OrderService.API.Controllers
             return NoContent();
         }
 
-        //service-service endpoints  //@ add [Authorize] with service authintication
         /// <summary>
         /// Cancels an order after its payment has been refunded through an internal service-to-service request.
         /// </summary>
@@ -296,6 +296,7 @@ namespace OrderService.API.Controllers
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the order was cancelled and marked as refunded successfully.</returns>
         [HttpPost("{orderId:guid}/cancel-internal")]
+        [Authorize(AuthenticationSchemes = "ServiceJwt")]
         public async Task<IActionResult> CancelRefundedOrderInternal(Guid orderId, CancellationToken cancellationToken = default)
         {
             var command = new CancelRefundedOrderInternalCommand(orderId);
