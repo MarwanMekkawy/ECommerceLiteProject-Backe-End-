@@ -56,10 +56,20 @@ namespace OrderService.Application.Tests
             uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
         [Fact]
-        public async Task Handle_ShouldPropagateDomainException_WhenOrderCannotBeCompleted()
+        public async Task Handle_ShouldThrowConflictException_WhenOrderIsCancelledDueToExpiry()
         {
             // Arrange
             var order = new Order(Guid.NewGuid());
+            order.AddItem(Guid.NewGuid(), 1);
+
+            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            {
+                [order.Items.First().ProductId] = (10, CurrencyCode.USD)
+            };
+
+            order.Confirm(productPrices, DateTime.UtcNow);
+            order.Expire();
+
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetByIdTrackedAsync(order.Id, It.IsAny<CancellationToken>())).ReturnsAsync(order);
             var uow = new Mock<IUnitOfWork>();
@@ -67,7 +77,7 @@ namespace OrderService.Application.Tests
             var command = new CompleteOrderInternalCommand(order.Id);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOrderException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
+            await Assert.ThrowsAsync<ConflictException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
             uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
     }
