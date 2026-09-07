@@ -34,6 +34,7 @@ namespace PaymentService.API.Controllers
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>An empty successful response when the webhook has been processed.</returns>
         [HttpPost("webhook")]
+        [AllowAnonymous]
         public async Task<IActionResult> StripeWebhook(CancellationToken cancellationToken)
         {
             var json = await new StreamReader(Request.Body).ReadToEndAsync(cancellationToken);
