@@ -23,10 +23,18 @@ namespace PaymentService.Infrastructure.Data.Configrations
             builder.Property(x => x.IsOrderCompletionConfirmed)
                 .IsRequired();
 
+            builder.Property(x => x.IsOrderCancellationDueToRefundConfirmed)
+                .IsRequired();
+
             builder.Property(x => x.OrderCompletionReattempts)
                 .IsRequired();
 
             builder.Property(x => x.NextOrderCompletionAttemptAt);
+
+            builder.Property(x => x.OrderCancellationReattempts)
+                .IsRequired();
+
+            builder.Property(x => x.NextOrderCancellationAttemptAt);
 
             builder.Property(x => x.StripePaymentIntentId)
                 .HasMaxLength(100);
@@ -39,11 +47,18 @@ namespace PaymentService.Infrastructure.Data.Configrations
 
             builder.Property(x => x.SucceededAt);
 
-            builder.Property(x => x.FailedAt);
+            builder.Property(x => x.PaymentFailedAt);
+
+            builder.Property(x => x.RefundInitiatedAt);
 
             builder.Property(x => x.RefundedAt);
 
-            builder.Property(x => x.FailureReason)
+            builder.Property(x => x.RefundFailedAt);
+
+            builder.Property(x => x.PaymentFailureReason)
+                .HasMaxLength(500);
+
+            builder.Property(x => x.RefundFailureReason)
                 .HasMaxLength(500);
 
             builder.OwnsOne(x => x.Amount, money =>

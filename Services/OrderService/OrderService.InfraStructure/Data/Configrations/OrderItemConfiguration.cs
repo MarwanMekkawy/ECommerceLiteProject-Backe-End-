@@ -27,6 +27,7 @@ namespace OrderService.InfraStructure.Data.Configrations
                 .IsRequired();
 
             builder.Property(x => x.Currency)
+                .HasConversion<string>()
                 .IsRequired();
 
             builder.Property(x => x.Total)

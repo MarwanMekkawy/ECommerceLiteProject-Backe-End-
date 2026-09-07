@@ -7,6 +7,7 @@ using PaymentService.Application.Extentions.App;
 using PaymentService.Infrastructure.Extentions.Infra;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json.Serialization;
 
 namespace PaymentService.API
@@ -41,8 +42,37 @@ namespace PaymentService.API
             //====== Auth JWT config ======//
             builder.Services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = "ServiceJwt";
-                options.DefaultChallengeScheme = "ServiceJwt";
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
+                };
+                // Human bearer Authentication error msgs
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+
+                        return context.Response.WriteAsJsonAsync(new { error = "Authentication required." });
+                    },
+                    OnForbidden = context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+
+                        return context.Response.WriteAsJsonAsync(new { error = "You are not authorized or Verified to perform this action." });
+                    }
+                };
             }).AddJwtBearer("ServiceJwt", options =>
             {
                 var rsa = RSA.Create();

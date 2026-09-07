@@ -10,7 +10,7 @@ using System.Text;
 
 namespace IdentityService.Infrastructure.Security
 {
-    public class JwtTokenService(IConfiguration configuration) : IJwtTokenService
+    public class JwtTokenService(IConfiguration configuration, RsaSecurityKey rsaServiceSigningKey) : IJwtTokenService
     {
         public string GenerateAccessToken(User user)
         {
@@ -79,29 +79,8 @@ namespace IdentityService.Infrastructure.Security
                 new Claim(ClaimTypes.Name, client.ServiceName),
                 new Claim("token_type", "service")
             };
-
-
-            var privateKey = configuration["JwtForServiceClient:PrivateKey"];
-            if (string.IsNullOrWhiteSpace(privateKey))
-                throw new InvalidOperationException("JWT service client private key is missing from configuration.");
-
-            using var rsa = RSA.Create();
-
-            try
-            {
-                rsa.ImportFromPem(privateKey.Replace("\\n", "\n"));
-            }
-            catch (ArgumentException ex)
-            {
-                throw new InvalidOperationException("JWT service client private key is invalid or has an invalid PEM format.", ex);
-            }
-            catch (CryptographicException ex)
-            {
-                throw new InvalidOperationException("JWT service client private key could not be imported.", ex);
-            }
-
-            var key = new RsaSecurityKey(rsa);
-            var creds = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
+          
+            var creds = new SigningCredentials(rsaServiceSigningKey, SecurityAlgorithms.RsaSha256);
 
             var token = new JwtSecurityToken(
                 issuer: configuration["Jwt:Issuer"],
@@ -111,7 +90,9 @@ namespace IdentityService.Infrastructure.Security
                 signingCredentials: creds
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var result = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return result;
         }
     }
 }

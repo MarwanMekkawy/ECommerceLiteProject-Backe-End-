@@ -243,28 +243,34 @@ namespace OrderService.Domain.Tests
         }
 
         [Fact]
-        public void Complete_ShouldThrow_WhenOrderIsPending()
+        public void Complete_ShouldDoNothing_WhenOrderIsPending()
         {
             // Arrange
             var order = new Order(Guid.NewGuid());
 
-            // Act & Assert
-            Assert.Throws<InvalidOrderException>(() => order.Complete());
+            // Act
+            order.Complete();
+
+            // Assert
+            Assert.Equal(OrderStatus.Pending, order.Status);
         }
 
         [Fact]
-        public void Complete_ShouldThrow_WhenOrderIsCancelled()
+        public void Complete_ShouldDoNothing_WhenOrderIsCancelled()
         {
             // Arrange
             var order = new Order(Guid.NewGuid());
             order.Cancel();
 
-            // Act & Assert
-            Assert.Throws<InvalidOrderException>(() => order.Complete());
+            // Act
+            order.Complete();
+
+            // Assert
+            Assert.Equal(OrderStatus.Cancelled, order.Status);
         }
 
         [Fact]
-        public void Complete_ShouldThrow_WhenOrderIsAlreadyCompleted()
+        public void Complete_ShouldDoNothing_WhenOrderIsAlreadyCompleted()
         {
             // Arrange
             var order = new Order(Guid.NewGuid());
@@ -279,8 +285,11 @@ namespace OrderService.Domain.Tests
             order.Confirm(productPrices, DateTime.UtcNow);
             order.Complete();
 
-            // Act & Assert
-            Assert.Throws<InvalidOrderException>(() => order.Complete());
+            // Act
+            order.Complete();
+
+            // Assert
+            Assert.Equal(OrderStatus.Completed, order.Status);
         }
 
         [Fact]

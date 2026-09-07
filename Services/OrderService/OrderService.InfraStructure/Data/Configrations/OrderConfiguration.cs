@@ -17,6 +17,7 @@ namespace OrderService.InfraStructure.Data.Configrations
                 .IsRequired();
 
             builder.Property(x => x.Status)
+                .HasConversion<string>()
                 .IsRequired();
 
             builder.Property(x => x.Total)
@@ -24,6 +25,7 @@ namespace OrderService.InfraStructure.Data.Configrations
                 .IsRequired();
 
             builder.Property(x => x.Currency)
+                .HasConversion<string>()
                 .IsRequired();
 
             builder.Property(x => x.CreatedAt)
@@ -41,7 +43,7 @@ namespace OrderService.InfraStructure.Data.Configrations
             //user can have only one Pending order at a time
             builder.HasIndex(x => x.UserId)
                 .IsUnique()
-                .HasFilter($"[Status] = {(int)OrderStatus.Pending}");
+                .HasFilter($"[Status] = '{OrderStatus.Pending}'");
 
             builder.HasMany(x => x.Items)
                 .WithOne(x => x.Order)

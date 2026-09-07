@@ -14,6 +14,8 @@ namespace PaymentService.Domain.Contracts
 
         Task<List<Payment>> GetSucceededPaymentsWithUnconfirmedOrderAsync(CancellationToken cancellationToken = default);
 
+        Task<List<Payment>> GetRefundedPaymentsWithUnconfirmedOrderCancellationAsync(CancellationToken cancellationToken = default);
+
         Task AddAsync(Payment payment, CancellationToken cancellationToken = default);
 
         Task SaveChangesAsync(CancellationToken cancellationToken = default);

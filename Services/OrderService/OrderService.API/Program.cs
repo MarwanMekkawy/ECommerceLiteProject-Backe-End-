@@ -5,6 +5,7 @@ using OrderService.API.Middleware;
 using OrderService.Application.Extentions.App;
 using OrderService.InfraStructure.Extentions.Infra;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -38,39 +39,71 @@ namespace OrderService.API
 
                     options.IncludeXmlComments(xmlPath);
                 });
+
             //====== Auth JWT config ======//
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
+                };
+                // Human bearer Authentication error msgs
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = context =>
                     {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                        ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
-                    };
-                    // Human bearer Authentication error msgs
-                    options.Events = new JwtBearerEvents
+                        context.HandleResponse();
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+
+                        return context.Response.WriteAsJsonAsync(new { error = "Authentication required." });
+                    },
+                    OnForbidden = context =>
                     {
-                        OnChallenge = context =>
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+
+                        return context.Response.WriteAsJsonAsync(new { error = "You are not authorized or Verified to perform this action." });
+                    }
+                };
+            }).AddJwtBearer("ServiceJwt", options =>
+            {
+                var rsa = RSA.Create();
+                rsa.ImportFromPem(builder.Configuration["JwtForServiceClient:PublicKey"]!.Replace("\\n", "\n"));
+                var key = new RsaSecurityKey(rsa);
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = key
+                };
+                // Service bearer Authentication error msgs
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = async context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = 401;
+                        await context.Response.WriteAsJsonAsync(new
                         {
-                            context.HandleResponse();
-                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-
-                            return context.Response.WriteAsJsonAsync(new { error = "Authentication required." });
-                        },
-
-                        OnForbidden = context =>
-                        {
-                            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-
-                            return context.Response.WriteAsJsonAsync(new { error = "You are not authorized to perform this action." });
-                        }
-                    };
-                });
+                            error = "Invalid or expired authentication token."
+                        });
+                    }
+                };
+            });
 
             builder.Services.AddAuthorization();
 

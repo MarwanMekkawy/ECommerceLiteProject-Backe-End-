@@ -7,103 +7,142 @@ using PaymentService.Domain.ValueObjects;
 
 namespace PaymentService.Application.Services
 {
-    public class PaymentAppService(IPaymentRepository _paymentRepository, IStripePaymentClient _stripePaymentClient,IOrderServiceClient _orderServiceClient) : IPaymentAppService
+    public class PaymentAppService(IUnitOfWork _unitOfWork, IStripePaymentClient _stripePaymentClient, IOrderServiceClient _orderServiceClient) : IPaymentAppService
     {
 
         #region // Helper Methods ==============================================================================================================
-        private async Task HandlePaymentSucceededAsync(string paymentIntentId, CancellationToken cancellationToken)
+        private async Task<Payment?> HandlePaymentSucceededAsync(string paymentIntentId, CancellationToken cancellationToken)
         {
-            var payment = await _paymentRepository.GetByStripePaymentIntentIdAsync(paymentIntentId, cancellationToken);
+            var payment = await _unitOfWork.Payments.GetByStripePaymentIntentIdAsync(paymentIntentId, cancellationToken);
 
             if (payment is null)
                 throw new InvalidOperationException("Payment not found.");
 
             if (payment.Status == PaymentStatus.Succeeded && payment.IsOrderCompletionConfirmed)
-                return;
+                return null;
+
+            if (payment.Status == PaymentStatus.RefundInitiated || payment.Status == PaymentStatus.RefundingByStripe || payment.Status == PaymentStatus.Refunded ||
+                payment.Status == PaymentStatus.RefundFailed)
+                return null;
 
             payment.MarkAsSucceeded();
-            await _paymentRepository.SaveChangesAsync(cancellationToken);
 
-            await _orderServiceClient.CompleteOrderAsync(payment.OrderId, cancellationToken);
-
-            payment.MarkCompletionConfirmed();
-            await _paymentRepository.SaveChangesAsync(cancellationToken);
+            return payment;
         }
-
         private async Task HandlePaymentFailedAsync(string paymentIntentId, string? failureReason, CancellationToken cancellationToken)
         {
-            var payment = await _paymentRepository.GetByStripePaymentIntentIdAsync(paymentIntentId, cancellationToken);
+            var payment = await _unitOfWork.Payments.GetByStripePaymentIntentIdAsync(paymentIntentId, cancellationToken);
 
             if (payment is null)
                 throw new InvalidOperationException("Payment not found.");
 
-            if (payment.Status == PaymentStatus.Succeeded)
+            if (payment.Status == PaymentStatus.Succeeded || payment.Status == PaymentStatus.RefundInitiated || payment.Status == PaymentStatus.RefundingByStripe ||
+                payment.Status == PaymentStatus.Refunded || payment.Status == PaymentStatus.RefundFailed)
                 return;
 
             payment.MarkAsFailed(failureReason);
-
-            await _paymentRepository.SaveChangesAsync(cancellationToken);
         }
-
         private async Task HandlePaymentProcessingAsync(string paymentIntentId, CancellationToken cancellationToken)
         {
-            var payment = await _paymentRepository.GetByStripePaymentIntentIdAsync(paymentIntentId, cancellationToken);
+            var payment = await _unitOfWork.Payments.GetByStripePaymentIntentIdAsync(paymentIntentId, cancellationToken);
 
             if (payment is null)
                 throw new InvalidOperationException("Payment not found.");
 
-            if (payment.Status == PaymentStatus.Succeeded || payment.Status == PaymentStatus.Failed || payment.Status == PaymentStatus.Cancelled)
+            if (payment.Status == PaymentStatus.Succeeded || payment.Status == PaymentStatus.Failed || payment.Status == PaymentStatus.Cancelled || payment.Status == PaymentStatus.RefundInitiated ||
+                payment.Status == PaymentStatus.RefundingByStripe || payment.Status == PaymentStatus.Refunded || payment.Status == PaymentStatus.RefundFailed)
                 return;
 
             payment.MarkAsProcessing();
-
-            await _paymentRepository.SaveChangesAsync(cancellationToken);
         }
-
         private async Task HandlePaymentRequiresActionAsync(string paymentIntentId, CancellationToken cancellationToken)
         {
-            var payment = await _paymentRepository.GetByStripePaymentIntentIdAsync(paymentIntentId, cancellationToken);
+            var payment = await _unitOfWork.Payments.GetByStripePaymentIntentIdAsync(paymentIntentId, cancellationToken);
 
             if (payment is null)
                 throw new InvalidOperationException("Payment not found.");
 
-            if (payment.Status == PaymentStatus.Succeeded || payment.Status == PaymentStatus.Failed || payment.Status == PaymentStatus.Cancelled)
+            if (payment.Status == PaymentStatus.Succeeded || payment.Status == PaymentStatus.Failed || payment.Status == PaymentStatus.Cancelled || payment.Status == PaymentStatus.RefundInitiated ||
+                payment.Status == PaymentStatus.RefundingByStripe || payment.Status == PaymentStatus.Refunded || payment.Status == PaymentStatus.RefundFailed)
                 return;
 
             payment.MarkAsRequiresAction();
-
-            await _paymentRepository.SaveChangesAsync(cancellationToken);
         }
-
-        private async Task HandleRefundSucceededAsync(string refundId, CancellationToken cancellationToken)
+        // refund methods ===============================================================================================
+        private async Task HandleRefundCreatedAsync(string refundId, string? refundStatus, CancellationToken cancellationToken)
         {
-            var payment = await _paymentRepository.GetByStripeRefundIdAsync(refundId, cancellationToken);
+            var payment = await _unitOfWork.Payments.GetByStripeRefundIdAsync(refundId, cancellationToken);
 
             if (payment is null)
                 throw new InvalidOperationException("Payment not found.");
 
-            if (payment.Status == PaymentStatus.Refunded)
+            if (payment.Status == PaymentStatus.Refunded || payment.Status == PaymentStatus.RefundFailed)
                 return;
 
-            payment.MarkAsRefunded(refundId);
+            if (payment.Status != PaymentStatus.RefundInitiated && payment.Status != PaymentStatus.RefundingByStripe)
+                return;
 
-            await _paymentRepository.SaveChangesAsync(cancellationToken);
+            switch (refundStatus)
+            {
+                case "succeeded":
+                    payment.MarkAsRefunded(refundId);
+                    break;
+
+                case "pending":
+                case "requires_action":
+                    payment.MarkAsRefunding();
+                    break;
+
+                case "failed":
+                    payment.MarkAsRefundFailedRequiresAdminAttention(refundId);
+                    break;
+            }
         }
-
-        private async Task HandleRefundFailedAsync(string refundId, string? failureReason, CancellationToken cancellationToken)
+        private async Task HandleRefundUpdatedAsync(string refundId, string? refundStatus, CancellationToken cancellationToken)
         {
-            var payment = await _paymentRepository.GetByStripeRefundIdAsync(refundId, cancellationToken);
+            var payment = await _unitOfWork.Payments.GetByStripeRefundIdAsync(refundId, cancellationToken);
 
             if (payment is null)
                 throw new InvalidOperationException("Payment not found.");
 
-            payment.MarkAsFailed(failureReason);
+            switch (refundStatus)
+            {
+                case "succeeded":
+                    if (payment.Status != PaymentStatus.Refunded)
+                        payment.MarkAsRefunded(refundId);
+                    break;
+
+                case "pending":
+                case "requires_action":
+                    if (payment.Status != PaymentStatus.Refunded &&
+                        payment.Status != PaymentStatus.RefundFailed)
+                    {
+                        payment.MarkAsRefunding();
+                    }
+                    break;
+
+                case "failed":
+                    payment.MarkAsRefundFailedRequiresAdminAttention(refundId);
+                    break;
+            }
+        }
+        private async Task HandleRefundFailedAsync(string refundId, string? failureReason, CancellationToken cancellationToken)
+        {
+            var payment = await _unitOfWork.Payments.GetByStripeRefundIdAsync(refundId, cancellationToken);
+
+            if (payment is null)
+                throw new InvalidOperationException("Payment not found.");
+
+            if (payment.Status == PaymentStatus.RefundFailed)
+                return;
+
+            payment.MarkAsRefundFailedRequiresAdminAttention(refundId, failureReason);
         }
         #endregion // ==========================================================================================================================
 
         public async Task<CreatePaymentResponseDto> CreatePaymentAsync(Guid orderId, Guid userId, decimal amount, CurrencyCode currency, CancellationToken cancellationToken = default)
         {
-            var existingPayment = await _paymentRepository.GetByOrderIdAsync(orderId, cancellationToken);
+            var existingPayment = await _unitOfWork.Payments.GetByOrderIdAsync(orderId, cancellationToken);
 
             if (existingPayment is not null)
             {
@@ -125,35 +164,50 @@ namespace PaymentService.Application.Services
 
             payment.SetStripePaymentIntentId(stripeResult.PaymentIntentId);
 
-            await _paymentRepository.AddAsync(payment, cancellationToken);
+            await _unitOfWork.Payments.AddAsync(payment, cancellationToken);
 
-            await _paymentRepository.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return new CreatePaymentResponseDto { PaymentId = payment.Id, ClientSecret = stripeResult.ClientSecret, Status = payment.Status };
         }
 
-        public async Task RefundPaymentAsync(Payment payment, CancellationToken cancellationToken)
+        public async Task RefundPaymentAsync(Guid paymentId, CancellationToken cancellationToken = default)
         {
+            var payment = await _unitOfWork.Payments.GetByIdAsync(paymentId, cancellationToken);
+
+            if (payment is null)
+                throw new InvalidOperationException("Payment not found.");
+
             if (payment.Status == PaymentStatus.Refunded)
                 return;
 
-            if (payment.Status != PaymentStatus.Refunding)
-            {
-                payment.MarkAsRefunding();
-                await _paymentRepository.SaveChangesAsync(cancellationToken);
-            }
+            if (payment.Status == PaymentStatus.RefundInitiated || payment.Status == PaymentStatus.RefundingByStripe)
+                return;
 
-            await _stripePaymentClient.CreateRefundAsync(payment.StripePaymentIntentId!, cancellationToken);
+            payment.MarkAsRefundInitiated();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            var refundID = await _stripePaymentClient.CreateRefundAsync(payment.StripePaymentIntentId!, cancellationToken);
+
+            payment.SetStripeRefundId(refundID);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
         public async Task HandleStripeWebhookAsync(string json, string stripeSignature, CancellationToken cancellationToken = default)
         {
             var webhookEvent = _stripePaymentClient.ConstructWebhookEvent(json, stripeSignature);
 
+            var alreadyProcessed = await _unitOfWork.ProcessedStripeEvents.ExistsAsync(webhookEvent.EventId, cancellationToken);
+
+            if (alreadyProcessed)
+                return;
+
+            Payment? paymentToComplete = null;
+
             switch (webhookEvent.Type)
             {
                 case "payment_intent.succeeded":
-                    await HandlePaymentSucceededAsync(webhookEvent.PaymentIntentId, cancellationToken);
+                    paymentToComplete  = await HandlePaymentSucceededAsync(webhookEvent.PaymentIntentId, cancellationToken);
                     break;
 
                 case "payment_intent.payment_failed":
@@ -168,13 +222,29 @@ namespace PaymentService.Application.Services
                     await HandlePaymentRequiresActionAsync(webhookEvent.PaymentIntentId, cancellationToken);
                     break;
 
-                case "refund.succeeded":
-                    await HandleRefundSucceededAsync(webhookEvent.RefundId, cancellationToken);
+                // refunds
+                case "refund.created":
+                    await HandleRefundCreatedAsync(webhookEvent.RefundId, webhookEvent.RefundStatus, cancellationToken);
+                    break;
+
+                case "refund.updated":
+                    await HandleRefundUpdatedAsync(webhookEvent.RefundId, webhookEvent.RefundStatus, cancellationToken);
                     break;
 
                 case "refund.failed":
                     await HandleRefundFailedAsync(webhookEvent.RefundId, webhookEvent.FailureReason, cancellationToken);
                     break;
+            }
+
+            await _unitOfWork.ProcessedStripeEvents.AddAsync(new ProcessedStripeEvent(webhookEvent.EventId), cancellationToken);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            if (paymentToComplete is not null)
+            {
+                await _orderServiceClient.CompleteOrderAsync(paymentToComplete.OrderId , cancellationToken);
+                paymentToComplete .MarkCompletionConfirmed();
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
         }
     }

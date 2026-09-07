@@ -135,7 +135,7 @@ namespace OrderService.Domain.Orders
         public void Complete()
         {
             if (Status != OrderStatus.Confirmed)
-                throw new InvalidOrderException("Only confirmed orders can be completed.");
+                return;
             if (ExpiresAt.HasValue && DateTime.UtcNow >= ExpiresAt.Value)
                 throw new ConflictException($"Order expired at {ExpiresAt:O} and can no longer be completed.");
 
@@ -145,7 +145,7 @@ namespace OrderService.Domain.Orders
         // cancel order with or without refund
         public void Cancel(bool cancelledWithRefund = false)
         {
-            if (Status != OrderStatus.Pending && Status != OrderStatus.Confirmed)
+            if (Status != OrderStatus.Pending && Status != OrderStatus.Confirmed && !(Status == OrderStatus.Completed && cancelledWithRefund))
                 throw new InvalidOrderException("Only pending or confirmed orders can be cancelled.");
 
             Status = cancelledWithRefund ? OrderStatus.CancelledAndRefunded : OrderStatus.Cancelled;
