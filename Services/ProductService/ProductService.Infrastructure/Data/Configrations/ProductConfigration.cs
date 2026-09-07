@@ -38,6 +38,7 @@ namespace ProductService.Infrastructure.Data.Configrations
 
                 money.Property(m => m.Currency)
                     .HasColumnName("Currency")
+                    .HasConversion<string>()
                     .IsRequired();
             });
 
