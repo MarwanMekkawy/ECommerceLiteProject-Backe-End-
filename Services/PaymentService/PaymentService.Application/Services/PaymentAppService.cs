@@ -11,7 +11,7 @@ namespace PaymentService.Application.Services
     {
 
         #region // Helper Methods ==============================================================================================================
-        private async Task<Guid?> HandlePaymentSucceededAsync(string paymentIntentId, CancellationToken cancellationToken)
+        private async Task<Payment?> HandlePaymentSucceededAsync(string paymentIntentId, CancellationToken cancellationToken)
         {
             var payment = await _unitOfWork.Payments.GetByStripePaymentIntentIdAsync(paymentIntentId, cancellationToken);
 
@@ -27,7 +27,7 @@ namespace PaymentService.Application.Services
 
             payment.MarkAsSucceeded();
 
-            return payment.OrderId;
+            return payment;
         }
         private async Task HandlePaymentFailedAsync(string paymentIntentId, string? failureReason, CancellationToken cancellationToken)
         {
@@ -202,12 +202,12 @@ namespace PaymentService.Application.Services
             if (alreadyProcessed)
                 return;
 
-            Guid? orderIdToComplete = null;
+            Payment? paymentToComplete = null;
 
             switch (webhookEvent.Type)
             {
                 case "payment_intent.succeeded":
-                    orderIdToComplete = await HandlePaymentSucceededAsync(webhookEvent.PaymentIntentId, cancellationToken);
+                    paymentToComplete  = await HandlePaymentSucceededAsync(webhookEvent.PaymentIntentId, cancellationToken);
                     break;
 
                 case "payment_intent.payment_failed":
@@ -240,9 +240,11 @@ namespace PaymentService.Application.Services
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            if (orderIdToComplete.HasValue)
+            if (paymentToComplete is not null)
             {
-                await _orderServiceClient.CompleteOrderAsync(orderIdToComplete.Value, cancellationToken);
+                await _orderServiceClient.CompleteOrderAsync(paymentToComplete.OrderId , cancellationToken);
+                paymentToComplete .MarkCompletionConfirmed();
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
         }
     }
