@@ -1,23 +1,25 @@
-﻿using NotificationService.Domain.Contracts;
+﻿using Microsoft.EntityFrameworkCore;
+using NotificationService.Domain.Contracts;
 using NotificationService.Domain.Entities;
+using NotificationService.Domain.Enums;
 
 namespace NotificationService.Infrastructure.Repositories
 {
-    public class NotificationRepository : INotificationRepository
+    public class NotificationRepository(NotificationDbContext _context) : INotificationRepository
     {
-        public Task AddAsync(Notification notification, CancellationToken cancellationToken)
+        public async Task<Notification?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _context.Notifications.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public Task<Notification?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<Notification>> GetPendingAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _context.Notifications.Where(x => x.Status == NotificationStatus.Pending).ToListAsync(cancellationToken);
         }
 
-        public Task<IReadOnlyList<Notification>> GetPendingAsync(CancellationToken cancellationToken)
+        public async Task AddAsync(Notification notification, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await _context.Notifications.AddAsync(notification, cancellationToken);
         }
     }
 }

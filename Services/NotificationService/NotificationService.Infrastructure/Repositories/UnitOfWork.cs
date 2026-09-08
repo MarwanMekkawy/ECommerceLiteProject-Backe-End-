@@ -2,7 +2,7 @@
 
 namespace NotificationService.Infrastructure.Repositories
 {
-    public class UnitOfWork(NotificationServiceDbContext _context, INotificationRepository notificationRepo, IProcessedMailjetEventRepository processedMailjetEventRepo) : IUnitOfWork
+    public class UnitOfWork(NotificationDbContext _context, INotificationRepository notificationRepo, IProcessedMailjetEventRepository processedMailjetEventRepo) : IUnitOfWork
     {
         public INotificationRepository NotificationRepo { get; } = notificationRepo;
         public IProcessedMailjetEventRepository ProcessedMailjetEventRepo { get; } = processedMailjetEventRepo;

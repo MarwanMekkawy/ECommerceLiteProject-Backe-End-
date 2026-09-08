@@ -15,7 +15,6 @@
         OrderExpired,
 
         // Payments
-        PaymentSucceeded,
         PaymentFailed,
         PaymentRefunded
     }

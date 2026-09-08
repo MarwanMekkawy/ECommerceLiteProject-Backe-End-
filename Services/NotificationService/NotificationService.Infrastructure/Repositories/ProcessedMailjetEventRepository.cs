@@ -1,18 +1,18 @@
-﻿using NotificationService.Domain.Contracts;
+﻿using Microsoft.EntityFrameworkCore;
+using NotificationService.Domain.Contracts;
 using NotificationService.Domain.Entities;
 
 namespace NotificationService.Infrastructure.Repositories
 {
-    public class ProcessedMailjetEventRepository : IProcessedMailjetEventRepository
+    public class ProcessedMailjetEventRepository(NotificationDbContext _context) : IProcessedMailjetEventRepository
     {
-        public Task AddAsync(ProcessedMailjetEvent mailjetEvent, CancellationToken cancellationToken)
+        public async Task<bool> ExistsAsync(string mailjetEventId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _context.ProcessedMailjetEvents.AnyAsync(x => x.MailjetEventId == mailjetEventId, cancellationToken);
         }
-
-        public Task<bool> ExistsAsync(string mailjetEventId, CancellationToken cancellationToken)
+        public async Task AddAsync(ProcessedMailjetEvent mailjetEvent, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await _context.ProcessedMailjetEvents.AddAsync(mailjetEvent, cancellationToken);
         }
     }
 }
