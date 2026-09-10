@@ -17,6 +17,12 @@ namespace NotificationService.Infrastructure.Repositories
             return await _context.Notifications.Where(x => x.Status == NotificationStatus.Pending).ToListAsync(cancellationToken);
         }
 
+        public async Task<IReadOnlyList<Notification>> GetFailedNotificationsDueForRetryAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Notifications.Where(x => x.Status == NotificationStatus.Failed && x.AttemptCount < 5 && x.NextAttemptAt <= DateTime.UtcNow)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task AddAsync(Notification notification, CancellationToken cancellationToken)
         {
             await _context.Notifications.AddAsync(notification, cancellationToken);

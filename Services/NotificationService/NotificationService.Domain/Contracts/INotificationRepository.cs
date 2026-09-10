@@ -6,6 +6,7 @@ namespace NotificationService.Domain.Contracts
     {
         Task<Notification?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
         Task<IReadOnlyList<Notification>> GetPendingAsync(CancellationToken cancellationToken);
+        Task<IReadOnlyList<Notification>> GetFailedNotificationsDueForRetryAsync(CancellationToken cancellationToken);
         Task AddAsync(Notification notification, CancellationToken cancellationToken);
     }
 }
