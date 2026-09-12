@@ -1,4 +1,4 @@
-﻿namespace OrderService.InfraStructure.Clients
+﻿namespace OrderService.InfraStructure.Clients.IdentityServiceTokenAuthClient
 {
     public interface IServiceTokenCache
     {

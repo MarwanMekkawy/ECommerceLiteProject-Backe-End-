@@ -1,4 +1,4 @@
-﻿namespace PaymentService.Application.Abstractions
+﻿namespace OrderService.Application.Abstractions.ClientsAbstractions
 {
     public interface IServiceTokenClient
     {

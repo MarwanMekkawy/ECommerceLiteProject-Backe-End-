@@ -1,4 +1,4 @@
-﻿namespace PaymentService.Application.Abstractions
+﻿namespace PaymentService.Application.Abstractions.ClientsAbstractions
 {
     public interface IOrderServiceClient
     {

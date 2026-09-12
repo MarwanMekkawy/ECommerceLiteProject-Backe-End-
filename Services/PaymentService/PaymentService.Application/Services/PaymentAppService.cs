@@ -1,4 +1,5 @@
 ﻿using PaymentService.Application.Abstractions;
+using PaymentService.Application.Abstractions.ClientsAbstractions;
 using PaymentService.Application.DTOs;
 using PaymentService.Domain.Contracts;
 using PaymentService.Domain.Entities;

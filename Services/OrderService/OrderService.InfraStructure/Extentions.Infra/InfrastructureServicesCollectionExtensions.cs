@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using OrderService.Application.Abstractions;
+using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Domain.Contracts;
 using OrderService.InfraStructure.Clients;
+using OrderService.InfraStructure.Clients.IdentityServiceTokenAuthClient;
 using OrderService.InfraStructure.Clients.PaymentServiceClient;
+using OrderService.InfraStructure.Clients.ProductServiceClient;
 using OrderService.InfraStructure.Repositories;
 
 namespace OrderService.InfraStructure.Extentions.Infra

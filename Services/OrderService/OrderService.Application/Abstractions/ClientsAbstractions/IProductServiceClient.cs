@@ -1,6 +1,6 @@
 ﻿using OrderService.Application.DTOs;
 
-namespace OrderService.Application.Abstractions
+namespace OrderService.Application.Abstractions.ClientsAbstractions
 {
     public interface IProductServiceClient
     {

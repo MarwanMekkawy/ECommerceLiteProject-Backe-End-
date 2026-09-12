@@ -1,4 +1,4 @@
-﻿using OrderService.Application.Abstractions;
+﻿using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Domain.Enums;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;

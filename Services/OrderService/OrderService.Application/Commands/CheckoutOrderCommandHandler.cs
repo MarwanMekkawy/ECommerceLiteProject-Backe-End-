@@ -1,5 +1,6 @@
 ﻿using Domain.Exceptions;
 using OrderService.Application.Abstractions;
+using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Application.DTOs;
 using OrderService.Domain.Contracts;
 using OrderService.Domain.Enums;

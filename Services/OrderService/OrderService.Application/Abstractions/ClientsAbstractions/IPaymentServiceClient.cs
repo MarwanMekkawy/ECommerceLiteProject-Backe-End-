@@ -1,6 +1,6 @@
 ﻿using OrderService.Domain.Enums;
 
-namespace OrderService.Application.Abstractions
+namespace OrderService.Application.Abstractions.ClientsAbstractions
 {
     public interface IPaymentServiceClient
     {

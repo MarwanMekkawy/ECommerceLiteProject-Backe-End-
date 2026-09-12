@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PaymentService.Application.Abstractions;
+using PaymentService.Application.Abstractions.ClientsAbstractions;
 using PaymentService.Domain.Contracts;
-using PaymentService.Infrastructure.Clients;
+using PaymentService.Infrastructure.Clients.OrderServiceClient;
 using PaymentService.Infrastructure.Clients.ServiceTokenAuth;
 using PaymentService.Infrastructure.Clients.Stripe;
 using PaymentService.Infrastructure.Repositories;

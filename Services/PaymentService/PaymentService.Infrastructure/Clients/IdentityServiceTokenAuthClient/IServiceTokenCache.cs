@@ -1,4 +1,4 @@
-﻿namespace PaymentService.Infrastructure.Clients.ServiceTokenAuth
+﻿namespace PaymentService.Infrastructure.Clients.IdentityServiceTokenAuthClient
 {
     public interface IServiceTokenCache
     {

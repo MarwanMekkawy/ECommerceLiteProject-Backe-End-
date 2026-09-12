@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Clients\NotificationServiceClient\" />
     <Folder Include="Data\Migrations\" />
   </ItemGroup>
 

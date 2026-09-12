@@ -1,4 +1,5 @@
 ﻿using PaymentService.Application.Abstractions;
+using PaymentService.Application.Abstractions.ClientsAbstractions;
 using PaymentService.Domain.Contracts;
 
 namespace PaymentService.Application.Services

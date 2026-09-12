@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
-using PaymentService.Application.Abstractions;
-using PaymentService.Domain.Exceptions;
-using PaymentService.Infrastructure.Clients.DTOIdentityContracts;
+﻿using Domain.Exceptions;
+using Microsoft.Extensions.Configuration;
+using OrderService.Application.Abstractions.ClientsAbstractions;
+using OrderService.InfraStructure.Clients.IdentityServiceTokenAuthClient.DTOIdentityContracts;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace PaymentService.Infrastructure.Clients.ServiceTokenAuth
+namespace OrderService.InfraStructure.Clients.IdentityServiceTokenAuthClient
 {
     public class ServiceTokenClient(HttpClient httpClient, IConfiguration configuration, IServiceTokenCache cache) : IServiceTokenClient
     {
@@ -19,8 +19,8 @@ namespace PaymentService.Infrastructure.Clients.ServiceTokenAuth
 
             var request = new ServiceTokenRequest
             {
-                ClientId = configuration["PaymentService:ServiceId"]!,
-                ClientSecret = configuration["PaymentService:ServiceSecret"]!
+                ClientId = configuration["OrderService:ServiceId"]!,
+                ClientSecret = configuration["OrderService:ServiceSecret"]!
             };
 
             var response = await httpClient.PostAsJsonAsync("auth/oauth/service-token", request, cancellationToken);
@@ -47,7 +47,7 @@ namespace PaymentService.Infrastructure.Clients.ServiceTokenAuth
 
             var expiresAt = jwt.ValidTo;
 
-            cache.Set(result.JwtToken, new DateTimeOffset(expiresAt));
+            cache.Set(result.JwtToken,new DateTimeOffset(expiresAt));
 
             return result.JwtToken;
         }

@@ -1,6 +1,6 @@
 ﻿using Domain.Exceptions;
 using Moq;
-using OrderService.Application.Abstractions;
+using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Application.Commands;
 using OrderService.Application.DTOs;
 using OrderService.Domain.Contracts;

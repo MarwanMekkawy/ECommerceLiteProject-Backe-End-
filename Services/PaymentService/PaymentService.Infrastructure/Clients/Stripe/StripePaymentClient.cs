@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using PaymentService.Application.Abstractions;
+using PaymentService.Application.Abstractions.ClientsAbstractions;
 using PaymentService.Application.DTOs;
 using PaymentService.Domain.Enums;
 using Stripe;

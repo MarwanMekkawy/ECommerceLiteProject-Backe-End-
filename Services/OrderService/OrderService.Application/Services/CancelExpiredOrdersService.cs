@@ -1,4 +1,5 @@
 ﻿using OrderService.Application.Abstractions;
+using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Domain.Contracts;
 
 namespace OrderService.Application.Services

@@ -1,5 +1,5 @@
 ﻿using Domain.Exceptions;
-using OrderService.Application.Abstractions;
+using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Application.DTOs;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;

@@ -1,8 +1,8 @@
-﻿using PaymentService.Application.Abstractions;
+﻿using PaymentService.Application.Abstractions.ClientsAbstractions;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace PaymentService.Infrastructure.Clients
+namespace PaymentService.Infrastructure.Clients.OrderServiceClient
 {
     public class OrderServiceClient(HttpClient httpClient, IServiceTokenClient serviceTokenClient) : IOrderServiceClient
     {

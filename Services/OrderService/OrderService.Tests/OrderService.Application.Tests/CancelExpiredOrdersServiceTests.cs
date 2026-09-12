@@ -1,5 +1,5 @@
 ﻿using Moq;
-using OrderService.Application.Abstractions;
+using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Application.Services;
 using OrderService.Domain.Contracts;
 using OrderService.Domain.Enums;

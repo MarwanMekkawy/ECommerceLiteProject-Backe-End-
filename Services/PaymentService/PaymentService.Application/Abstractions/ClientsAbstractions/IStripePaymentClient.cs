@@ -1,7 +1,7 @@
 ﻿using PaymentService.Application.DTOs;
 using PaymentService.Domain.Enums;
 
-namespace PaymentService.Application.Abstractions
+namespace PaymentService.Application.Abstractions.ClientsAbstractions
 {
     public interface IStripePaymentClient
     {
