@@ -1,5 +1,3 @@
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using NotificationService.API.BackgroundTasks;
 using NotificationService.API.Middlewere;
@@ -7,8 +5,9 @@ using NotificationService.Application.Extentions.App;
 using NotificationService.Infrastructure.Extentions.Infra;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 
 namespace NotificationService.API
 {
@@ -93,6 +92,7 @@ namespace NotificationService.API
             }
 
             app.UseMiddleware<GlobalHandlingMiddleware>();
+            app.UseMiddleware<MailjetWebhookAuthenticationMiddleware>();
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();

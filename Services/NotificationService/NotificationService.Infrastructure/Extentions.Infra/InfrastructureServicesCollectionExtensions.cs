@@ -16,7 +16,7 @@ namespace NotificationService.Infrastructure.Extentions.Infra
 
             // DI registering
             services.AddScoped<INotificationRepository, NotificationRepository>();
-            services.AddScoped<IProcessedMailjetEventRepository, IProcessedMailjetEventRepository>();
+            services.AddScoped<IProcessedMailjetEventRepository, ProcessedMailjetEventRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IMailjetClient, MailjetClient>();
 

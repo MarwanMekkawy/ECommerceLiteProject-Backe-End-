@@ -31,18 +31,21 @@ namespace NotificationService.Infrastructure.Data.Configrations
                 .IsRequired()
                 .HasMaxLength(256);
 
+            builder.Property(x => x.Data)
+                .HasColumnType("nvarchar(max)");
+
+            builder.Property(x => x.CreatedAt)
+                .IsRequired();
+
             builder.Property(x => x.AttemptCount)
                 .IsRequired();
 
-            builder.Property(x => x.LastAttemptAt);
+            builder.Property(x => x.NextAttemptAt);
 
             builder.Property(x => x.SentAt);
 
             builder.Property(x => x.FailureReason)
                 .HasMaxLength(2000);
-
-            builder.Property(x => x.CreatedAt)
-                .IsRequired();
         }
     }
 }

@@ -11,6 +11,7 @@ namespace NotificationService.Application.Extentions.App
             services.AddScoped<INotificationCreationService, NotificationCreationService>();
             services.AddScoped<INotificationDeliveryService, NotificationDeliveryService>();
             services.AddScoped<IRetrySendingFailedMailsService, RetrySendingFailedMailsService>();
+            services.AddScoped<IMailjetWebhookService, MailjetWebhookService>();
 
             return services;
         }
