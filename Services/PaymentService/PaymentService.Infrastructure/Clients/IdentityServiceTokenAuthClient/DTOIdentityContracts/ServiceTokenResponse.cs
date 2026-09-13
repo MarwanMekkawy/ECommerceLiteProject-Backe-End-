@@ -1,4 +1,4 @@
-﻿namespace PaymentService.Infrastructure.Clients.DTOIdentityContracts
+﻿namespace PaymentService.Infrastructure.Clients.IdentityServiceTokenAuthClient.DTOIdentityContracts
 {
     public class ServiceTokenResponse
     {

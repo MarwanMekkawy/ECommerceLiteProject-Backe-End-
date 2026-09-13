@@ -1,5 +1,6 @@
 ﻿using IdentityService.API.CookiesHelpers;
 using IdentityService.Application.Abstractions;
+using IdentityService.Application.Abstractions.ClientsAbstractions;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.DTOs.AuthDTOs;
 using Microsoft.AspNetCore.Authorization;

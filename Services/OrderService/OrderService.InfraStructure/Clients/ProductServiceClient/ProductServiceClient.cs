@@ -6,7 +6,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OrderService.InfraStructure.Clients
+namespace OrderService.InfraStructure.Clients.ProductServiceClient
 {
     public class ProductServiceClient(HttpClient httpClient, IServiceTokenClient serviceTokenClient) : IProductServiceClient
     {

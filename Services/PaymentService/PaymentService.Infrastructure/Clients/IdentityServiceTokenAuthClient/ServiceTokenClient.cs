@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using PaymentService.Application.Abstractions.ClientsAbstractions;
 using PaymentService.Domain.Exceptions;
-using PaymentService.Infrastructure.Clients.DTOIdentityContracts;
+using PaymentService.Infrastructure.Clients.IdentityServiceTokenAuthClient.DTOIdentityContracts;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Json;
 using System.Text.Json;

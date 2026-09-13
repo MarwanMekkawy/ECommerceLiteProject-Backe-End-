@@ -1,13 +1,13 @@
 ﻿using Domain.Exceptions;
-using IdentityService.Application.Abstractions;
 using IdentityService.Application.Abstractions.Authentication;
+using IdentityService.Application.Abstractions.ClientsAbstractions;
 using IdentityService.Application.DTOs.AuthDTOs;
 using IdentityService.Domain.Contracts;
 
 
 namespace IdentityService.Application.Services
 {
-    public class ServiceClientService(IUnitOfWork uow, IOneTimeTokenService oTTokenService,IJwtTokenService jwt) : IServiceClientService
+    public class ServiceClientService(IUnitOfWork uow, IOneTimeTokenService oTTokenService, IJwtTokenService jwt) : IServiceClientService
     {
         public async Task<AuthResponseDto> AuthinticateAsync(string clientId, string clientSecret, CancellationToken cancellationToken)
         {

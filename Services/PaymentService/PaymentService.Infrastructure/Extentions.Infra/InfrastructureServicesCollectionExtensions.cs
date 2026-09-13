@@ -2,8 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using PaymentService.Application.Abstractions.ClientsAbstractions;
 using PaymentService.Domain.Contracts;
+using PaymentService.Infrastructure.Clients.IdentityServiceTokenAuthClient;
+using PaymentService.Infrastructure.Clients.NotificationServiceClient;
 using PaymentService.Infrastructure.Clients.OrderServiceClient;
-using PaymentService.Infrastructure.Clients.ServiceTokenAuth;
 using PaymentService.Infrastructure.Clients.Stripe;
 using PaymentService.Infrastructure.Repositories;
 using Stripe;
@@ -34,6 +35,8 @@ namespace PaymentService.Infrastructure.Extentions.Infra
                 client =>{client.BaseAddress = new Uri(config["HttpClients:OrderService:BaseUrl"]!); });
             services.AddHttpClient<IServiceTokenClient, ServiceTokenClient>(
                 client => { client.BaseAddress = new Uri(config["HttpClients:IdentityService:BaseUrl"]!); });
+            services.AddHttpClient<INotificationServiceClient, NotificationServiceClient>(
+                client => { client.BaseAddress = new Uri(config["HttpClients:NotificationService:BaseUrl"]!); });
             services.AddSingleton<IServiceTokenCache, ServiceTokenCache>();
 
             return services;

@@ -1,19 +1,15 @@
 ﻿using IdentityService.Application.Abstractions.Authentication;
+using IdentityService.Application.Abstractions.ClientsAbstractions;
 using IdentityService.Domain.Contracts;
-using IdentityService.Domain.Entities;
+using IdentityService.Infrastructure.Clients;
+using IdentityService.Infrastructure.Clients.NotificationServiceClient;
 using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Security;
 using IdentityService.Infrastructure.SecurityRepos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IdentityService.Infrastructure.Extentions.Infra
 {
@@ -35,10 +31,17 @@ namespace IdentityService.Infrastructure.Extentions.Infra
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
+
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
             services.AddSingleton<IJwtTokenService, JwtTokenService>();
             services.AddSingleton<IOneTimeTokenService, OneTimeTokenService>();
+
+
+            services.AddHttpClient<INotificationServiceClient, NotificationServiceClient>(
+                client => { client.BaseAddress = new Uri(config["HttpClients:NotificationService:BaseUrl"]!); });
+            services.AddSingleton<IServiceTokenCache, ServiceTokenCache>();
+
 
             #region // RSA KEY Singletone register
             var privateKey = config["JwtForServiceClient:PrivateKey"];
