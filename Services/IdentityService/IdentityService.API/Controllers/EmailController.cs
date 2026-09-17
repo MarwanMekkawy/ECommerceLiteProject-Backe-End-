@@ -1,6 +1,9 @@
 ﻿using IdentityService.API.ApiClaimsFactory;
 using IdentityService.Application.Abstractions;
 using IdentityService.Application.DTOs.EmailVerificationDTOs;
+using IdentityService.Application.UseCases.Email.ChangeEmail;
+using IdentityService.Application.UseCases.Email.ConfirmEmailChange;
+using IdentityService.Application.UseCases.Email.ResendVerification;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +15,11 @@ namespace IdentityService.API.Controllers
     [Route("api/v1/email")]
     [ApiController]
     [Authorize]
-    public class EmailController(IEmailVerificationTokenService emailVerificationService) : ControllerBase
+    public class EmailController
+        (IEmailVerificationTokenService emailVerificationService, 
+        IResendEamilVerificationUseCase  resendEamilVerificationUseCase, 
+        IChangeEmailVerificationUseCase changeEmailVerificationUseCase,
+        IConfirmEmailChangeUseCase confirmEmailChangeUseCase) : ControllerBase
     {
         /// <summary>
         /// Confirms a user's email address using a verification token.
@@ -43,9 +50,7 @@ namespace IdentityService.API.Controllers
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 
-            var result = await emailVerificationService.ResendVerificationEmailAsync(claims.UserId, cancellationToken);
-
-            //@ call api mail service to send the token [ result ] in email
+            await resendEamilVerificationUseCase.ResendAsync(claims.UserId, cancellationToken);
 
             return NoContent();
         }
@@ -62,15 +67,13 @@ namespace IdentityService.API.Controllers
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 
-            var tokenResult = await emailVerificationService.GenerateEmailChangeTokenAsync(claims.UserId, dto, cancellationToken);
-
-            //@ extract new email from dto and mail the token
+            await changeEmailVerificationUseCase.EmailChangeAsync(claims.UserId, dto, cancellationToken);
 
             //@ add valid url to redirect
             //return Redirect("https://myfrontend.com/resendemail");
 
             //@ for testing
-            return Ok(tokenResult);
+            return Ok();
         }
 
         /// <summary>
@@ -83,7 +86,7 @@ namespace IdentityService.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmailChange([FromQuery] string token, CancellationToken cancellationToken)
         {
-            await emailVerificationService.ConfirmEmailChangeAsync(token, cancellationToken);
+            await confirmEmailChangeUseCase.SendEmailChangeConfirmationAsync(token, cancellationToken);
 
             //@ add valid url to redirect
             //return Redirect("https://myfrontend.com/login");

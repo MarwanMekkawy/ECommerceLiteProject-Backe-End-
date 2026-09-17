@@ -5,11 +5,6 @@ using IdentityService.Application.DTOs.PwResetDTOs;
 using IdentityService.Domain.Contracts;
 using IdentityService.Domain.Entities;
 using IdentityService.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IdentityService.Application.Services
 {
@@ -19,7 +14,7 @@ namespace IdentityService.Application.Services
         #region //[helper methods]========================================================
         private bool IsStrongPassword(string password)
         {
-            return password.Any(char.IsUpper) && password.Any(char.IsLower) && password.Any(char.IsDigit) && password.Any(c => char.IsPunctuation(c) || char.IsSymbol(c)); ;
+            return password.Any(char.IsUpper) && password.Any(char.IsLower) && password.Any(char.IsDigit) && password.Any(c => char.IsPunctuation(c) || char.IsSymbol(c)); 
         }
         private void ValidatePassword(string Password, string ConfirmPassword)
         {
@@ -60,7 +55,7 @@ namespace IdentityService.Application.Services
         }
         #endregion ========================================================================
 
-        public async Task<GeneratePasswordResetDto> RequestPasswordResetAsync(ForgotPasswordDto dto, CancellationToken cancellationToken)
+        public async Task<GeneratePasswordResetDto?> RequestPasswordResetAsync(ForgotPasswordDto dto, CancellationToken cancellationToken)
         {
             var token = OTTService.GenerateToken();
             var hashedToken = OTTService.HashToken(token);
@@ -68,7 +63,7 @@ namespace IdentityService.Application.Services
 
             var user = await uow.users.GetByEmailAsync(normalizedEmail, cancellationToken);
             if (user == null)
-                return new GeneratePasswordResetDto();
+                return null;
 
             var passwordResetToken = new PasswordResetToken() { UserId = user.Id, TokenHash = hashedToken };
 
@@ -76,10 +71,10 @@ namespace IdentityService.Application.Services
             await uow.passwordResetTokens.AddAsync(passwordResetToken, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
 
-            return new GeneratePasswordResetDto() { Email = user.Email, Token = token };
+            return new GeneratePasswordResetDto() { UserId = user.Id, Email = user.Email, FirstName = user.FirstName, Token = token, ExpirationInMinutes = 1440 };
         }
 
-        public async Task ResetPasswordAndLogOutAllDevicesAsync(string token, ResetPasswordDto dto, CancellationToken cancellationToken)
+        public async Task<(Guid userId, string firstName, string Email)> ResetPasswordAndLogOutAllDevicesAsync(string token, ResetPasswordDto dto, CancellationToken cancellationToken)
         {
             var hashedToken = OTTService.HashToken(token);
             var newPassword = dto.NewPassword;
@@ -104,6 +99,8 @@ namespace IdentityService.Application.Services
             await refreshTokenService.RevokeAllUserRefreshTokensAsync(user.Id, cancellationToken);
 
             await uow.SaveChangesAsync(cancellationToken);
+
+            return (user.Id, user.FirstName, user.Email);
         }
     }
 }

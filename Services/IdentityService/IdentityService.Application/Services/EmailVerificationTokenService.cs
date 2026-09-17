@@ -58,7 +58,7 @@ namespace IdentityService.Application.Services
             return new GenerateVerificationEmailDto() { Email = user.Email, Token = token };
         }
 
-        public async Task<GenerateVerificationEmailDto> ResendVerificationEmailAsync(Guid userId, CancellationToken cancellationToken)
+        public async Task<(GenerateVerificationEmailDto dto,string firstName)> ResendVerificationEmailAsync(Guid userId, CancellationToken cancellationToken)
         {
             var user = await uow.users.GetByIdAsync(userId, cancellationToken);
             if (user == null)
@@ -72,7 +72,7 @@ namespace IdentityService.Application.Services
 
             user.StartVerificationEmailCooldown();
   
-            return await GenerateVerificationTokenAsync(user, cancellationToken);
+            return (await GenerateVerificationTokenAsync(user, cancellationToken),user.FirstName);
         }
 
         public async Task ConfirmEmailAsync(string token, CancellationToken cancellationToken)
@@ -93,7 +93,7 @@ namespace IdentityService.Application.Services
         }
 
         //Email Change
-        public async Task<string> GenerateEmailChangeTokenAsync(Guid userId, ChangeEmailRequestDto dto, CancellationToken cancellationToken)
+        public async Task<(string token,string firstName)> GenerateEmailChangeTokenAsync(Guid userId, ChangeEmailRequestDto dto, CancellationToken cancellationToken)
         {
             var token = OTTService.GenerateToken();
             var hashedToken = OTTService.HashToken(token);
@@ -127,10 +127,10 @@ namespace IdentityService.Application.Services
             await uow.emailChangeTokens.AddAsync(emailChangeToken, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
 
-            return token;
+            return (token,user.FirstName);
         }
 
-        public async Task ConfirmEmailChangeAsync(string token, CancellationToken cancellationToken)
+        public async Task<ConfirmEmailChangeDto> ConfirmEmailChangeAsync(string token, CancellationToken cancellationToken)
         {
             var hashedToken = OTTService.HashToken(token);
 
@@ -150,6 +150,8 @@ namespace IdentityService.Application.Services
             emailChangeToken.Confirm();      
             user.ChangeEmail(emailChangeToken.NewEmail);
             await uow.SaveChangesAsync(cancellationToken);
+
+            return new ConfirmEmailChangeDto { UserId = user.Id, OldEmail = user.Email, FirstName = user.FirstName, NewEmail = emailChangeToken.NewEmail };
         }
     }
 }

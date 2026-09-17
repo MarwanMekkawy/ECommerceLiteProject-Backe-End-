@@ -1,5 +1,5 @@
-﻿using Domain.Exceptions;
-using IdentityService.Application.Abstractions.ClientsAbstractions;
+﻿using IdentityService.Application.Abstractions.ClientsAbstractions;
+using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
 {
-    public class NotificationServiceClient(HttpClient httpClient, ISelfServiceClientService selfServiceClientService, IServiceTokenCache cache)  : INotificationServiceClient
+    public class NotificationServiceClient(HttpClient httpClient, ISelfServiceClientService selfServiceClientService, IServiceTokenCache cache, IConfiguration config)  : INotificationServiceClient
     {
         private async Task SendAsync(SendEmailNotificationRequestDto request, string token)
         {
@@ -37,7 +37,6 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
                 throw new Exception(error ?? $"NotificationService returned {(int)response.StatusCode} {response.StatusCode}");
             }
         }
-
         private async Task<string> GetTokenAsync(CancellationToken cancellationToken)
         {
             if (cache.Token is not null && cache.ExpiresAt is not null && cache.ExpiresAt > DateTimeOffset.UtcNow.AddSeconds(30))
@@ -56,9 +55,13 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
             return token;
         }
 
-        public async Task SendEmailConfirmationAsync(Guid userId, string recipientEmail, string firstName, string confirmationUrl, CancellationToken cancellationToken)
+        public async Task SendEmailConfirmationAsync(Guid userId, string recipientEmail, string firstName, string emailConfirmationToken, CancellationToken cancellationToken)
         {
             var token = await GetTokenAsync(cancellationToken);
+
+            var baseUrl = config["HttpClients:IdentityService:BaseUrl"];
+
+            var confirmationUrl = $"{baseUrl}/email/confirm?token={Uri.EscapeDataString(emailConfirmationToken)}";
 
             var request = new SendEmailNotificationRequestDto
             {
@@ -94,9 +97,14 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
             await SendAsync(request, token);
         }
 
-        public async Task SendPasswordResetAsync(Guid userId, string recipientEmail, string firstName, string resetUrl, int expirationMinutes, CancellationToken cancellationToken)
+        public async Task SendPasswordResetAsync(Guid userId, string recipientEmail, string firstName, string passwordResetToken, int expirationMinutes, CancellationToken cancellationToken)
         {
             var token = await GetTokenAsync(cancellationToken);
+
+            var baseUrl = config["HttpClients:IdentityService:BaseUrl"];
+
+            var resetUrl = $"{baseUrl}/password/reset?token={Uri.EscapeDataString(passwordResetToken)}";
+
 
             var request = new SendEmailNotificationRequestDto
             {

@@ -1,6 +1,7 @@
 ﻿using IdentityService.API.CookiesHelpers;
-using IdentityService.Application.Abstractions;
 using IdentityService.Application.DTOs.PwResetDTOs;
+using IdentityService.Application.UseCases.Password.ForgotPassword;
+using IdentityService.Application.UseCases.Password.ResetPassword;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +13,8 @@ namespace IdentityService.API.Controllers
     [Route("api/v1/password")]
     [ApiController]
     [AllowAnonymous]
-    public class PasswordController(IPasswordResetTokenService passwordService) : ControllerBase
+    public class PasswordController(IForgotPasswordVerificationUseCase forgotPasswordVerificationUseCase, IResetPasswordConfirmaionUseCase resetPasswordConfirmaionUseCase) 
+        : ControllerBase
     {
         /// <summary>
         /// Generates a password reset token for the specified email address.
@@ -23,15 +25,13 @@ namespace IdentityService.API.Controllers
         [HttpPost("forgot")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto, CancellationToken cancellationToken)
         {
-            var tokenResult = await passwordService.RequestPasswordResetAsync(dto, cancellationToken);
-
-            //@ send email with the token tokenResult:{email,token}
+            await forgotPasswordVerificationUseCase.ForgotPasswordAsync(dto, cancellationToken);
 
             //@ add valid url to redirect
             //return Redirect("https://myfrontend.com/resendemail");
 
             //@ for testing
-            return Ok(tokenResult);
+            return Ok();
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace IdentityService.API.Controllers
         [HttpPost("reset")]
         public async Task<IActionResult> ResetPassword(string token, ResetPasswordDto dto, CancellationToken cancellationToken)
         {
-            await passwordService.ResetPasswordAndLogOutAllDevicesAsync(token, dto, cancellationToken);
+            await resetPasswordConfirmaionUseCase.SendPasswordResetConfirmationAsync(token, dto, cancellationToken);
 
             CookieHelper.DeleteRefreshTokenCookie(Response);
 

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace IdentityService.Application.DTOs.PwResetDTOs
+﻿namespace IdentityService.Application.DTOs.PwResetDTOs
 {
     public class GeneratePasswordResetDto
     {
+        public Guid UserId { get; set; }
         public string Email { get; set; } = default!;
+        public string FirstName { get; set; } = default!;
+        public int ExpirationInMinutes { get; set; }
         public string Token { get; set; } = default!;
     }
 }

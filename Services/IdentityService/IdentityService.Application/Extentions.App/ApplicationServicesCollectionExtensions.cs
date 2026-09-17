@@ -2,6 +2,7 @@
 using IdentityService.Application.Abstractions.ClientsAbstractions;
 using IdentityService.Application.MappingProfiles;
 using IdentityService.Application.Services;
+using IdentityService.Application.UseCases.Auth.RegisterUser;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IdentityService.Application.Extentions.App
@@ -18,6 +19,10 @@ namespace IdentityService.Application.Extentions.App
             services.AddScoped<IServiceClientService, ServiceClientService>();
             services.AddScoped<ISelfServiceClientService, SelfServiceClientService>();
             services.AddScoped<ITokenCleanupService, TokenCleanupService>();
+
+            //usecases
+            services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
+
 
             services.AddAutoMapper(cfg => { cfg.AddMaps(typeof(AutoMapperMarker).Assembly); });
 

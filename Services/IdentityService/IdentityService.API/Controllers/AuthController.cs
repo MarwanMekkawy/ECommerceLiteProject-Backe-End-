@@ -3,6 +3,7 @@ using IdentityService.Application.Abstractions;
 using IdentityService.Application.Abstractions.ClientsAbstractions;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.DTOs.AuthDTOs;
+using IdentityService.Application.UseCases.Auth.RegisterUser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,8 +15,8 @@ namespace IdentityService.API.Controllers
     [Route("api/v1/auth")]
     [ApiController]
     [AllowAnonymous]
-    public class AuthController(IAuthService authService, IServiceClientService clientService, IEmailVerificationTokenService emailVerification)
-        : ControllerBase
+    public class AuthController
+        (IAuthService authService, IServiceClientService clientService, IRegisterUserUseCase registerUserUseCase) : ControllerBase
     {
         /// <summary>
         /// Registers a new user account.
@@ -26,14 +27,9 @@ namespace IdentityService.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto dto, CancellationToken cancellationToken)
         {
-            var registerResultUserId = await authService.RegisterAsync(dto, cancellationToken);
+            await registerUserUseCase.RegisterAsync(dto, cancellationToken);
 
-            var emailVerificationTokenResult = await emailVerification.GenerateVerificationTokenAsync(registerResultUserId.userId, cancellationToken);
-
-            //@ generate email confirm token and call endpoint to send email with it 
-
-            //@ for testing
-            return Ok(new { registerResultUserId, emailVerificationTokenResult });
+            return Ok();
         }
 
         /// <summary>
