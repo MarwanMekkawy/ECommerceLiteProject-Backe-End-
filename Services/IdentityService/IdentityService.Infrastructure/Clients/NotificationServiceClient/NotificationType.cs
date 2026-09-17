@@ -4,6 +4,7 @@
     {
         EmailConfirmation,
         PasswordReset,
+        EmailChangeConfirmation,
         EmailChanged,
         PasswordChanged
     }

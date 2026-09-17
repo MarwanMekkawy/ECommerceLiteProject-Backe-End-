@@ -7,11 +7,12 @@ using System.Text.Json;
 
 namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
 {
-    public class NotificationServiceClient(HttpClient httpClient, ISelfServiceClientService selfServiceClientService, IServiceTokenCache cache, IConfiguration config)  : INotificationServiceClient
+    public class NotificationServiceClient(HttpClient httpClient, ISelfServiceClientService selfServiceClientService, IServiceTokenCache cache, IConfiguration config)  
+        : INotificationServiceClient
     {
         private async Task SendAsync(SendEmailNotificationRequestDto request, string token)
         {
-            using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "notifications");
+            using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "notifications/internal");
 
             httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -61,7 +62,7 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
 
             var baseUrl = config["HttpClients:IdentityService:BaseUrl"];
 
-            var confirmationUrl = $"{baseUrl}/email/confirm?token={Uri.EscapeDataString(emailConfirmationToken)}";
+            var confirmationUrl = $"{baseUrl}email/confirm?token={Uri.EscapeDataString(emailConfirmationToken)}";
 
             var request = new SendEmailNotificationRequestDto
             {
@@ -72,6 +73,31 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
                 {
                     ["firstName"] = firstName,
                     ["confirmationUrl"] = confirmationUrl
+                }
+            };
+
+            await SendAsync(request, token);
+        }
+        public async Task SendEmailChangeConfirmationAsync
+            (Guid userId, string recipientEmail, string firstName, string newEmail, string emailChangeToken, int expirationMinutes, CancellationToken cancellationToken)
+        {
+            var token = await GetTokenAsync(cancellationToken);
+
+            var baseUrl = config["HttpClients:IdentityService:BaseUrl"];
+
+            var confirmationUrl = $"{baseUrl}email/confirm-change?token={Uri.EscapeDataString(emailChangeToken)}";
+
+            var request = new SendEmailNotificationRequestDto
+            {
+                UserId = userId,
+                RecipientEmail = recipientEmail,
+                Type = NotificationType.EmailChangeConfirmation,
+                Data = new Dictionary<string, object>
+                {
+                    ["firstName"] = firstName,
+                    ["newEmail"] = newEmail,
+                    ["confirmationUrl"] = confirmationUrl,
+                    ["expirationMinutes"] = expirationMinutes
                 }
             };
 
@@ -103,7 +129,7 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
 
             var baseUrl = config["HttpClients:IdentityService:BaseUrl"];
 
-            var resetUrl = $"{baseUrl}/password/reset?token={Uri.EscapeDataString(passwordResetToken)}";
+            var resetUrl = $"{baseUrl}password/reset?token={Uri.EscapeDataString(passwordResetToken)}";
 
 
             var request = new SendEmailNotificationRequestDto

@@ -3,9 +3,11 @@
     public static class MailjetTemplateIds
     {
         public const int EmailConfirmation = 8334054;
-        public const int PasswordReset = 8334013;
-        public const int EmailChanged = 8334094;
+        public const int PasswordReset = 8334058;
+        public const int EmailChangeConfirmation = 8359278;
+        public const int EmailChanged = 8334013;
         public const int PasswordChanged = 8334094;
+
 
         public const int OrderConfirmed = 8334096;
         public const int OrderCompleted = 8334180;

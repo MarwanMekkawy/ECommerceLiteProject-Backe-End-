@@ -9,7 +9,7 @@ namespace IdentityService.Application.Services
         public async Task<string> SelfAuthinticateAsync(CancellationToken cancellationToken)
         {
             var self = await uow.serviceClients.GetByClientIdAsync("Identity-Service", cancellationToken) 
-                ?? throw new InvalidOperationException("Identity service has no ServiceClient record for itself.");
+                ?? throw new InvalidOperationException("Identity service has no ServiceClient record for itself in the Db.");
 
             return jwt.GenerateAccessTokenForClient(self);
         }

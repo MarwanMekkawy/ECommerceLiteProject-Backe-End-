@@ -87,7 +87,7 @@ namespace IdentityService.Application.Services
             await uow.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task ChangePasswordAndLogOutAllDevicesAsync(Guid userId, ChangePasswordDto dto, CancellationToken cancellationToken)
+        public async Task<(string email, string firstName)> ChangePasswordAndLogOutAllDevicesAsync(Guid userId, ChangePasswordDto dto, CancellationToken cancellationToken)
         {
             var user = await GetUserOrThrowAsync(admin: false, userId, cancellationToken);
 
@@ -101,6 +101,8 @@ namespace IdentityService.Application.Services
             user.ChangePassword(hasher.Hash(dto.NewPassword));
             await refreshTokenService.RevokeAllUserRefreshTokensAsync(userId, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
+
+            return (user.Email,user.FirstName);
         }
 
         public async Task DeactivateAccountAndLogOutAllDevicesAsync(Guid userId, CancellationToken cancellationToken)

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using NotificationService.Domain.Enums;
 using NotificationService.Infrastructure.Clients.MailjetClient.Templates;
+using System.Text.Json;
 using IMailjetClient = NotificationService.Application.Abstractions.IMailjetClient;
 
 namespace NotificationService.Infrastructure.Clients.MailjetClient
@@ -18,6 +19,7 @@ namespace NotificationService.Infrastructure.Clients.MailjetClient
             {
                 NotificationType.EmailConfirmation => MailjetTemplateIds.EmailConfirmation,
                 NotificationType.PasswordReset => MailjetTemplateIds.PasswordReset,
+                NotificationType.EmailChangeConfirmation => MailjetTemplateIds.EmailChangeConfirmation,
                 NotificationType.EmailChanged => MailjetTemplateIds.EmailChanged,
                 NotificationType.PasswordChanged => MailjetTemplateIds.PasswordChanged,
                 NotificationType.OrderConfirmed => MailjetTemplateIds.OrderConfirmed,
@@ -51,7 +53,20 @@ namespace NotificationService.Infrastructure.Clients.MailjetClient
 
             if (variables is not null)
             {
-                message["Variables"] = JObject.FromObject(variables);
+                var variablesObject = new JObject();
+
+                foreach (var variable in variables)
+                {
+                    if (variable.Value is JsonElement jsonElement)
+                    {
+                        variablesObject[variable.Key] = JToken.Parse(jsonElement.GetRawText());
+                    }
+                    else
+                    {
+                        variablesObject[variable.Key] = JToken.FromObject(variable.Value);
+                    }
+                }
+                message["Variables"] = variablesObject;
             }
 
             var request = new MailjetRequest { Resource = SendV31.Resource };

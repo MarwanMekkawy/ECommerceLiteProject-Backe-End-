@@ -12,7 +12,7 @@ namespace IdentityService.Application.Abstractions
     {
         Task<UserDto> GetCurrentUserAsync(Guid userId, CancellationToken cancellationToken);
         Task UpdateProfileAsync(Guid userId, UpdateUserDto dto, CancellationToken cancellationToken);
-        Task ChangePasswordAndLogOutAllDevicesAsync(Guid userId, ChangePasswordDto dto, CancellationToken cancellationToken);
+        Task<(string email, string firstName)> ChangePasswordAndLogOutAllDevicesAsync(Guid userId, ChangePasswordDto dto, CancellationToken cancellationToken);
         Task DeactivateAccountAndLogOutAllDevicesAsync(Guid userId, CancellationToken cancellationToken);
 
         // Admin

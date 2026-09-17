@@ -1,5 +1,4 @@
 ﻿using NotificationService.Domain.Enums;
-using NotificationService.Domain.ValueObjects;
 
 namespace NotificationService.Application.DTOs
 {

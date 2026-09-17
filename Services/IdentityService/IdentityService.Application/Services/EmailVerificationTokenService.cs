@@ -93,7 +93,7 @@ namespace IdentityService.Application.Services
         }
 
         //Email Change
-        public async Task<(string token,string firstName)> GenerateEmailChangeTokenAsync(Guid userId, ChangeEmailRequestDto dto, CancellationToken cancellationToken)
+        public async Task<(string token,string firstName,string oldEmail)> GenerateEmailChangeTokenAsync(Guid userId, ChangeEmailRequestDto dto, CancellationToken cancellationToken)
         {
             var token = OTTService.GenerateToken();
             var hashedToken = OTTService.HashToken(token);
@@ -127,7 +127,7 @@ namespace IdentityService.Application.Services
             await uow.emailChangeTokens.AddAsync(emailChangeToken, cancellationToken);
             await uow.SaveChangesAsync(cancellationToken);
 
-            return (token,user.FirstName);
+            return (token, user.FirstName, user.Email);
         }
 
         public async Task<ConfirmEmailChangeDto> ConfirmEmailChangeAsync(string token, CancellationToken cancellationToken)

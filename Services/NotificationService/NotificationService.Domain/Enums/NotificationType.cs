@@ -5,6 +5,7 @@
         // Identity
         EmailConfirmation,
         PasswordReset,
+        EmailChangeConfirmation,
         EmailChanged,
         PasswordChanged,
 

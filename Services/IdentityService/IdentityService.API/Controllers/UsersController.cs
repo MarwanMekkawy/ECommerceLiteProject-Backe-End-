@@ -2,6 +2,7 @@
 using IdentityService.API.CookiesHelpers;
 using IdentityService.Application.Abstractions;
 using IdentityService.Application.DTOs.UserDTOs;
+using IdentityService.Application.UseCases.User.ChangePassword;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +14,7 @@ namespace IdentityService.API.Controllers
     [Route("api/v1/users")]
     [ApiController]
     [Authorize]
-    public class UsersController(IUserService userService) : ControllerBase
+    public class UsersController(IUserService userService, IPasswordChangedConfirmationUseCase passwordChangedConfirmationUseCase) : ControllerBase
     {
         /// <summary>
         /// Retrieves the profile of the currently authenticated user.
@@ -76,7 +77,7 @@ namespace IdentityService.API.Controllers
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 
-            await userService.ChangePasswordAndLogOutAllDevicesAsync(claims.UserId, dto, cancellationToken);
+            await passwordChangedConfirmationUseCase.SendPasswordResetConfirmationAsync(claims.UserId, dto, cancellationToken);
 
             CookieHelper.DeleteRefreshTokenCookie(Response);
 

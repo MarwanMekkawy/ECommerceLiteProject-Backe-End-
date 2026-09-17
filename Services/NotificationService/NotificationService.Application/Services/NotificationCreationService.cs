@@ -16,6 +16,7 @@ namespace NotificationService.Application.Services
             {
                 NotificationType.EmailConfirmation => "email Confirmation",
                 NotificationType.PasswordReset => "password Reset",
+                NotificationType.EmailChangeConfirmation => "email change Confirmation",
                 NotificationType.EmailChanged => "changing Email address",
                 NotificationType.PasswordChanged => "changing Password",
                 NotificationType.OrderConfirmed => "Order confirmed",

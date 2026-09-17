@@ -10,7 +10,7 @@ namespace IdentityService.Application.UseCases.Email.ChangeEmail
         {
             var tokenResult = await emailVerificationService.GenerateEmailChangeTokenAsync(userId, dto, cancellationToken);
 
-            await notificationsClient.SendEmailConfirmationAsync(userId, dto.NewEmail, tokenResult.firstName, tokenResult.token, cancellationToken);
+            await notificationsClient.SendEmailChangeConfirmationAsync(userId, dto.NewEmail, tokenResult.firstName, dto.NewEmail, tokenResult.token, 1440, cancellationToken);
         }
     }
 }
