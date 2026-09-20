@@ -6,6 +6,7 @@ using IdentityService.Application.UseCases.Email.ConfirmEmailChange;
 using IdentityService.Application.UseCases.Email.ResendVerification;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace IdentityService.API.Controllers
 {
@@ -19,7 +20,8 @@ namespace IdentityService.API.Controllers
         (IEmailVerificationTokenService emailVerificationService, 
         IResendEamilVerificationUseCase  resendEamilVerificationUseCase, 
         IChangeEmailVerificationUseCase changeEmailVerificationUseCase,
-        IConfirmEmailChangeUseCase confirmEmailChangeUseCase) : ControllerBase
+        IConfirmEmailChangeUseCase confirmEmailChangeUseCase,
+        IConfiguration config) : ControllerBase
     {
         /// <summary>
         /// Confirms a user's email address using a verification token.
@@ -34,10 +36,10 @@ namespace IdentityService.API.Controllers
             await emailVerificationService.ConfirmEmailAsync(token, cancellationToken);
 
             //@ add valid url to redirect
-            //return Redirect("https://myfrontend.com/login");
+            return Redirect($"{config["FrontendBaseUrlForRedirect"]}/login");
 
             //@ for testing
-            return Ok("confirmed");
+            //return Ok("confirmed");
         }
 
         /// <summary>
@@ -70,7 +72,7 @@ namespace IdentityService.API.Controllers
             await changeEmailVerificationUseCase.EmailChangeAsync(claims.UserId, dto, cancellationToken);
 
             //@ add valid url to redirect
-            //return Redirect("https://myfrontend.com/resendemail");
+            //return Redirect($"{config["FrontendBaseUrlForRedirect"]}/resendemail");
 
             //@ for testing
             return Ok();
@@ -82,17 +84,17 @@ namespace IdentityService.API.Controllers
         /// <param name="token">The email change verification token.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>Redirects the user to the frontend after the email address has been updated.</returns>
-        [HttpPost("confirm-change")]
+        [HttpGet("confirm-change")]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmailChange([FromQuery] string token, CancellationToken cancellationToken)
         {
             await confirmEmailChangeUseCase.SendEmailChangeConfirmationAsync(token, cancellationToken);
 
             //@ add valid url to redirect
-            //return Redirect("https://myfrontend.com/login");
+            return Redirect($"{config["FrontendBaseUrlForRedirect"]}/login");
 
             //@ for testing
-            return Ok();
+            //return Ok();
         }
     }
 }

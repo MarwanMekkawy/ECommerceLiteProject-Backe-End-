@@ -13,8 +13,8 @@ namespace IdentityService.API.Controllers
     [Route("api/v1/password")]
     [ApiController]
     [AllowAnonymous]
-    public class PasswordController(IForgotPasswordVerificationUseCase forgotPasswordVerificationUseCase, IResetPasswordConfirmaionUseCase resetPasswordConfirmaionUseCase) 
-        : ControllerBase
+    public class PasswordController
+        (IForgotPasswordVerificationUseCase forgotPasswordVerificationUseCase, IResetPasswordConfirmaionUseCase resetPasswordConfirmaionUseCase, IConfiguration config) : ControllerBase
     {
         /// <summary>
         /// Generates a password reset token for the specified email address.
@@ -28,7 +28,7 @@ namespace IdentityService.API.Controllers
             await forgotPasswordVerificationUseCase.ForgotPasswordAsync(dto, cancellationToken);
 
             //@ add valid url to redirect
-            //return Redirect("https://myfrontend.com/resendemail");
+            //return Redirect($"{config["FrontendBaseUrlForRedirect"]}/resendemail");
 
             //@ for testing
             return Ok();
@@ -42,14 +42,14 @@ namespace IdentityService.API.Controllers
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>Redirects the user after the password has been successfully reset.</returns>
         [HttpPost("reset")]
-        public async Task<IActionResult> ResetPassword(string token, ResetPasswordDto dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> ResetPassword([FromQuery] string token, ResetPasswordDto dto, CancellationToken cancellationToken)
         {
             await resetPasswordConfirmaionUseCase.SendPasswordResetConfirmationAsync(token, dto, cancellationToken);
 
             CookieHelper.DeleteRefreshTokenCookie(Response);
 
             //@ add valid url to redirect
-            //return Redirect("https://myfrontend.com/login");
+            //return Redirect($"{config["FrontendBaseUrlForRedirect"]}/login");
 
             //@ for testing
             return Ok();

@@ -146,12 +146,13 @@ namespace IdentityService.Application.Services
             if (user == null)
                 throw new NotFoundException("the user that you are trying to change email for is not found");
 
+            var oldEmail = user.Email;
 
             emailChangeToken.Confirm();      
             user.ChangeEmail(emailChangeToken.NewEmail);
             await uow.SaveChangesAsync(cancellationToken);
 
-            return new ConfirmEmailChangeDto { UserId = user.Id, OldEmail = user.Email, FirstName = user.FirstName, NewEmail = emailChangeToken.NewEmail };
+            return new ConfirmEmailChangeDto { UserId = user.Id, OldEmail = oldEmail, FirstName = user.FirstName, NewEmail = emailChangeToken.NewEmail };
         }
     }
 }

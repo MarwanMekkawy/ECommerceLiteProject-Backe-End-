@@ -14,11 +14,11 @@ namespace NotificationService.Application.Services
         {
             var subject = request.Type switch
             {
-                NotificationType.EmailConfirmation => "email Confirmation",
+                NotificationType.EmailConfirmation => "Email Confirmation",
                 NotificationType.PasswordReset => "password Reset",
-                NotificationType.EmailChangeConfirmation => "email change Confirmation",
-                NotificationType.EmailChanged => "changing Email address",
-                NotificationType.PasswordChanged => "changing Password",
+                NotificationType.EmailChangeConfirmation => "Email change Confirmation",
+                NotificationType.EmailChanged => "Email address Was Changed",
+                NotificationType.PasswordChanged => "Password Was Changed",
                 NotificationType.OrderConfirmed => "Order confirmed",
                 NotificationType.OrderCompleted => "Order completed",
                 NotificationType.OrderCancelled => "Order cancelled",
