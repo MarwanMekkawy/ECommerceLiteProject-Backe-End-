@@ -14,7 +14,7 @@ namespace OrderService.Application.Tests
         public async Task Handle_ShouldReturnOrders()
         {
             // Arrange
-            var orders = new List<Order> { new Order(Guid.NewGuid()), new Order(Guid.NewGuid()) };
+            var orders = new List<Order> { new Order(Guid.NewGuid(), "example@gmail.com"), new Order(Guid.NewGuid(), "example@gmail.com") };
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetPagedAsync(1, 10, It.IsAny<CancellationToken>())).ReturnsAsync(orders);
 

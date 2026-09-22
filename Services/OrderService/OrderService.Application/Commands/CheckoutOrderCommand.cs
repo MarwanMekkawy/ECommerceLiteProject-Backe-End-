@@ -7,11 +7,13 @@ namespace OrderService.Application.Commands
     {
         public Guid OrderId { get; }
         public Guid UserId { get; }
+        public string UserName { get; }
 
-        public CheckoutOrderCommand(Guid userId, Guid orderId)
+        public CheckoutOrderCommand(Guid userId, Guid orderId, string username)
         {
             UserId = userId;
             OrderId = orderId;
+            UserName = username;
         }
     }
 }

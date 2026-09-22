@@ -20,7 +20,7 @@ namespace OrderService.Application.Tests
             // Arrange
             var productId = Guid.NewGuid();
 
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
 
             order.AddItem(productId, 2);
 
@@ -62,7 +62,7 @@ namespace OrderService.Application.Tests
             var productId1 = Guid.NewGuid();
             var productId2 = Guid.NewGuid();
 
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
 
             order.AddItem(productId1, 2);
             order.AddItem(productId2, 5);
@@ -129,7 +129,7 @@ namespace OrderService.Application.Tests
             // Arrange
             var productId = Guid.NewGuid();
 
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
 
             order.AddItem(productId, 2);
 

@@ -14,7 +14,7 @@ namespace OrderService.Application.Tests
         public async Task Handle_ShouldReturnOrder_WhenOrderExists()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetByIdUnTrackedAsync(order.Id, It.IsAny<CancellationToken>())).ReturnsAsync(order);
 

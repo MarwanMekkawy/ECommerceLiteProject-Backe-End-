@@ -11,8 +11,9 @@ namespace OrderService.Domain.Tests
         public void Constructor_ShouldThrow_WhenUserIdIsEmpty()
         {
             var userId = Guid.Empty;
+            var email = "example@gmail.com";
 
-            var action = () => new Order(userId);
+            var action = () => new Order(userId, email);
 
             Assert.Throws<InvalidOrderException>(action);
         }
@@ -20,7 +21,7 @@ namespace OrderService.Domain.Tests
         [Fact]
         public void AddItem_ShouldThrow_WhenProductIdIsEmpty()
         {
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
 
             var action = () => order.AddItem(Guid.Empty, 1);
 
@@ -30,7 +31,7 @@ namespace OrderService.Domain.Tests
         [Fact]
         public void AddItem_ShouldIncreaseQuantity_WhenItemExists()
         {
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
@@ -44,7 +45,7 @@ namespace OrderService.Domain.Tests
         [Fact]
         public void AddItem_ShouldThrow_WhenQuantityIsZero()
         {
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
 
             var action = () => order.AddItem(productId, 0);
@@ -55,7 +56,7 @@ namespace OrderService.Domain.Tests
         [Fact]
         public void AddItem_ShouldThrow_WhenQuantityIsNegative()
         {
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
 
             var action = () => order.AddItem(productId, -1);
@@ -67,8 +68,9 @@ namespace OrderService.Domain.Tests
         public void CreateOrder_ShouldCreatePendingOrder_WhenUserIdIsValid()
         {
             var userId = Guid.NewGuid();
+            var email = "example@gmail.com";
 
-            var order = new Order(userId);
+            var order = new Order(userId, email);
 
             Assert.Equal(userId, order.UserId);
             Assert.Equal(OrderStatus.Pending, order.Status);
@@ -80,8 +82,9 @@ namespace OrderService.Domain.Tests
         {
             var userId = Guid.NewGuid();
             var productId = Guid.NewGuid();
+            var email = "example@gmail.com";
 
-            var order = new Order(userId);
+            var order = new Order(userId, email);
             order.AddItem(productId, 2);
 
             Assert.Equal(1, order.Items.Count(x => x.ProductId == productId));
@@ -92,7 +95,7 @@ namespace OrderService.Domain.Tests
         public void Confirm_ShouldChangeStatusToConfirmed_WhenOrderIsPending()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
@@ -116,7 +119,7 @@ namespace OrderService.Domain.Tests
         public void Confirm_ShouldSnapshotItemPrice_WhenOrderIsPending()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
@@ -139,7 +142,7 @@ namespace OrderService.Domain.Tests
         public void Confirm_ShouldSetPaymentExpirationToThreeDays_WhenOrderIsPending()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
@@ -161,7 +164,7 @@ namespace OrderService.Domain.Tests
         public void Confirm_ShouldThrow_WhenOrderHasNoItems()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>();
 
             // Act & Assert
@@ -172,7 +175,7 @@ namespace OrderService.Domain.Tests
         public void Confirm_ShouldThrow_WhenOrderIsAlreadyConfirmed()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
@@ -191,7 +194,7 @@ namespace OrderService.Domain.Tests
         public void Confirm_ShouldThrow_WhenOrderIsCompleted()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
@@ -211,7 +214,7 @@ namespace OrderService.Domain.Tests
         public void Confirm_ShouldThrow_WhenOrderIsCancelled()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             order.Cancel();
 
             var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>();
@@ -224,7 +227,7 @@ namespace OrderService.Domain.Tests
         public void Complete_ShouldChangeStatusToCompleted_WhenOrderIsConfirmed()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
@@ -246,7 +249,7 @@ namespace OrderService.Domain.Tests
         public void Complete_ShouldDoNothing_WhenOrderIsPending()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
 
             // Act
             order.Complete();
@@ -259,7 +262,7 @@ namespace OrderService.Domain.Tests
         public void Complete_ShouldDoNothing_WhenOrderIsCancelled()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             order.Cancel();
 
             // Act
@@ -273,7 +276,7 @@ namespace OrderService.Domain.Tests
         public void Complete_ShouldDoNothing_WhenOrderIsAlreadyCompleted()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
@@ -296,7 +299,7 @@ namespace OrderService.Domain.Tests
         public void Cancel_ShouldChangeStatusToCancelled_WhenOrderIsPending()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
 
             // Act
             order.Cancel();
@@ -309,7 +312,7 @@ namespace OrderService.Domain.Tests
         public void Cancel_ShouldChangeStatusToCancelled_WhenOrderIsConfirmed()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
@@ -331,7 +334,7 @@ namespace OrderService.Domain.Tests
         public void Cancel_ShouldThrow_WhenOrderIsAlreadyCompleted()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
@@ -351,7 +354,7 @@ namespace OrderService.Domain.Tests
         public void Cancel_ShouldThrow_WhenOrderIsAlreadyCancelled()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             order.Cancel();
 
             // Act & Assert
@@ -362,7 +365,7 @@ namespace OrderService.Domain.Tests
         public void RemoveItem_ShouldDecreaseQuantity_WhenQuantityIsLessThanCurrentQuantity()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
 
             order.AddItem(productId, 5);
@@ -380,7 +383,7 @@ namespace OrderService.Domain.Tests
         public void RemoveItem_ShouldRemoveItem_WhenQuantityReachesZero()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
 
             order.AddItem(productId, 2);
@@ -396,7 +399,7 @@ namespace OrderService.Domain.Tests
         public void RemoveItem_ShouldThrow_WhenProductDoesNotExist()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
 
             // Act & Assert
             Assert.Throws<InvalidOrderItemException>(() => order.DecreaseItem(Guid.NewGuid(), 1));
@@ -406,7 +409,7 @@ namespace OrderService.Domain.Tests
         public void RemoveItem_ShouldThrow_WhenQuantityIsGreaterThanCurrentQuantity()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
 
             order.AddItem(productId, 2);
@@ -419,7 +422,7 @@ namespace OrderService.Domain.Tests
         public void RemoveItem_ShouldThrow_WhenOrderIsNotPending()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
 
             order.AddItem(productId, 2);

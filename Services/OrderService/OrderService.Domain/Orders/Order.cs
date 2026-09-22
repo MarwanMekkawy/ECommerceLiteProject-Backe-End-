@@ -11,6 +11,7 @@ namespace OrderService.Domain.Orders
 
         public Guid Id { get; private set; }
         public Guid UserId { get; private set; }
+        public string CustomerEmail { get; private set; }
         public OrderStatus Status { get; private set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public decimal Total { get; private set; }
@@ -23,13 +24,14 @@ namespace OrderService.Domain.Orders
 
         private Order() { }
 
-        public Order(Guid userId)
+        public Order(Guid userId,string customerEmail)
         {
             if (userId == Guid.Empty)
                 throw new InvalidOrderException("User ID is required.");
 
             Id = Guid.NewGuid();
             UserId = userId;
+            CustomerEmail = customerEmail;
             Status = OrderStatus.Pending;
         }
 

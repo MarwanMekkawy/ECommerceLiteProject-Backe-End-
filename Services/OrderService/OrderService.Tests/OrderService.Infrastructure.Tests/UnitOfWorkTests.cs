@@ -22,7 +22,7 @@ namespace OrderService.Infrastructure.Tests
 
             await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
 
             context.Orders.Add(order);
 

@@ -15,8 +15,9 @@ namespace OrderService.Application.Tests
             // Arrange
             var userId = Guid.NewGuid();
             var productId = Guid.NewGuid();
+            var email = "example@gmail.com";
 
-            var order = new Order(userId);
+            var order = new Order(userId, email);
 
             var repository = new Mock<IOrderRepository>();
 
@@ -26,7 +27,7 @@ namespace OrderService.Application.Tests
 
             var handler = new AddOrderItemCommandHandler(repository.Object, uow.Object);
 
-            var command = new AddOrderItemCommand(userId, productId, 2);
+            var command = new AddOrderItemCommand(userId, email, productId, 2);
 
             // Act
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
@@ -47,6 +48,7 @@ namespace OrderService.Application.Tests
             // Arrange
             var userId = Guid.NewGuid();
             var productId = Guid.NewGuid();
+            var email = "example@gmail.com";
 
             var repository = new Mock<IOrderRepository>();
 
@@ -56,7 +58,7 @@ namespace OrderService.Application.Tests
 
             var handler = new AddOrderItemCommandHandler(repository.Object, uow.Object);
 
-            var command = new AddOrderItemCommand(userId, productId, 2);
+            var command = new AddOrderItemCommand(userId, email, productId, 2);
 
             // Act
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
@@ -66,6 +68,7 @@ namespace OrderService.Application.Tests
                 x => x.AddAsync(
                     It.Is<Order>(o =>
                         o.UserId == userId &&
+                        o.CustomerEmail == email &&
                         o.Status == OrderStatus.Pending &&
                         o.Items.Count == 1 &&
                         o.Items.First().ProductId == productId &&
@@ -83,8 +86,9 @@ namespace OrderService.Application.Tests
             // Arrange
             var userId = Guid.NewGuid();
             var productId = Guid.NewGuid();
+            var email = "example@gmail.com";
 
-            var order = new Order(userId);
+            var order = new Order(userId, email);
             order.AddItem(productId, 2);
 
             var repository = new Mock<IOrderRepository>();
@@ -95,7 +99,7 @@ namespace OrderService.Application.Tests
 
             var handler = new AddOrderItemCommandHandler(repository.Object, uow.Object);
 
-            var command = new AddOrderItemCommand(userId, productId, 3);
+            var command = new AddOrderItemCommand(userId, email, productId, 3);
 
             // Act
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);

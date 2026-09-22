@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - orderService
+      - main
 
   pull_request:
     types:

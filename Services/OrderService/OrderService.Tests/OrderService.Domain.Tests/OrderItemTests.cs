@@ -61,7 +61,7 @@ namespace OrderService.Domain.Tests
         public void AddItem_ShouldIncreaseQuantity_WhenProductAlreadyExists()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
 
             order.AddItem(productId, 2);

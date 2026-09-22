@@ -102,7 +102,7 @@ namespace OrderService.API.Controllers
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 
-            var command = new CreateOrderCommand(claims.UserId, items);
+            var command = new CreateOrderCommand(claims.UserId, claims.UserEmail, items);
 
             await createOrderHandler.HandleAsync(command, cancellationToken);
 
@@ -123,7 +123,7 @@ namespace OrderService.API.Controllers
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 
-            var command = new AddOrderItemCommand(claims.UserId, item.ProductId, item.Quantity);
+            var command = new AddOrderItemCommand(claims.UserId,claims.UserEmail, item.ProductId, item.Quantity);
 
             await addOrderItemHandler.HandleAsync(command, cancellationToken);
 
@@ -188,7 +188,7 @@ namespace OrderService.API.Controllers
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 
-            var command = new CheckoutOrderCommand(claims.UserId, orderId);
+            var command = new CheckoutOrderCommand(claims.UserId, orderId, claims.UserName);
 
             var result = await checkoutOrderHandler.HandleAsync(command, cancellationToken);
 

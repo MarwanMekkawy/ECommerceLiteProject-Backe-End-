@@ -15,7 +15,7 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var orders = new List<Order> { new Order(userId), new Order(userId) };
+            var orders = new List<Order> { new Order(userId, "example@gmail.com"), new Order(userId, "example@gmail.com") };
             var repository = new Mock<IOrderRepository>();
 
             repository.Setup(x => x.GetPagedByUserIdAsync(userId, 1, 10, It.IsAny<CancellationToken>())).ReturnsAsync(orders);
@@ -78,6 +78,5 @@ namespace OrderService.Application.Tests
             // Assert
             repository.Verify(x => x.GetPagedByUserIdAsync(userId, 2, 5, It.IsAny<CancellationToken>()), Times.Once);
         }
-
     }
 }

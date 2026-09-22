@@ -15,8 +15,9 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
+            var email = "example@gmail.com";
 
-            var order = new Order(userId);
+            var order = new Order(userId, email);
 
             var repository = new Mock<IOrderRepository>();
 

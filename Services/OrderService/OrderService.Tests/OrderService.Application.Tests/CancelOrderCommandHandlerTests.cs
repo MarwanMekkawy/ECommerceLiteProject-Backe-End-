@@ -17,7 +17,8 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
 
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetByIdAndUserIdTrackedAsync(order.Id, userId, It.IsAny<CancellationToken>())).ReturnsAsync(order);
@@ -59,7 +60,8 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
             var productId = Guid.NewGuid();
 
             order.AddItem(productId, 1);

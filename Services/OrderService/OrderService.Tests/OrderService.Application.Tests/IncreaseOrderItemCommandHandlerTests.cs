@@ -15,7 +15,8 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
             var productId = Guid.NewGuid();
 
             order.AddItem(productId, 2);
@@ -38,7 +39,6 @@ namespace OrderService.Application.Tests
 
             uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
-
 
         [Fact]
         public async Task Handle_ShouldThrow_WhenOrderDoesNotExist()
@@ -64,13 +64,13 @@ namespace OrderService.Application.Tests
             uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
-
         [Fact]
         public async Task Handle_ShouldThrow_WhenProductDoesNotExistInOrder()
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
 
             var existingProductId = Guid.NewGuid();
             var requestedProductId = Guid.NewGuid();
@@ -93,13 +93,13 @@ namespace OrderService.Application.Tests
             uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
-
         [Fact]
         public async Task Handle_ShouldPropagateDomainException_WhenQuantityIsInvalid()
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
             var productId = Guid.NewGuid();
 
             order.AddItem(productId, 2);

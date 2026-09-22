@@ -3,7 +3,6 @@ using Moq;
 using OrderService.Application.Commands;
 using OrderService.Domain.Contracts;
 using OrderService.Domain.Enums;
-using OrderService.Domain.Exceptions.DomainExceptions;
 using OrderService.Domain.Orders;
 using Xunit;
 
@@ -15,7 +14,7 @@ namespace OrderService.Application.Tests
         public async Task Handle_ShouldCompleteOrder_WhenOrderIsConfirmed()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
@@ -59,7 +58,7 @@ namespace OrderService.Application.Tests
         public async Task Handle_ShouldThrowConflictException_WhenOrderIsCancelledDueToExpiry()
         {
             // Arrange
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             order.AddItem(Guid.NewGuid(), 1);
 
             var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>

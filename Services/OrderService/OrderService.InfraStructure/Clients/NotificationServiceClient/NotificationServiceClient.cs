@@ -34,7 +34,7 @@ namespace OrderService.InfraStructure.Clients.NotificationServiceClient
             }
         }
 
-        public async Task SendOrderConfirmedAsync(Guid userId, string recipientEmail, string firstName, Guid orderId, decimal total, string currency, DateTime paymentExpiresAt, CancellationToken cancellationToken)
+        public async Task SendOrderConfirmedAsync(Guid userId, string recipientEmail, string userName, Guid orderId, decimal total, string currency, DateTime paymentExpiresAt, CancellationToken cancellationToken)
         {
             var token = await serviceTokenClient.GetTokenAsync(cancellationToken);
 
@@ -45,7 +45,7 @@ namespace OrderService.InfraStructure.Clients.NotificationServiceClient
                 Type = NotificationType.OrderConfirmed,
                 Data = new Dictionary<string, object>
                 {
-                    ["firstName"] = firstName,
+                    ["firstName"] = userName,
                     ["orderId"] = orderId,
                     ["total"] = total,
                     ["currency"] = currency,

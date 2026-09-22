@@ -18,7 +18,8 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId,email);
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
@@ -92,7 +93,8 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
             order.Cancel();
 
             var command = new CheckoutOrderCommand(userId, order.Id);
@@ -115,7 +117,8 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
@@ -141,7 +144,8 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
@@ -179,7 +183,8 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
@@ -221,7 +226,8 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
@@ -261,7 +267,8 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
@@ -299,7 +306,8 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
@@ -337,8 +345,9 @@ namespace OrderService.Application.Tests
             var productA = Guid.NewGuid();
             var productB = Guid.NewGuid();
             var userId = Guid.NewGuid();
+            var email = "example@gmail.com";
 
-            var order = new Order(userId);
+            var order = new Order(userId, email);
             order.AddItem(productA, 2);
             order.AddItem(productB, 3);
 

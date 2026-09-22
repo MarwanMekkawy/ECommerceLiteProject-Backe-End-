@@ -12,7 +12,7 @@ namespace OrderService.Application.Commands
 
             if (order is null)
             {
-                order = new Order(command.UserId);
+                order = new Order(command.UserId, command.Email);
 
                 await orderRepository.AddAsync(order, cancellationToken);
             }

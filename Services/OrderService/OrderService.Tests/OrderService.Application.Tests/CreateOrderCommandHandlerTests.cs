@@ -15,6 +15,7 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
+            var email = "example@gmail.com";
             var productId = Guid.NewGuid();
 
             var items = new List<CreateOrderItemDto>
@@ -30,7 +31,7 @@ namespace OrderService.Application.Tests
 
             var handler = new CreateOrderCommandHandler(repository.Object, uow.Object);
 
-            var command = new CreateOrderCommand(userId, items);
+            var command = new CreateOrderCommand(userId, email, items);
 
             // Act
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
@@ -56,10 +57,11 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
+            var email = "example@gmail.com";
             var productId1 = Guid.NewGuid();
             var productId2 = Guid.NewGuid();
 
-            var order = new Order(userId);
+            var order = new Order(userId, email);
 
             var items = new List<CreateOrderItemDto>
             {
@@ -83,7 +85,7 @@ namespace OrderService.Application.Tests
 
             var handler = new CreateOrderCommandHandler(repository.Object, uow.Object);
 
-            var command = new CreateOrderCommand(userId, items);
+            var command = new CreateOrderCommand(userId, email, items);
 
             // Act
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
@@ -106,9 +108,10 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
+            var email = "example@gmail.com";
             var productId = Guid.NewGuid();
 
-            var order = new Order(userId);
+            var order = new Order(userId, email);
             order.AddItem(productId, 2);
 
             var items = new List<CreateOrderItemDto>
@@ -128,7 +131,7 @@ namespace OrderService.Application.Tests
 
             var handler = new CreateOrderCommandHandler(repository.Object, uow.Object);
 
-            var command = new CreateOrderCommand(userId, items);
+            var command = new CreateOrderCommand(userId, email, items);
 
             // Act
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);

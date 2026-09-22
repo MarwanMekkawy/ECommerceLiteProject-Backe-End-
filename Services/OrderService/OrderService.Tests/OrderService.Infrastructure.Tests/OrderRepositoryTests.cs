@@ -23,7 +23,7 @@ namespace OrderService.Infrastructure.Tests
 
             await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
 
             context.Orders.Add(order);
             await context.SaveChangesAsync(TestContext.Current.CancellationToken);
@@ -77,7 +77,7 @@ namespace OrderService.Infrastructure.Tests
             {
                 await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
-                var order = new Order(userId);
+                var order = new Order(userId, "example@gmail.com");
 
                 order.AddItem(Guid.NewGuid(), 2);
                 order.AddItem(Guid.NewGuid(), 3);
@@ -117,7 +117,7 @@ namespace OrderService.Infrastructure.Tests
             await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
             var repository = new OrderRepository(context);
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
 
             // Act
             await repository.AddAsync(order, TestContext.Current.CancellationToken);
@@ -141,7 +141,7 @@ namespace OrderService.Infrastructure.Tests
 
             await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
 
             context.Orders.Add(order);
             await context.SaveChangesAsync(TestContext.Current.CancellationToken);
@@ -195,10 +195,12 @@ namespace OrderService.Infrastructure.Tests
             await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
             var userId = Guid.NewGuid();
+            var email = "example@gmail.com";
             var otherUserId = Guid.NewGuid();
+            var otherEmail = "otherexample@gmail.com";
 
-            var order1 = new Order(userId);
-            var order2 = new Order(otherUserId);
+            var order1 = new Order(userId, email);
+            var order2 = new Order(otherUserId, otherEmail);
 
             context.Orders.AddRange(order1, order2);
 
@@ -228,7 +230,8 @@ namespace OrderService.Infrastructure.Tests
             await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId,email);
 
             context.Orders.Add(order);
             await context.SaveChangesAsync(TestContext.Current.CancellationToken);
@@ -262,8 +265,9 @@ namespace OrderService.Infrastructure.Tests
 
             var userId = Guid.NewGuid();
             var otherUserId = Guid.NewGuid();
+            var email = "example@gmail.com";
 
-            var order = new Order(userId);
+            var order = new Order(userId, email);
 
             context.Orders.Add(order);
             await context.SaveChangesAsync(TestContext.Current.CancellationToken);
@@ -288,12 +292,13 @@ namespace OrderService.Infrastructure.Tests
 
             Guid orderId;
             var userId = Guid.NewGuid();
+            var email = "example@gmail.com";
 
             await using (var context = new OrderDbContext(options))
             {
                 await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
-                var order = new Order(userId);
+                var order = new Order(userId, email);
 
                 order.AddItem(Guid.NewGuid(), 2);
                 order.AddItem(Guid.NewGuid(), 3);
@@ -333,7 +338,8 @@ namespace OrderService.Infrastructure.Tests
             await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
 
             context.Orders.Add(order);
             await context.SaveChangesAsync(TestContext.Current.CancellationToken);
@@ -367,8 +373,9 @@ namespace OrderService.Infrastructure.Tests
 
             var userId = Guid.NewGuid();
             var otherUserId = Guid.NewGuid();
+            var email = "example@gmail.com";
 
-            var order = new Order(userId);
+            var order = new Order(userId, email);
 
             context.Orders.Add(order);
             await context.SaveChangesAsync(TestContext.Current.CancellationToken);
@@ -396,9 +403,10 @@ namespace OrderService.Infrastructure.Tests
             await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
             var userId = Guid.NewGuid();
+            var email = "example@gmail.com";
 
-            var olderOrder = new Order(userId);
-            var latestOrder = new Order(userId);
+            var olderOrder = new Order(userId,email);
+            var latestOrder = new Order(userId,email);
 
             olderOrder.CreatedAt = DateTime.UtcNow.AddMinutes(-10);
             latestOrder.CreatedAt = DateTime.UtcNow;
@@ -456,7 +464,8 @@ namespace OrderService.Infrastructure.Tests
             await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
 
             context.Orders.Add(order);
             await context.SaveChangesAsync(TestContext.Current.CancellationToken);
@@ -514,7 +523,8 @@ namespace OrderService.Infrastructure.Tests
             await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
 
             order.Cancel();
 
@@ -544,7 +554,7 @@ namespace OrderService.Infrastructure.Tests
 
             await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
-            var order = new Order(Guid.NewGuid());
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
             var productId = Guid.NewGuid();
 
             order.AddItem(productId, 2);

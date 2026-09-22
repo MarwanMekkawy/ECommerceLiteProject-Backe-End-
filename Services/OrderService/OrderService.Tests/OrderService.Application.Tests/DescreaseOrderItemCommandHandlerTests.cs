@@ -13,8 +13,9 @@ namespace OrderService.Application.Tests
         public async Task Handle_ShouldDecreaseItemQuantity_WhenOrderExists()
         {
             // Arrange
-            var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var userId = Guid.NewGuid(); 
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
             var productId = Guid.NewGuid();
 
             order.AddItem(productId, 5);
@@ -44,7 +45,8 @@ namespace OrderService.Application.Tests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var order = new Order(userId);
+            var email = "example@gmail.com";
+            var order = new Order(userId, email);
             var productId = Guid.NewGuid();
 
             order.AddItem(productId, 2);
