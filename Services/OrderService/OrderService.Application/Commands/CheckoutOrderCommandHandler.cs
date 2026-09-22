@@ -9,8 +9,9 @@ using OrderService.Domain.Orders;
 
 namespace OrderService.Application.Commands
 {
-    public class CheckoutOrderCommandHandler(IOrderRepository orderRepository, IProductServiceClient productServiceClient, IPaymentServiceClient paymentServiceClient, IUnitOfWork uow)
-        : ICommandHandler<CheckoutOrderCommand, CheckoutOrderDto>
+    public class CheckoutOrderCommandHandler
+        (IOrderRepository orderRepository, IProductServiceClient productServiceClient, IPaymentServiceClient paymentServiceClient, 
+        INotificationServiceClient notificationServiceClient, IUnitOfWork uow) : ICommandHandler<CheckoutOrderCommand, CheckoutOrderDto>
     {
         public async Task<CheckoutOrderDto> HandleAsync(CheckoutOrderCommand command, CancellationToken cancellationToken)
         {
@@ -46,6 +47,8 @@ namespace OrderService.Application.Commands
 
                 // Confirm order and snapshot prices
                 order.Confirm(productPrices, DateTime.UtcNow);
+
+                //await notificationServiceClient.SendOrderConfirmedAsync(order.UserId,)     -------------------------//
 
                 var paymentResult = await paymentServiceClient.CreatePaymentAsync(order.Id, order.UserId, order.Total, order.Currency, cancellationToken);
 

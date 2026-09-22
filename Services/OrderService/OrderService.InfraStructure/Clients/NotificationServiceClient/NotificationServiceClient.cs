@@ -99,7 +99,7 @@ namespace OrderService.InfraStructure.Clients.NotificationServiceClient
             await SendAsync(request, token);
         }
 
-        public async Task SendOrderExpiredAsync(Guid userId, string recipientEmail, string firstName, Guid orderId, CancellationToken cancellationToken)
+        public async Task SendOrderCancelledDueExpirationAsync(Guid userId, string recipientEmail, string firstName, Guid orderId, CancellationToken cancellationToken)
         {
             var token = await serviceTokenClient.GetTokenAsync(cancellationToken);
 
