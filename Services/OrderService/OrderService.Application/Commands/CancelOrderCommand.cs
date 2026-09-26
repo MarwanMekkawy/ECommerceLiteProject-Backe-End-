@@ -6,11 +6,13 @@ namespace OrderService.Application.Commands
     {
         public Guid OrderId { get; }
         public Guid UserId { get; }
+        public string UserName { get; }
 
-        public CancelOrderCommand(Guid userId, Guid orderId)
+        public CancelOrderCommand(Guid userId, Guid orderId, string userName)
         {
             OrderId = orderId;
             UserId = userId;
+            UserName = userName;
         }
     }
 }

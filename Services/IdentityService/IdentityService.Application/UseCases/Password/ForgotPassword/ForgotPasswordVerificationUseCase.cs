@@ -12,8 +12,8 @@ namespace IdentityService.Application.UseCases.Password.ForgotPassword
 
             if (tokenResult is null) return;
 
-            await notificationsClient.SendPasswordResetAsync
-                (tokenResult.UserId, tokenResult.Email, tokenResult.FirstName, tokenResult.Token, tokenResult.ExpirationInMinutes, cancellationToken);
+            var expiresAt = DateTime.UtcNow.AddMinutes(tokenResult.ExpirationInMinutes).ToString("dd MMMM yyyy, HH:mm 'UTC'");
+            await notificationsClient.SendPasswordResetAsync(tokenResult.UserId, tokenResult.Email, tokenResult.FirstName, tokenResult.Token, expiresAt, cancellationToken);
         }
     }
 }

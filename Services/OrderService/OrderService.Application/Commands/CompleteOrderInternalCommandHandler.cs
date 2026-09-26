@@ -1,10 +1,11 @@
 ﻿using Domain.Exceptions;
 using OrderService.Application.Abstractions;
+using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Domain.Contracts;
 
 namespace OrderService.Application.Commands
 {
-    public class CompleteOrderInternalCommandHandler(IOrderRepository orderRepository, IUnitOfWork uow) : ICommandHandler<CompleteOrderInternalCommand>
+    public class CompleteOrderInternalCommandHandler(IOrderRepository orderRepository, INotificationServiceClient notificationServiceClient, IUnitOfWork uow) : ICommandHandler<CompleteOrderInternalCommand>
     {
         public async Task HandleAsync(CompleteOrderInternalCommand command, CancellationToken cancellationToken)
         {
@@ -18,6 +19,11 @@ namespace OrderService.Application.Commands
 
             order.Complete();
             await uow.SaveChangesAsync(cancellationToken);
+
+            var items = order.Items.Select
+                (item => $"Product: {item.ProductName}, Quantity: {item.Quantity} X UnitPrice: {item.UnitPrice:N2}= {item.Total:N2}{item.Currency}").ToList();
+            await notificationServiceClient.SendOrderCompletedAsync
+                (order.UserId, order.CustomerEmail, "Customer", order.Id, items, order.Total, order.Currency.ToString(), cancellationToken);
         }
     }
 }

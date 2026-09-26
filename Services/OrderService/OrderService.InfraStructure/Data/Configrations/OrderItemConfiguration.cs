@@ -13,6 +13,10 @@ namespace OrderService.InfraStructure.Data.Configrations
             builder.Property(x => x.Id)
                 .ValueGeneratedNever();
 
+            builder.Property(x => x.ProductName)
+                .IsRequired()
+                .HasMaxLength(200);
+
             builder.Property(x => x.OrderId)
                 .IsRequired();
 

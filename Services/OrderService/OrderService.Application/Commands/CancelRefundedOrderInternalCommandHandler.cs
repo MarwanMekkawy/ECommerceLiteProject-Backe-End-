@@ -1,10 +1,11 @@
 ﻿using Domain.Exceptions;
 using OrderService.Application.Abstractions;
+using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Domain.Contracts;
 
 namespace OrderService.Application.Commands
 {
-    public class CancelRefundedOrderInternalCommandHandler(IOrderRepository orderRepository, IUnitOfWork uow) : ICommandHandler<CancelRefundedOrderInternalCommand>
+    public class CancelRefundedOrderInternalCommandHandler(IOrderRepository orderRepository, INotificationServiceClient notificationServiceClient, IUnitOfWork uow) : ICommandHandler<CancelRefundedOrderInternalCommand>
     {
         public async Task HandleAsync(CancelRefundedOrderInternalCommand command, CancellationToken cancellationToken)
         {
@@ -15,6 +16,9 @@ namespace OrderService.Application.Commands
 
             order.Cancel(true);
             await uow.SaveChangesAsync(cancellationToken);
+
+            var reason = "Order was cancelled due to a refund request.";
+            await notificationServiceClient.SendOrderCancelledAsync(order.UserId, order.CustomerEmail, "Customer", order.Id, reason, cancellationToken);
         }
     }
 }

@@ -79,7 +79,7 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
             await SendAsync(request, token);
         }
         public async Task SendEmailChangeConfirmationAsync
-            (Guid userId, string recipientEmail, string firstName, string newEmail, string emailChangeToken, int expirationMinutes, CancellationToken cancellationToken)
+            (Guid userId, string recipientEmail, string firstName, string newEmail, string emailChangeToken, string expirsAt, CancellationToken cancellationToken)
         {
             var token = await GetTokenAsync(cancellationToken);
 
@@ -97,7 +97,7 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
                     ["firstName"] = firstName,
                     ["newEmail"] = newEmail,
                     ["confirmationUrl"] = confirmationUrl,
-                    ["expirationMinutes"] = expirationMinutes
+                    ["expirsAt"] = expirsAt
                 }
             };
 
@@ -123,7 +123,7 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
             await SendAsync(request, token);
         }
 
-        public async Task SendPasswordResetAsync(Guid userId, string recipientEmail, string firstName, string passwordResetToken, int expirationMinutes, CancellationToken cancellationToken)
+        public async Task SendPasswordResetAsync(Guid userId, string recipientEmail, string firstName, string passwordResetToken, string expirsAt, CancellationToken cancellationToken)
         {
             var token = await GetTokenAsync(cancellationToken);
 
@@ -141,7 +141,7 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
                 {
                     ["firstName"] = firstName,
                     ["resetUrl"] = resetUrl,
-                    ["expirationMinutes"] = expirationMinutes
+                    ["expirsAt"] = expirsAt
                 }
             };
 

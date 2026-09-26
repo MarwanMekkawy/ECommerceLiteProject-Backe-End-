@@ -95,7 +95,7 @@ namespace OrderService.Domain.Orders
         }
 
         // confirm the order before payment and snapshot its total price
-        public void Confirm(IReadOnlyDictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)> productPrices, DateTime confirmedAt)
+        public void Confirm(IReadOnlyDictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)> productPrices, DateTime confirmedAt)
         {
             if (Status != OrderStatus.Pending)
                 throw new InvalidOrderException("Only pending orders can be confirmed.");
@@ -117,7 +117,7 @@ namespace OrderService.Domain.Orders
                 else if (currency != price.Currency)
                     throw new InvalidOrderException("All order items must use the same currency.");
 
-                item.SetPriceSnapshot(price.UnitPrice, price.Currency);
+                item.SetPriceSnapshot(price.Name, price.UnitPrice, price.Currency);
 
                 total += item.Total;
             }

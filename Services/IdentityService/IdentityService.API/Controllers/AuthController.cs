@@ -19,7 +19,8 @@ namespace IdentityService.API.Controllers
         (IAuthService authService, IServiceClientService clientService, IRegisterUserUseCase registerUserUseCase) : ControllerBase
     {
         /// <summary>
-        /// Registers a new user account.
+        /// [Notification] Registers a new user account,
+        /// and sending email verifcation notification email.
         /// </summary>
         /// <param name="dto">The registration information.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>

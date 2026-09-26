@@ -6,7 +6,6 @@ using IdentityService.Application.UseCases.Email.ConfirmEmailChange;
 using IdentityService.Application.UseCases.Email.ResendVerification;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 
 namespace IdentityService.API.Controllers
 {
@@ -43,7 +42,7 @@ namespace IdentityService.API.Controllers
         }
 
         /// <summary>
-        /// Generates and sends a new email verification token for the authenticated user.
+        /// [Notification] Generates and sends a new email verification token for the authenticated user.
         /// </summary>
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the verification email was successfully requested.</returns>
@@ -58,7 +57,7 @@ namespace IdentityService.API.Controllers
         }
 
         /// <summary>
-        /// Initiates the email address change process by generating a verification token for the new email address.
+        /// [Notification] Initiates the email address change process by generating a verification token for the new email address.
         /// </summary>
         /// <param name="dto">The requested email change information.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
@@ -79,7 +78,7 @@ namespace IdentityService.API.Controllers
         }
 
         /// <summary>
-        /// Confirms an email address change using the provided verification token.
+        /// [Notification] Confirms an email address change using the provided verification token.
         /// </summary>
         /// <param name="token">The email change verification token.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>

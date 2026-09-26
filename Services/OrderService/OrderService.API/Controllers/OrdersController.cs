@@ -176,8 +176,8 @@ namespace OrderService.API.Controllers
         }
 
         /// <summary>
-        /// Checks out an order belonging to the currently authenticated user,
-        /// confirms the order, reserves the required stock, and initiates its payment.
+        /// [Notification] Checks out an order belonging to the currently authenticated user,
+        /// confirms the order, reserves the required stock, initiates its payment, and sending email with the order details.
         /// </summary>
         /// <param name="orderId">The unique identifier of the order to check out.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
@@ -196,7 +196,8 @@ namespace OrderService.API.Controllers
         }
 
         /// <summary>
-        /// Cancels an order belonging to the currently authenticated user.
+        /// [Notification] Cancels an order belonging to the currently authenticated user 
+        /// , and sending email with the order status.
         /// </summary>
         /// <param name="orderId">The unique identifier of the order to cancel.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
@@ -207,7 +208,7 @@ namespace OrderService.API.Controllers
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
 
-            var command = new CancelOrderCommand(claims.UserId, orderId);
+            var command = new CancelOrderCommand(claims.UserId, orderId, claims.UserName);
 
             await cancelOrderHandler.HandleAsync(command, cancellationToken);
 
@@ -273,7 +274,8 @@ namespace OrderService.API.Controllers
         }
         // service to service ===================================================================================
         /// <summary>
-        /// Completes an order through an internal service-to-service request.
+        /// [Notification] an order through an internal service-to-service request,
+        /// and notify the user by email with status complete.
         /// </summary>
         /// <param name="orderId">The unique identifier of the order to complete.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>
@@ -290,7 +292,8 @@ namespace OrderService.API.Controllers
         }
 
         /// <summary>
-        /// Cancels an order after its payment has been refunded through an internal service-to-service request.
+        /// [Notification] Cancels an order after its payment has been refunded through an internal service-to-service request,
+        /// and send email notification with the Expiry Status.
         /// </summary>
         /// <param name="orderId">The unique identifier of the order to cancel.</param>
         /// <param name="cancellationToken">A token to cancel the request.</param>

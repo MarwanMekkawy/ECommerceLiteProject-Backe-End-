@@ -1,10 +1,13 @@
 ﻿using OrderService.Application.Abstractions;
 using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Domain.Contracts;
+using OrderService.Domain.Orders;
 
 namespace OrderService.Application.Services
 {
-    public class CancelExpiredOrdersService(IOrderRepository orderRepository, IProductServiceClient productServiceClient, IUnitOfWork uow) : ICancelExpiredOrdersService
+    public class CancelExpiredOrdersService
+        (IOrderRepository orderRepository, IProductServiceClient productServiceClient, INotificationServiceClient notificationServiceClient, IUnitOfWork uow) 
+        : ICancelExpiredOrdersService
     {
         public async Task CancelExpiredAsync(CancellationToken cancellationToken)
         {
@@ -20,6 +23,12 @@ namespace OrderService.Application.Services
             }
 
             await uow.SaveChangesAsync(cancellationToken);
+
+            foreach (var order in expiredOrders)
+            {
+                if(order.IsCancelledDueToExpiry)
+                    await notificationServiceClient.SendOrderCancelledDueExpirationAsync(order.UserId, order.CustomerEmail, "Customer", order.Id, cancellationToken);
+            }
         }
     }
 }

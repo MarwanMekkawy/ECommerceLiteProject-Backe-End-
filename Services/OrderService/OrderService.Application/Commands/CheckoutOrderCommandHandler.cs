@@ -26,7 +26,7 @@ namespace OrderService.Application.Commands
             var decreasedItems = new List<OrderItem>();
 
             // container for  current product prices 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>();
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>();
 
             try
             {
@@ -38,7 +38,7 @@ namespace OrderService.Application.Commands
                     if (product is null)
                         throw new NotFoundException($"Product with Id [{item.ProductId}] Was NOT FOUND.");
 
-                    productPrices[item.ProductId] = (product.Price, product.Currency);
+                    productPrices[item.ProductId] = (product.Name, product.Price, product.Currency);
 
                     await productServiceClient.DecreaseStockAsync(item.ProductId, item.Quantity, cancellationToken);
 
@@ -55,18 +55,18 @@ namespace OrderService.Application.Commands
                 var paymentResult = await paymentServiceClient.CreatePaymentAsync(order.Id, order.UserId, order.Total, order.Currency, cancellationToken);
 
                 await uow.SaveChangesAsync(cancellationToken);
-                
+
                 // Return checkout result
                 return new CheckoutOrderDto
                 {
                     OrderId = order.Id,
                     Items = order.Items.Select(item => new CheckoutOrderItemDto
-                    { ProductId = item.ProductId, Quantity = item.Quantity, UnitPrice = item.UnitPrice, Total = item.Total }).ToList(),
+                    { ProductId = item.ProductId, ProductName = item.ProductName, Quantity = item.Quantity, UnitPrice = item.UnitPrice, Total = item.Total }).ToList(),
                     Total = order.Total,
                     Currency = order.Currency,
 
-                    PaymentId = paymentResult.PaymentId, 
-                    ClientSecret = paymentResult.ClientSecret, 
+                    PaymentId = paymentResult.PaymentId,
+                    ClientSecret = paymentResult.ClientSecret,
                     PaymentStatus = paymentResult.Status
                 };
             }

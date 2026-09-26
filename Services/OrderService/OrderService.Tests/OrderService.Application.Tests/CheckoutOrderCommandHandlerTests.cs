@@ -16,10 +16,11 @@ namespace OrderService.Application.Tests
         [Fact]
         public async Task Handle_ShouldConfirmOrderAndReturnCheckoutDetails_WhenCheckoutIsValid()
         {
-            // Arrange
+            // Arrange 
             var userId = Guid.NewGuid();
             var email = "example@gmail.com";
-            var order = new Order(userId,email);
+            var order = new Order(userId, email);
+            var userName = "app user";
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
@@ -34,7 +35,7 @@ namespace OrderService.Application.Tests
             var clientSecret = "test_client_secret";
             var paymentStatus = "Pending";
 
-            var command = new CheckoutOrderCommand(userId, order.Id);
+            var command = new CheckoutOrderCommand(userId, order.Id, userName);
 
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdAndUserIdTrackedAsync(order.Id, userId, TestContext.Current.CancellationToken)).ReturnsAsync(order);
@@ -45,14 +46,16 @@ namespace OrderService.Application.Tests
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
             paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 20, CurrencyCode.USD, TestContext.Current.CancellationToken)).ReturnsAsync((paymentId, clientSecret, paymentStatus));
 
+            var notificationServiceClient = new Mock<INotificationServiceClient>();
+
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, uow.Object);
+            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, notificationServiceClient.Object, uow.Object);
 
-            // Act
+            // Act 
             var result = await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
-            // Assert
+            // Assert 
             Assert.Equal(order.Id, result.OrderId);
             Assert.Equal(OrderStatus.Confirmed, order.Status);
             Assert.Equal(20, order.Total);
@@ -70,59 +73,61 @@ namespace OrderService.Application.Tests
         [Fact]
         public async Task Handle_ShouldThrow_WhenOrderDoesNotExist()
         {
-            // Arrange
+            // Arrange 
             var orderId = Guid.NewGuid();
             var userId = Guid.NewGuid();
-            var command = new CheckoutOrderCommand(userId, orderId);
+            var command = new CheckoutOrderCommand(userId, orderId, "app user");
 
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdAndUserIdTrackedAsync(orderId, userId, TestContext.Current.CancellationToken)).ReturnsAsync((Order?)null);
 
             var productServiceClient = new Mock<IProductServiceClient>();
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
+            var notificationServiceClient = new Mock<INotificationServiceClient>();
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, uow.Object);
+            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, notificationServiceClient.Object, uow.Object);
 
-            // Act & Assert
+            // Act & Assert 
             await Assert.ThrowsAsync<NotFoundException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
         }
 
         [Fact]
         public async Task Handle_ShouldThrow_WhenOrderIsNotPending()
         {
-            // Arrange
+            // Arrange 
             var userId = Guid.NewGuid();
             var email = "example@gmail.com";
             var order = new Order(userId, email);
             order.Cancel();
 
-            var command = new CheckoutOrderCommand(userId, order.Id);
+            var command = new CheckoutOrderCommand(userId, order.Id, "app user");
 
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdAndUserIdTrackedAsync(order.Id, userId, TestContext.Current.CancellationToken)).ReturnsAsync(order);
 
             var productServiceClient = new Mock<IProductServiceClient>();
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
+            var notificationServiceClient = new Mock<INotificationServiceClient>();
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, uow.Object);
+            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, notificationServiceClient.Object, uow.Object);
 
-            // Act & Assert
+            // Act & Assert 
             await Assert.ThrowsAsync<InvalidOrderException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
         }
 
         [Fact]
         public async Task Handle_ShouldThrow_WhenProductDoesNotExist()
         {
-            // Arrange
+            // Arrange 
             var userId = Guid.NewGuid();
             var email = "example@gmail.com";
             var order = new Order(userId, email);
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
-            var command = new CheckoutOrderCommand(userId, order.Id);
+            var command = new CheckoutOrderCommand(userId, order.Id, "app user");
 
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdAndUserIdTrackedAsync(order.Id, userId, TestContext.Current.CancellationToken)).ReturnsAsync(order);
@@ -131,18 +136,19 @@ namespace OrderService.Application.Tests
             productServiceClient.Setup(x => x.GetProductForCheckoutAsync(productId, TestContext.Current.CancellationToken)).ReturnsAsync((ProductDto)null!);
 
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
+            var notificationServiceClient = new Mock<INotificationServiceClient>();
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, uow.Object);
+            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, notificationServiceClient.Object, uow.Object);
 
-            // Act & Assert
+            // Act & Assert 
             await Assert.ThrowsAsync<NotFoundException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
         }
 
         [Fact]
         public async Task Handle_ShouldDecreaseStock_WhenCheckoutIsValid()
         {
-            // Arrange
+            // Arrange 
             var userId = Guid.NewGuid();
             var email = "example@gmail.com";
             var order = new Order(userId, email);
@@ -159,7 +165,9 @@ namespace OrderService.Application.Tests
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
             paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 20, CurrencyCode.USD, TestContext.Current.CancellationToken)).ReturnsAsync((Guid.NewGuid(), "test_client_secret", "Pending"));
 
-            var command = new CheckoutOrderCommand(userId, order.Id);
+            var notificationServiceClient = new Mock<INotificationServiceClient>();
+
+            var command = new CheckoutOrderCommand(userId, order.Id, "app user");
 
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdAndUserIdTrackedAsync(order.Id, userId, TestContext.Current.CancellationToken)).ReturnsAsync(order);
@@ -169,19 +177,19 @@ namespace OrderService.Application.Tests
 
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, uow.Object);
+            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, notificationServiceClient.Object, uow.Object);
 
-            // Act
+            // Act 
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
-            // Assert
+            // Assert 
             productServiceClient.Verify(x => x.DecreaseStockAsync(productId, 2, TestContext.Current.CancellationToken), Times.Once);
         }
 
         [Fact]
         public async Task Handle_ShouldSnapshotProductPrice_WhenCheckoutIsValid()
         {
-            // Arrange
+            // Arrange 
             var userId = Guid.NewGuid();
             var email = "example@gmail.com";
             var order = new Order(userId, email);
@@ -198,7 +206,9 @@ namespace OrderService.Application.Tests
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
             paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 50, CurrencyCode.USD, TestContext.Current.CancellationToken)).ReturnsAsync((Guid.NewGuid(), "test_client_secret", "Pending"));
 
-            var command = new CheckoutOrderCommand(userId, order.Id);
+            var notificationServiceClient = new Mock<INotificationServiceClient>();
+
+            var command = new CheckoutOrderCommand(userId, order.Id, "app user");
 
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdAndUserIdTrackedAsync(order.Id, userId, TestContext.Current.CancellationToken)).ReturnsAsync(order);
@@ -208,12 +218,12 @@ namespace OrderService.Application.Tests
 
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, uow.Object);
+            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, notificationServiceClient.Object, uow.Object);
 
-            // Act
+            // Act 
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
-            // Assert
+            // Assert 
             var item = order.Items.First();
 
             Assert.Equal(25, item.UnitPrice);
@@ -224,7 +234,7 @@ namespace OrderService.Application.Tests
         [Fact]
         public async Task Handle_ShouldSetPaymentExpiration_WhenCheckoutIsValid()
         {
-            // Arrange
+            // Arrange 
             var userId = Guid.NewGuid();
             var email = "example@gmail.com";
             var order = new Order(userId, email);
@@ -241,7 +251,9 @@ namespace OrderService.Application.Tests
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
             paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 20, CurrencyCode.USD, TestContext.Current.CancellationToken)).ReturnsAsync((Guid.NewGuid(), "test_client_secret", "Pending"));
 
-            var command = new CheckoutOrderCommand(userId, order.Id);
+            var notificationServiceClient = new Mock<INotificationServiceClient>();
+
+            var command = new CheckoutOrderCommand(userId, order.Id, "app user");
 
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdAndUserIdTrackedAsync(order.Id, userId, TestContext.Current.CancellationToken)).ReturnsAsync(order);
@@ -251,12 +263,12 @@ namespace OrderService.Application.Tests
 
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, uow.Object);
+            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, notificationServiceClient.Object, uow.Object);
 
-            // Act
+            // Act 
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
-            // Assert
+            // Assert 
             Assert.NotNull(order.ConfirmedAt);
             Assert.NotNull(order.ExpiresAt);
             Assert.Equal(3, (order.ExpiresAt.Value - order.ConfirmedAt.Value).TotalDays);
@@ -265,7 +277,7 @@ namespace OrderService.Application.Tests
         [Fact]
         public async Task Handle_ShouldSaveChanges_WhenCheckoutIsValid()
         {
-            // Arrange
+            // Arrange 
             var userId = Guid.NewGuid();
             var email = "example@gmail.com";
             var order = new Order(userId, email);
@@ -282,7 +294,9 @@ namespace OrderService.Application.Tests
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
             paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 20, CurrencyCode.USD, TestContext.Current.CancellationToken)).ReturnsAsync((Guid.NewGuid(), "test_client_secret", "Pending"));
 
-            var command = new CheckoutOrderCommand(userId, order.Id);
+            var notificationServiceClient = new Mock<INotificationServiceClient>();
+
+            var command = new CheckoutOrderCommand(userId, order.Id, "app user");
 
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdAndUserIdTrackedAsync(order.Id, userId, TestContext.Current.CancellationToken)).ReturnsAsync(order);
@@ -292,19 +306,19 @@ namespace OrderService.Application.Tests
 
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, uow.Object);
+            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, notificationServiceClient.Object, uow.Object);
 
-            // Act
+            // Act 
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
 
-            // Assert
+            // Assert 
             uow.Verify(x => x.SaveChangesAsync(TestContext.Current.CancellationToken), Times.Once);
         }
 
         [Fact]
         public async Task Handle_ShouldRestoreStock_WhenCheckoutFails()
         {
-            // Arrange
+            // Arrange 
             var userId = Guid.NewGuid();
             var email = "example@gmail.com";
             var order = new Order(userId, email);
@@ -318,7 +332,7 @@ namespace OrderService.Application.Tests
                 Currency = CurrencyCode.USD
             };
 
-            var command = new CheckoutOrderCommand(userId, order.Id);
+            var command = new CheckoutOrderCommand(userId, order.Id, "app user");
 
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdAndUserIdTrackedAsync(order.Id, userId, TestContext.Current.CancellationToken)).ReturnsAsync(order);
@@ -328,11 +342,12 @@ namespace OrderService.Application.Tests
             productServiceClient.Setup(x => x.DecreaseStockAsync(productId, 2, TestContext.Current.CancellationToken)).ThrowsAsync(new HttpRequestException());
 
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
+            var notificationServiceClient = new Mock<INotificationServiceClient>();
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, uow.Object);
+            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, notificationServiceClient.Object, uow.Object);
 
-            // Act & Assert
+            // Act & Assert 
             await Assert.ThrowsAsync<HttpRequestException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
 
             productServiceClient.Verify(x => x.IncreaseStockAsync(productId, 2, TestContext.Current.CancellationToken), Times.Never);
@@ -341,7 +356,7 @@ namespace OrderService.Application.Tests
         [Fact]
         public async Task Handle_ShouldRestorePreviousStock_WhenLaterStockDecreaseFails()
         {
-            // Arrange
+            // Arrange 
             var productA = Guid.NewGuid();
             var productB = Guid.NewGuid();
             var userId = Guid.NewGuid();
@@ -351,7 +366,7 @@ namespace OrderService.Application.Tests
             order.AddItem(productA, 2);
             order.AddItem(productB, 3);
 
-            var command = new CheckoutOrderCommand(userId, order.Id);
+            var command = new CheckoutOrderCommand(userId, order.Id, "app user");
 
             var orderRepository = new Mock<IOrderRepository>();
             orderRepository.Setup(x => x.GetByIdAndUserIdTrackedAsync(order.Id, userId, TestContext.Current.CancellationToken)).ReturnsAsync(order);
@@ -374,11 +389,12 @@ namespace OrderService.Application.Tests
             productServiceClient.Setup(x => x.DecreaseStockAsync(productB, 3, TestContext.Current.CancellationToken)).ThrowsAsync(new HttpRequestException());
 
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
+            var notificationServiceClient = new Mock<INotificationServiceClient>();
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, uow.Object);
+            var handler = new CheckoutOrderCommandHandler(orderRepository.Object, productServiceClient.Object, paymentServiceClient.Object, notificationServiceClient.Object, uow.Object);
 
-            // Act & Assert
+            // Act & Assert 
             await Assert.ThrowsAsync<HttpRequestException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
 
             productServiceClient.Verify(x => x.IncreaseStockAsync(productA, 2, TestContext.Current.CancellationToken), Times.Once);

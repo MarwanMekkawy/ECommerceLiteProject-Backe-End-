@@ -8,6 +8,7 @@ namespace OrderService.Domain.Orders
     {
         public Guid Id { get; private set; }
         public Guid ProductId { get; private set; }
+        public string ProductName { get; private set; } = null!;
         public int Quantity { get; private set; }
         public Guid OrderId { get; private set; }
 
@@ -55,11 +56,12 @@ namespace OrderService.Domain.Orders
             Quantity -= quantity;
         }
 
-        internal void SetPriceSnapshot(decimal unitPrice, CurrencyCode currency)
+        internal void SetPriceSnapshot(string productName, decimal unitPrice, CurrencyCode currency)
         {
             if (unitPrice < 0)
                 throw new InvalidOrderItemException("Unit price cannot be negative.");
 
+            ProductName = productName;
             UnitPrice = unitPrice;
             Currency = currency;
             Total = unitPrice * Quantity;

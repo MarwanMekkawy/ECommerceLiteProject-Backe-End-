@@ -10,7 +10,8 @@ namespace IdentityService.Application.UseCases.Email.ChangeEmail
         {
             var tokenResult = await emailVerificationService.GenerateEmailChangeTokenAsync(userId, dto, cancellationToken);
 
-            await notificationsClient.SendEmailChangeConfirmationAsync(userId, dto.NewEmail, tokenResult.firstName, dto.NewEmail, tokenResult.token, 1440, cancellationToken);
+            var expiresAt = DateTime.UtcNow.AddMinutes(1440).ToString("dd MMMM yyyy, HH:mm 'UTC'");
+            await notificationsClient.SendEmailChangeConfirmationAsync(userId, dto.NewEmail, tokenResult.firstName, dto.NewEmail, tokenResult.token, expiresAt, cancellationToken);
         }
     }
 }
