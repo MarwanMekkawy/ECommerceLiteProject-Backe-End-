@@ -45,7 +45,7 @@ namespace ProductService.Infrastructure.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("ProductService.Domain.Entities.Product", b =>
@@ -85,7 +85,7 @@ namespace ProductService.Infrastructure.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("ProductService.Domain.Entities.Product", b =>
@@ -96,7 +96,7 @@ namespace ProductService.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsOne("ProductService.Domain.Value_Objects.Money", "Price", b1 =>
+                    b.OwnsOne("ProductService.Domain.Entities.Product.Price#ProductService.Domain.Value_Objects.Money", "Price", b1 =>
                         {
                             b1.Property<Guid>("ProductId")
                                 .HasColumnType("uniqueidentifier");
@@ -113,7 +113,7 @@ namespace ProductService.Infrastructure.Data.Migrations
 
                             b1.HasKey("ProductId");
 
-                            b1.ToTable("Products");
+                            b1.ToTable("Products", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ProductId");

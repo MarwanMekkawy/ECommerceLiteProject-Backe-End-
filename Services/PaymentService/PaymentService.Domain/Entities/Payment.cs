@@ -8,6 +8,7 @@ namespace PaymentService.Domain.Entities
         public Guid Id { get; private set; }
         public Guid OrderId { get; private set; }
         public Guid UserId { get; private set; }
+        public string CustomerEmail { get; private set; } = null!;
         public Money Amount { get; private set; } = null!;
         public PaymentStatus Status { get; private set; }
 
@@ -36,7 +37,7 @@ namespace PaymentService.Domain.Entities
 
         private Payment() { }
 
-        public Payment(Guid orderId, Guid userId, Money amount)
+        public Payment(Guid orderId, Guid userId, Money amount, string email)
         {
             Id = Guid.NewGuid();
             OrderId = orderId;
@@ -44,6 +45,7 @@ namespace PaymentService.Domain.Entities
             Amount = amount;
             Status = PaymentStatus.Pending;
             CreatedAt = DateTime.UtcNow;
+            CustomerEmail = email;
         }
 
         public void SetStripePaymentIntentId(string stripePaymentIntentId)

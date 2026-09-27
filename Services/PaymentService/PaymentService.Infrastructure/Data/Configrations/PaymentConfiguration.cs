@@ -16,6 +16,10 @@ namespace PaymentService.Infrastructure.Data.Configrations
             builder.Property(x => x.UserId)
                 .IsRequired();
 
+            builder.Property(x => x.CustomerEmail)
+                .IsRequired()
+                .HasMaxLength(256);
+
             builder.Property(x => x.Status)
                 .HasConversion<string>()
                 .IsRequired();

@@ -8,7 +8,9 @@ using PaymentService.Domain.ValueObjects;
 
 namespace PaymentService.Application.Services
 {
-    public class PaymentAppService(IUnitOfWork _unitOfWork, IStripePaymentClient _stripePaymentClient, IOrderServiceClient _orderServiceClient) : IPaymentAppService
+    public class PaymentAppService
+        (IUnitOfWork _unitOfWork, IStripePaymentClient _stripePaymentClient, IOrderServiceClient _orderServiceClient, 
+        INotificationServiceClient _notificationServiceClient) : IPaymentAppService
     {
 
         #region // Helper Methods ==============================================================================================================
@@ -30,7 +32,7 @@ namespace PaymentService.Application.Services
 
             return payment;
         }
-        private async Task HandlePaymentFailedAsync(string paymentIntentId, string? failureReason, CancellationToken cancellationToken)
+        private async Task HandlePaymentFailedAndNotifyAsync(string paymentIntentId, string? failureReason, CancellationToken cancellationToken)
         {
             var payment = await _unitOfWork.Payments.GetByStripePaymentIntentIdAsync(paymentIntentId, cancellationToken);
 
@@ -42,6 +44,9 @@ namespace PaymentService.Application.Services
                 return;
 
             payment.MarkAsFailed(failureReason);
+            //notify failed
+            await _notificationServiceClient.SendPaymentFailedAsync(payment.UserId, payment.CustomerEmail, "Customer", payment.OrderId, payment.Id, 
+                                                                    payment.Amount.Amount, payment.Amount.Currency.ToString(), failureReason!, cancellationToken);
         }
         private async Task HandlePaymentProcessingAsync(string paymentIntentId, CancellationToken cancellationToken)
         {
@@ -70,7 +75,7 @@ namespace PaymentService.Application.Services
             payment.MarkAsRequiresAction();
         }
         // refund methods ===============================================================================================
-        private async Task HandleRefundCreatedAsync(string refundId, string? refundStatus, CancellationToken cancellationToken)
+        private async Task HandleRefundCreatedAndNotifyAsync(string refundId, string? refundStatus, long? refundAmount, CancellationToken cancellationToken)
         {
             var payment = await _unitOfWork.Payments.GetByStripeRefundIdAsync(refundId, cancellationToken);
 
@@ -87,6 +92,9 @@ namespace PaymentService.Application.Services
             {
                 case "succeeded":
                     payment.MarkAsRefunded(refundId);
+                    //notify refunded
+                    await _notificationServiceClient.SendPaymentRefundedAsync(payment.UserId, payment.CustomerEmail, "Customer", payment.OrderId, 
+                        payment.Id, refundAmount!.Value / 100m, cancellationToken);
                     break;
 
                 case "pending":
@@ -99,7 +107,7 @@ namespace PaymentService.Application.Services
                     break;
             }
         }
-        private async Task HandleRefundUpdatedAsync(string refundId, string? refundStatus, CancellationToken cancellationToken)
+        private async Task HandleRefundUpdatedAndNotifyAsync(string refundId, string? refundStatus, long? refundAmount, CancellationToken cancellationToken)
         {
             var payment = await _unitOfWork.Payments.GetByStripeRefundIdAsync(refundId, cancellationToken);
 
@@ -110,7 +118,12 @@ namespace PaymentService.Application.Services
             {
                 case "succeeded":
                     if (payment.Status != PaymentStatus.Refunded)
+                    {
                         payment.MarkAsRefunded(refundId);
+                        //notify refunded if didnt already do it
+                        await _notificationServiceClient.SendPaymentRefundedAsync(payment.UserId, payment.CustomerEmail, "Customer", payment.OrderId, 
+                            payment.Id, refundAmount!.Value / 100m, cancellationToken);
+                    }
                     break;
 
                 case "pending":
@@ -127,7 +140,7 @@ namespace PaymentService.Application.Services
                     break;
             }
         }
-        private async Task HandleRefundFailedAsync(string refundId, string? failureReason, CancellationToken cancellationToken)
+        private async Task HandleRefundFailedAsync(string refundId, string? failureReason, long? refundAmount, CancellationToken cancellationToken)
         {
             var payment = await _unitOfWork.Payments.GetByStripeRefundIdAsync(refundId, cancellationToken);
 
@@ -141,7 +154,7 @@ namespace PaymentService.Application.Services
         }
         #endregion // ==========================================================================================================================
 
-        public async Task<CreatePaymentResponseDto> CreatePaymentAsync(Guid orderId, Guid userId, decimal amount, CurrencyCode currency, CancellationToken cancellationToken = default)
+        public async Task<CreatePaymentResponseDto> CreatePaymentAsync(Guid orderId, Guid userId, decimal amount, CurrencyCode currency, string email, CancellationToken cancellationToken = default)
         {
             var existingPayment = await _unitOfWork.Payments.GetByOrderIdAsync(orderId, cancellationToken);
 
@@ -159,7 +172,7 @@ namespace PaymentService.Application.Services
                 throw new InvalidOperationException("A payment already exists for this order.");
             }
 
-            var payment = new Payment(orderId, userId, new Money(amount, currency));
+            var payment = new Payment(orderId, userId, new Money(amount, currency), email);
 
             var stripeResult = await _stripePaymentClient.CreatePaymentIntentAsync(amount, currency, payment.Id, cancellationToken);
 
@@ -212,7 +225,7 @@ namespace PaymentService.Application.Services
                     break;
 
                 case "payment_intent.payment_failed":
-                    await HandlePaymentFailedAsync(webhookEvent.PaymentIntentId, webhookEvent.FailureReason, cancellationToken);
+                    await HandlePaymentFailedAndNotifyAsync(webhookEvent.PaymentIntentId, webhookEvent.FailureReason, cancellationToken);
                     break;
 
                 case "payment_intent.processing":
@@ -225,15 +238,15 @@ namespace PaymentService.Application.Services
 
                 // refunds
                 case "refund.created":
-                    await HandleRefundCreatedAsync(webhookEvent.RefundId, webhookEvent.RefundStatus, cancellationToken);
+                    await HandleRefundCreatedAndNotifyAsync(webhookEvent.RefundId, webhookEvent.RefundStatus, webhookEvent.RefundAmount, cancellationToken);
                     break;
 
                 case "refund.updated":
-                    await HandleRefundUpdatedAsync(webhookEvent.RefundId, webhookEvent.RefundStatus, cancellationToken);
+                    await HandleRefundUpdatedAndNotifyAsync(webhookEvent.RefundId, webhookEvent.RefundStatus, webhookEvent.RefundAmount, cancellationToken);
                     break;
 
                 case "refund.failed":
-                    await HandleRefundFailedAsync(webhookEvent.RefundId, webhookEvent.FailureReason, cancellationToken);
+                    await HandleRefundFailedAsync(webhookEvent.RefundId, webhookEvent.FailureReason, webhookEvent.RefundAmount, cancellationToken);
                     break;
             }
 

@@ -52,7 +52,7 @@ namespace OrderService.Application.Commands
                 await notificationServiceClient.SendOrderConfirmedAsync
                     (order.UserId, order.CustomerEmail, command.UserName, order.Id, order.Total, order.Currency.ToString(), order.ExpiresAt!.Value, cancellationToken);
 
-                var paymentResult = await paymentServiceClient.CreatePaymentAsync(order.Id, order.UserId, order.Total, order.Currency, cancellationToken);
+                var paymentResult = await paymentServiceClient.CreatePaymentAsync(order.Id, order.UserId, order.Total, order.Currency, order.CustomerEmail, cancellationToken);
 
                 await uow.SaveChangesAsync(cancellationToken);
 

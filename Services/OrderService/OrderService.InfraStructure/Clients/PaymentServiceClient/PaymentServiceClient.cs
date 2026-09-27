@@ -8,7 +8,7 @@ namespace OrderService.InfraStructure.Clients.PaymentServiceClient
 {
     public class PaymentServiceClient(HttpClient httpClient, IServiceTokenClient serviceTokenClient) : IPaymentServiceClient
     {
-        public async Task<(Guid PaymentId, string ClientSecret, string Status)> CreatePaymentAsync(Guid orderId, Guid userId, decimal amount, CurrencyCode currency, CancellationToken cancellationToken)
+        public async Task<(Guid PaymentId, string ClientSecret, string Status)> CreatePaymentAsync(Guid orderId, Guid userId, decimal amount, CurrencyCode currency, string email, CancellationToken cancellationToken)
         {
             var token = await serviceTokenClient.GetTokenAsync(cancellationToken);
 
@@ -16,7 +16,7 @@ namespace OrderService.InfraStructure.Clients.PaymentServiceClient
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var paymentRequest = new CreatePaymentRequestDto { OrderId = orderId, UserId = userId, Amount = amount, Currency = currency };
+            var paymentRequest = new CreatePaymentRequestDto { OrderId = orderId, UserId = userId, Amount = amount, Currency = currency, Email = email };
 
             request.Content = JsonContent.Create(paymentRequest);
 

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PaymentService.Application.Abstractions;
 using PaymentService.Application.DTOs;
-using System.Security.Claims;
+using PaymentService.Domain.Enums;
 
 namespace PaymentService.API.Controllers
 {
@@ -23,13 +23,13 @@ namespace PaymentService.API.Controllers
         [Authorize(AuthenticationSchemes = "ServiceJwt")]
         public async Task<ActionResult<CreatePaymentResponseDto>> CreatePayment(CreatePaymentRequestDto request, CancellationToken cancellationToken)
         {
-            var result = await paymentAppService.CreatePaymentAsync(request.OrderId, request.UserId, request.Amount, request.Currency, cancellationToken);
+            var result = await paymentAppService.CreatePaymentAsync(request.OrderId, request.UserId, request.Amount, request.Currency, request.Email, cancellationToken);
 
             return Ok(result);
-        }      
+        }
 
         /// <summary>
-        /// Handles webhook events sent by Stripe and updates the corresponding payment.
+        /// [Notification] Handles webhook events sent by Stripe and updates the corresponding payment.
         /// </summary>
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>An empty successful response when the webhook has been processed.</returns>

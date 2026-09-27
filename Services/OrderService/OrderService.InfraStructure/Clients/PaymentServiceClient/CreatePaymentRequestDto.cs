@@ -8,5 +8,6 @@ namespace OrderService.InfraStructure.Clients.PaymentServiceClient
         public Guid UserId { get; set; }
         public decimal Amount { get; set; }
         public CurrencyCode Currency { get; set; }
+        public required string Email { get; set; }
     }
 }
