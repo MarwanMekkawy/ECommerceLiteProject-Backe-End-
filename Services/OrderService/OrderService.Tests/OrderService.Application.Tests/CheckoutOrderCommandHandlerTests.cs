@@ -44,7 +44,7 @@ namespace OrderService.Application.Tests
             productServiceClient.Setup(x => x.GetProductForCheckoutAsync(productId, TestContext.Current.CancellationToken)).ReturnsAsync(product);
 
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
-            paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 20, CurrencyCode.USD, TestContext.Current.CancellationToken)).ReturnsAsync((paymentId, clientSecret, paymentStatus));
+            paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 20, CurrencyCode.USD, email, TestContext.Current.CancellationToken)).ReturnsAsync((paymentId, clientSecret, paymentStatus));
 
             var notificationServiceClient = new Mock<INotificationServiceClient>();
 
@@ -163,7 +163,7 @@ namespace OrderService.Application.Tests
             };
 
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
-            paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 20, CurrencyCode.USD, TestContext.Current.CancellationToken)).ReturnsAsync((Guid.NewGuid(), "test_client_secret", "Pending"));
+            paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 20, CurrencyCode.USD, email, TestContext.Current.CancellationToken)).ReturnsAsync((Guid.NewGuid(), "test_client_secret", "Pending"));
 
             var notificationServiceClient = new Mock<INotificationServiceClient>();
 
@@ -204,7 +204,7 @@ namespace OrderService.Application.Tests
             };
 
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
-            paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 50, CurrencyCode.USD, TestContext.Current.CancellationToken)).ReturnsAsync((Guid.NewGuid(), "test_client_secret", "Pending"));
+            paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 50, CurrencyCode.USD, email, TestContext.Current.CancellationToken)).ReturnsAsync((Guid.NewGuid(), "test_client_secret", "Pending"));
 
             var notificationServiceClient = new Mock<INotificationServiceClient>();
 
@@ -249,7 +249,7 @@ namespace OrderService.Application.Tests
             };
 
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
-            paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 20, CurrencyCode.USD, TestContext.Current.CancellationToken)).ReturnsAsync((Guid.NewGuid(), "test_client_secret", "Pending"));
+            paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 20, CurrencyCode.USD, email, TestContext.Current.CancellationToken)).ReturnsAsync((Guid.NewGuid(), "test_client_secret", "Pending"));
 
             var notificationServiceClient = new Mock<INotificationServiceClient>();
 
@@ -292,7 +292,7 @@ namespace OrderService.Application.Tests
             };
 
             var paymentServiceClient = new Mock<IPaymentServiceClient>();
-            paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 20, CurrencyCode.USD, TestContext.Current.CancellationToken)).ReturnsAsync((Guid.NewGuid(), "test_client_secret", "Pending"));
+            paymentServiceClient.Setup(x => x.CreatePaymentAsync(order.Id, userId, 20, CurrencyCode.USD, email, TestContext.Current.CancellationToken)).ReturnsAsync((Guid.NewGuid(), "test_client_secret", "Pending"));
 
             var notificationServiceClient = new Mock<INotificationServiceClient>();
 

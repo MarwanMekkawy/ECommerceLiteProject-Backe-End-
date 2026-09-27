@@ -560,9 +560,9 @@ namespace OrderService.Infrastructure.Tests
             order.AddItem(productId, 2);
 
             order.Confirm(
-                new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+                new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
                 {
-                    [productId] = (100m, CurrencyCode.USD)
+                    [productId] = ("Test Product", 100m, CurrencyCode.USD)
                 },
                 DateTime.UtcNow.AddDays(-4));
 

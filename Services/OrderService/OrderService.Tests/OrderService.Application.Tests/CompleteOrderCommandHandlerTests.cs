@@ -1,5 +1,6 @@
 ﻿using Domain.Exceptions;
 using Moq;
+using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Application.Commands;
 using OrderService.Domain.Contracts;
 using OrderService.Domain.Enums;
@@ -18,9 +19,9 @@ namespace OrderService.Application.Tests
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
             {
-                [productId] = (10, CurrencyCode.USD)
+                [productId] = ("Test Product", 10, CurrencyCode.USD)
             };
 
             order.Confirm(productPrices, DateTime.UtcNow);
@@ -28,8 +29,9 @@ namespace OrderService.Application.Tests
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetByIdTrackedAsync(order.Id, It.IsAny<CancellationToken>())).ReturnsAsync(order);
 
+            var notificationServiceClientMock = new Mock<INotificationServiceClient>();
             var uow = new Mock<IUnitOfWork>();
-            var handler = new CompleteOrderInternalCommandHandler(repository.Object, uow.Object);
+            var handler = new CompleteOrderInternalCommandHandler(repository.Object, notificationServiceClientMock.Object, uow.Object);
             var command = new CompleteOrderInternalCommand(order.Id);
 
             // Act
@@ -46,8 +48,9 @@ namespace OrderService.Application.Tests
             var orderId = Guid.NewGuid();
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetByIdTrackedAsync(orderId, It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
+            var notificationServiceClientMock = new Mock<INotificationServiceClient>();
             var uow = new Mock<IUnitOfWork>();
-            var handler = new CompleteOrderInternalCommandHandler(repository.Object, uow.Object);
+            var handler = new CompleteOrderInternalCommandHandler(repository.Object, notificationServiceClientMock.Object, uow.Object);
             var command = new CompleteOrderInternalCommand(orderId);
 
             // Act & Assert
@@ -61,9 +64,9 @@ namespace OrderService.Application.Tests
             var order = new Order(Guid.NewGuid(), "example@gmail.com");
             order.AddItem(Guid.NewGuid(), 1);
 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
             {
-                [order.Items.First().ProductId] = (10, CurrencyCode.USD)
+                [order.Items.First().ProductId] = ("Test Product", 10, CurrencyCode.USD)
             };
 
             order.Confirm(productPrices, DateTime.UtcNow);
@@ -71,8 +74,9 @@ namespace OrderService.Application.Tests
 
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetByIdTrackedAsync(order.Id, It.IsAny<CancellationToken>())).ReturnsAsync(order);
+            var notificationServiceClientMock = new Mock<INotificationServiceClient>();
             var uow = new Mock<IUnitOfWork>();
-            var handler = new CompleteOrderInternalCommandHandler(repository.Object, uow.Object);
+            var handler = new CompleteOrderInternalCommandHandler(repository.Object, notificationServiceClientMock.Object, uow.Object);
             var command = new CompleteOrderInternalCommand(order.Id);
 
             // Act & Assert

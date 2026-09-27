@@ -1,11 +1,13 @@
 ﻿using Domain.Exceptions;
 using Moq;
+using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Application.Commands;
 using OrderService.Domain.Contracts;
 using OrderService.Domain.Enums;
 using OrderService.Domain.Exceptions.DomainExceptions;
 using OrderService.Domain.Orders;
 using Xunit;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace OrderService.Application.Tests
 {
@@ -19,15 +21,18 @@ namespace OrderService.Application.Tests
             var userId = Guid.NewGuid();
             var email = "example@gmail.com";
             var order = new Order(userId, email);
+            var userName = "Test User";
 
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetByIdAndUserIdTrackedAsync(order.Id, userId, It.IsAny<CancellationToken>())).ReturnsAsync(order);
 
+            var notificationServiceClientMock = new Mock<INotificationServiceClient>();
+
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CancelOrderCommandHandler(repository.Object, uow.Object);
+            var handler = new CancelOrderCommandHandler(repository.Object, notificationServiceClientMock.Object, uow.Object);
 
-            var command = new CancelOrderCommand(userId, order.Id);
+            var command = new CancelOrderCommand(userId, order.Id, userName);
 
             // Act
             await handler.HandleAsync(command, TestContext.Current.CancellationToken);
@@ -42,13 +47,16 @@ namespace OrderService.Application.Tests
         public async Task Handle_ShouldThrowNotFoundException_WhenOrderDoesNotExist()
         {
             // Arrange
-            var userid = Guid.NewGuid();
+            var userId = Guid.NewGuid();
             var orderId = Guid.NewGuid();
             var repository = new Mock<IOrderRepository>();
             repository.Setup(x => x.GetByIdTrackedAsync(orderId, It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
+
+            var notificationServiceClientMock = new Mock<INotificationServiceClient>();
             var uow = new Mock<IUnitOfWork>();
-            var handler = new CancelOrderCommandHandler(repository.Object, uow.Object);
-            var command = new CancelOrderCommand(userid, orderId);
+
+            var handler = new CancelOrderCommandHandler(repository.Object, notificationServiceClientMock.Object, uow.Object);
+            var command = new CancelOrderCommand(userId, orderId, "Test User");
 
             // Act & Assert
             await Assert.ThrowsAsync<NotFoundException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
@@ -66,9 +74,9 @@ namespace OrderService.Application.Tests
 
             order.AddItem(productId, 1);
 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
             {
-                [productId] = (10, CurrencyCode.USD)
+                [productId] = ("Test Product", 10m, CurrencyCode.USD)
             };
 
             order.Confirm(productPrices, DateTime.UtcNow);
@@ -76,16 +84,23 @@ namespace OrderService.Application.Tests
 
             var repository = new Mock<IOrderRepository>();
 
-            repository.Setup(x => x.GetByIdAndUserIdTrackedAsync(order.Id, userId, It.IsAny<CancellationToken>())).ReturnsAsync(order);
+            repository
+                .Setup(x => x.GetByIdAndUserIdTrackedAsync(
+                    order.Id,
+                    userId,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(order);
 
+            var notificationServiceClientMock = new Mock<INotificationServiceClient>();
             var uow = new Mock<IUnitOfWork>();
 
-            var handler = new CancelOrderCommandHandler(repository.Object, uow.Object);
+            var handler = new CancelOrderCommandHandler(repository.Object, notificationServiceClientMock.Object, uow.Object);
 
-            var command = new CancelOrderCommand(userId, order.Id);
+            var command = new CancelOrderCommand(userId, order.Id, "Test User");
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOrderException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
+            await Assert.ThrowsAsync<InvalidOrderException>(
+                () => handler.HandleAsync(command, TestContext.Current.CancellationToken));
 
             uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }

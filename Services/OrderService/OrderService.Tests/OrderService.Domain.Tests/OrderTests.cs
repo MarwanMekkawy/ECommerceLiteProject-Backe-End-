@@ -99,9 +99,9 @@ namespace OrderService.Domain.Tests
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
             {
-                [productId] = (10, CurrencyCode.USD)
+                [productId] = ("Test Product", 10, CurrencyCode.USD)
             };
 
             // Act
@@ -123,9 +123,9 @@ namespace OrderService.Domain.Tests
             var productId = Guid.NewGuid();
             order.AddItem(productId, 2);
 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
             {
-                [productId] = (15, CurrencyCode.USD)
+                [productId] = ("Test Product", 10, CurrencyCode.USD)
             };
 
             // Act
@@ -133,9 +133,9 @@ namespace OrderService.Domain.Tests
 
             // Assert
             var item = order.Items.Single();
-            Assert.Equal(15, item.UnitPrice);
+            Assert.Equal(10, item.UnitPrice);
             Assert.Equal(CurrencyCode.USD, item.Currency);
-            Assert.Equal(30, item.Total);
+            Assert.Equal(20, item.Total);
         }
 
         [Fact]
@@ -146,9 +146,9 @@ namespace OrderService.Domain.Tests
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
             {
-                [productId] = (10, CurrencyCode.USD)
+                [productId] = ("Test Product", 10, CurrencyCode.USD)
             };
 
             // Act
@@ -165,7 +165,7 @@ namespace OrderService.Domain.Tests
         {
             // Arrange
             var order = new Order(Guid.NewGuid(), "example@gmail.com");
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>();
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>();
 
             // Act & Assert
             Assert.Throws<InvalidOrderException>(() => order.Confirm(productPrices, DateTime.UtcNow));
@@ -179,9 +179,9 @@ namespace OrderService.Domain.Tests
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
             {
-                [productId] = (10, CurrencyCode.USD)
+                [productId] = ("Test Product", 10, CurrencyCode.USD)
             };
 
             order.Confirm(productPrices, DateTime.UtcNow);
@@ -198,9 +198,9 @@ namespace OrderService.Domain.Tests
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
             {
-                [productId] = (10, CurrencyCode.USD)
+                [productId] = ("Test Product", 10, CurrencyCode.USD)
             };
 
             order.Confirm(productPrices, DateTime.UtcNow);
@@ -217,7 +217,7 @@ namespace OrderService.Domain.Tests
             var order = new Order(Guid.NewGuid(), "example@gmail.com");
             order.Cancel();
 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>();
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>();
 
             // Act & Assert
             Assert.Throws<InvalidOrderException>(() => order.Confirm(productPrices, DateTime.UtcNow));
@@ -231,9 +231,9 @@ namespace OrderService.Domain.Tests
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
             {
-                [productId] = (10, CurrencyCode.USD)
+                [productId] = ("Test Product", 10, CurrencyCode.USD)
             };
 
             order.Confirm(productPrices, DateTime.UtcNow);
@@ -280,9 +280,9 @@ namespace OrderService.Domain.Tests
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
             {
-                [productId] = (10, CurrencyCode.USD)
+                [productId] = ("Test Product", 10, CurrencyCode.USD)
             };
 
             order.Confirm(productPrices, DateTime.UtcNow);
@@ -316,9 +316,9 @@ namespace OrderService.Domain.Tests
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
             {
-                [productId] = (10, CurrencyCode.USD)
+                [productId] = ("Test Product", 10, CurrencyCode.USD)
             };
 
             order.Confirm(productPrices, DateTime.UtcNow);
@@ -338,9 +338,9 @@ namespace OrderService.Domain.Tests
             var productId = Guid.NewGuid();
             order.AddItem(productId, 1);
 
-            var productPrices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
             {
-                [productId] = (10, CurrencyCode.USD)
+                [productId] = ("Test Product", 10, CurrencyCode.USD)
             };
 
             order.Confirm(productPrices, DateTime.UtcNow);
@@ -427,12 +427,12 @@ namespace OrderService.Domain.Tests
 
             order.AddItem(productId, 2);
 
-            var prices = new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+            var productPrices = new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
             {
-                [productId] = (10, CurrencyCode.USD)
+                [productId] = ("Test Product", 10, CurrencyCode.USD)
             };
 
-            order.Confirm(prices, DateTime.UtcNow);
+            order.Confirm(productPrices, DateTime.UtcNow);
 
             // Act & Assert
             Assert.Throws<InvalidOrderException>(() => order.DecreaseItem(productId, 1));

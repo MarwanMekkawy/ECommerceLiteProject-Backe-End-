@@ -11,7 +11,7 @@ namespace OrderService.Domain.Orders
 
         public Guid Id { get; private set; }
         public Guid UserId { get; private set; }
-        public string CustomerEmail { get; private set; }
+        public string CustomerEmail { get; private set; } = null!;
         public OrderStatus Status { get; private set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public decimal Total { get; private set; }

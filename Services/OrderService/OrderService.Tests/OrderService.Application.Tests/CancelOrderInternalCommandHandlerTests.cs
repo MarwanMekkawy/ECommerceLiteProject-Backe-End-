@@ -1,20 +1,15 @@
 ﻿using Domain.Exceptions;
 using Moq;
+using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Application.Commands;
 using OrderService.Domain.Contracts;
 using OrderService.Domain.Orders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace OrderService.Application.Tests
 {
-
     public class CancelOrderInternalCommandHandlerTests
-        {
+    {
         [Fact]
         public async Task Handle_ShouldCancelOrder_WhenOrderExists()
         {
@@ -26,11 +21,16 @@ namespace OrderService.Application.Tests
             var order = new Order(userId, email);
 
             var repository = new Mock<IOrderRepository>();
+            var notificationServiceClientMock = new Mock<INotificationServiceClient>();
             var uow = new Mock<IUnitOfWork>();
 
-            repository.Setup(x => x.GetByIdTrackedAsync(orderId, It.IsAny<CancellationToken>())).ReturnsAsync(order);
+            repository
+                .Setup(x => x.GetByIdTrackedAsync(
+                    orderId,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(order);
 
-            var handler = new CancelRefundedOrderInternalCommandHandler(repository.Object, uow.Object);
+            var handler = new CancelRefundedOrderInternalCommandHandler(repository.Object, notificationServiceClientMock.Object, uow.Object);
 
             var command = new CancelRefundedOrderInternalCommand(orderId);
 
@@ -39,7 +39,9 @@ namespace OrderService.Application.Tests
 
             // Assert
             Assert.Equal(OrderStatus.CancelledAndRefunded, order.Status);
+
             repository.Verify(x => x.GetByIdTrackedAsync(orderId, It.IsAny<CancellationToken>()), Times.Once);
+
             uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
@@ -50,19 +52,24 @@ namespace OrderService.Application.Tests
             var orderId = Guid.NewGuid();
 
             var repository = new Mock<IOrderRepository>();
+            var notificationServiceClientMock = new Mock<INotificationServiceClient>();
             var uow = new Mock<IUnitOfWork>();
 
-            repository.Setup(x => x.GetByIdTrackedAsync(orderId, It.IsAny<CancellationToken>())).ReturnsAsync((Order?)null);
+            repository
+                .Setup(x => x.GetByIdTrackedAsync(
+                    orderId,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Order?)null);
 
-            var handler = new CancelRefundedOrderInternalCommandHandler(repository.Object, uow.Object);
+            var handler = new CancelRefundedOrderInternalCommandHandler(repository.Object, notificationServiceClientMock.Object, uow.Object);
 
             var command = new CancelRefundedOrderInternalCommand(orderId);
 
             // Act & Assert
-            await Assert.ThrowsAsync<NotFoundException>(() =>
-                handler.HandleAsync(command, TestContext.Current.CancellationToken));
+            await Assert.ThrowsAsync<NotFoundException>(() => handler.HandleAsync(command, TestContext.Current.CancellationToken));
 
             repository.Verify(x => x.GetByIdTrackedAsync(orderId, It.IsAny<CancellationToken>()), Times.Once);
+
             uow.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
     }

@@ -14,7 +14,6 @@ namespace OrderService.InfraStructure.Data.Configrations
                 .ValueGeneratedNever();
 
             builder.Property(x => x.ProductName)
-                .IsRequired()
                 .HasMaxLength(200);
 
             builder.Property(x => x.OrderId)

@@ -12,6 +12,7 @@ namespace OrderService.Application.Tests
     {
         private readonly Mock<IOrderRepository> orderRepositoryMock = new();
         private readonly Mock<IProductServiceClient> productServiceClientMock = new();
+        private readonly Mock<INotificationServiceClient> notificationServiceClientMock = new();
         private readonly Mock<IUnitOfWork> uowMock = new();
 
         [Fact]
@@ -25,9 +26,9 @@ namespace OrderService.Application.Tests
             order.AddItem(productId, 2);
 
             order.Confirm(
-                new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+                new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
                 {
-                    [productId] = (100m, CurrencyCode.USD)
+                    [productId] = ("Test Product", 100m, CurrencyCode.USD)
                 },
                 DateTime.UtcNow.AddDays(-4));
 
@@ -37,10 +38,7 @@ namespace OrderService.Application.Tests
                 .Setup(x => x.IncreaseStockAsync(productId, 2, It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var service = new CancelExpiredOrdersService(
-                orderRepositoryMock.Object,
-                productServiceClientMock.Object,
-                uowMock.Object);
+            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, productServiceClientMock.Object, notificationServiceClientMock.Object, uowMock.Object);
 
             // Act
             await service.CancelExpiredAsync(TestContext.Current.CancellationToken);
@@ -68,10 +66,10 @@ namespace OrderService.Application.Tests
             order.AddItem(productId2, 5);
 
             order.Confirm(
-                new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+                new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
                 {
-                    [productId1] = (100m, CurrencyCode.USD),
-                    [productId2] = (50m, CurrencyCode.USD)
+                    [productId1] = ("Test Product 1", 100m, CurrencyCode.USD),
+                    [productId2] = ("Test Product 2", 50m, CurrencyCode.USD)
                 },
                 DateTime.UtcNow.AddDays(-4));
 
@@ -85,7 +83,7 @@ namespace OrderService.Application.Tests
                     It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, productServiceClientMock.Object, uowMock.Object);
+            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, productServiceClientMock.Object, notificationServiceClientMock.Object, uowMock.Object);
 
             // Act
             await service.CancelExpiredAsync(TestContext.Current.CancellationToken);
@@ -108,10 +106,7 @@ namespace OrderService.Application.Tests
             orderRepositoryMock
                 .Setup(x => x.GetConfirmedOrdersPastExpiryDateAsync(It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
-            var service = new CancelExpiredOrdersService(
-                orderRepositoryMock.Object,
-                productServiceClientMock.Object,
-                uowMock.Object);
+            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, productServiceClientMock.Object, notificationServiceClientMock.Object, uowMock.Object);
 
             // Act
             await service.CancelExpiredAsync(TestContext.Current.CancellationToken);
@@ -134,9 +129,9 @@ namespace OrderService.Application.Tests
             order.AddItem(productId, 2);
 
             order.Confirm(
-                new Dictionary<Guid, (decimal UnitPrice, CurrencyCode Currency)>
+                new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
                 {
-                    [productId] = (100m, CurrencyCode.USD)
+                    [productId] = ("Test Product", 100m, CurrencyCode.USD)
                 },
                 DateTime.UtcNow.AddDays(-4));
 
@@ -146,7 +141,7 @@ namespace OrderService.Application.Tests
                 .Setup(x => x.IncreaseStockAsync(productId, 2, It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception("Product service unavailable"));
 
-            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, productServiceClientMock.Object, uowMock.Object);
+            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, productServiceClientMock.Object, notificationServiceClientMock.Object, uowMock.Object);
 
             // Act & Assert
             await Assert.ThrowsAsync<Exception>(() => service.CancelExpiredAsync(TestContext.Current.CancellationToken));
