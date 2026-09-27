@@ -21,7 +21,7 @@ namespace OrderService.Application.Commands
             await uow.SaveChangesAsync(cancellationToken);
 
             var items = order.Items.Select
-                (item => $"Product: {item.ProductName}, Quantity: {item.Quantity} X UnitPrice: {item.UnitPrice:N2}= {item.Total:N2}{item.Currency}").ToList();
+                (item => $"<strong>{item.ProductName}:</strong> {item.Quantity} X {item.UnitPrice:N2} = {item.Total:N2}{item.Currency}").ToList();
             await notificationServiceClient.SendOrderCompletedAsync
                 (order.UserId, order.CustomerEmail, "Customer", order.Id, items, order.Total, order.Currency.ToString(), cancellationToken);
         }

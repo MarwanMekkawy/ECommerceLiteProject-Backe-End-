@@ -9,7 +9,7 @@ namespace PaymentService.Infrastructure.Clients.NotificationServiceClient
     {
         private async Task SendAsync(SendEmailNotificationRequestDto request, string token)
         {
-            using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "notifications");
+            using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "notifications/internal");
 
             httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 

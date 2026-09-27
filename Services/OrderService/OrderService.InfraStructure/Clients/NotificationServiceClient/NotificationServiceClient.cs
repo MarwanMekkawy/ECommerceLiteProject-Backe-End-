@@ -9,7 +9,7 @@ namespace OrderService.InfraStructure.Clients.NotificationServiceClient
     {
         private async Task SendAsync(SendEmailNotificationRequestDto request, string token)
         {
-            using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "notifications");
+            using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "notifications/internal");
 
             httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -49,7 +49,7 @@ namespace OrderService.InfraStructure.Clients.NotificationServiceClient
                     ["orderId"] = orderId,
                     ["total"] = total,
                     ["currency"] = currency,
-                    ["paymentExpiresAt"] = paymentExpiresAt
+                    ["paymentExpiresAt"] = paymentExpiresAt.ToString("dd MMMM yyyy, HH:mm 'UTC'")
                 }
             };
 
@@ -57,7 +57,7 @@ namespace OrderService.InfraStructure.Clients.NotificationServiceClient
         }
 
         public async Task SendOrderCompletedAsync
-            (Guid userId, string recipientEmail, string firstName, Guid orderId, object items, decimal total, string currency, CancellationToken cancellationToken)
+            (Guid userId, string recipientEmail, string firstName, Guid orderId, List<string> items, decimal total, string currency, CancellationToken cancellationToken)
         {
             var token = await serviceTokenClient.GetTokenAsync(cancellationToken);
 
@@ -70,12 +70,11 @@ namespace OrderService.InfraStructure.Clients.NotificationServiceClient
                 {
                     ["firstName"] = firstName,
                     ["orderId"] = orderId,
-                    ["items"] = items,
+                    ["items"] = string.Join("<br>", items),
                     ["total"] = total,
                     ["currency"] = currency
                 }
             };
-
             await SendAsync(request, token);
         }
 
