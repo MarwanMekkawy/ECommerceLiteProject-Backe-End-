@@ -3,6 +3,6 @@
     public interface INotificationServiceClient
     {
         Task SendPaymentFailedAsync(Guid userId, string recipientEmail, string firstName, Guid orderId, Guid paymentId, decimal amount, string currency, string failureReason, CancellationToken cancellationToken);
-        Task SendPaymentRefundedAsync(Guid userId, string recipientEmail, string firstName, Guid orderId, Guid paymentId, decimal refundAmount, CancellationToken cancellationToken);
+        Task SendPaymentRefundedAsync(Guid userId, string recipientEmail, string firstName, Guid orderId, Guid paymentId, decimal refundAmount, string currency, CancellationToken cancellationToken);
     }
 }

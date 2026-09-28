@@ -2,9 +2,7 @@
 using IdentityService.Application.DTOs.AdminDtos;
 using IdentityService.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace IdentityService.API.Controllers
 {

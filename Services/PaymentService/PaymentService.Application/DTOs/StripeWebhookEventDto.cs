@@ -7,6 +7,7 @@
         public string PaymentIntentId { get; set; } = null!;
         public string Type { get; set; } = null!;
         public long? RefundAmount { get; set; }
+        public string Currency { get; set; } = string.Empty;
         public string? FailureReason { get; set; }
         public string? RefundStatus { get; set; }
     }

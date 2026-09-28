@@ -60,7 +60,7 @@ namespace PaymentService.Infrastructure.Clients.NotificationServiceClient
         }
 
         public async Task SendPaymentRefundedAsync
-            (Guid userId, string recipientEmail, string firstName, Guid orderId, Guid paymentId, decimal refundAmount, CancellationToken cancellationToken)
+            (Guid userId, string recipientEmail, string firstName, Guid orderId, Guid paymentId, decimal refundAmount, string currency, CancellationToken cancellationToken)
         {
             var token = await serviceTokenClient.GetTokenAsync(cancellationToken);
 
@@ -74,6 +74,7 @@ namespace PaymentService.Infrastructure.Clients.NotificationServiceClient
                     ["firstName"] = firstName,
                     ["orderId"] = orderId,
                     ["paymentId"] = paymentId,
+                    ["currency"] = currency,
                     ["refundAmount"] = refundAmount
                 }
             };

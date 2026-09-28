@@ -75,9 +75,9 @@ namespace PaymentService.Application.Services
             payment.MarkAsRequiresAction();
         }
         // refund methods ===============================================================================================
-        private async Task HandleRefundCreatedAndNotifyAsync(string refundId, string? refundStatus, long? refundAmount, CancellationToken cancellationToken)
+        private async Task HandleRefundCreatedAndNotifyAsync(string paymentIntentId, string refundId, string? refundStatus, long? refundAmount, string currency, CancellationToken cancellationToken)
         {
-            var payment = await _unitOfWork.Payments.GetByStripeRefundIdAsync(refundId, cancellationToken);
+            var payment = await _unitOfWork.Payments.GetByStripePaymentIntentIdAsync(paymentIntentId, cancellationToken);
 
             if (payment is null)
                 throw new InvalidOperationException("Payment not found.");
@@ -94,7 +94,7 @@ namespace PaymentService.Application.Services
                     payment.MarkAsRefunded(refundId);
                     //notify refunded
                     await _notificationServiceClient.SendPaymentRefundedAsync(payment.UserId, payment.CustomerEmail, "Customer", payment.OrderId, 
-                        payment.Id, refundAmount!.Value / 100m, cancellationToken);
+                        payment.Id, refundAmount!.Value / 100m, currency, cancellationToken);
                     break;
 
                 case "pending":
@@ -107,9 +107,9 @@ namespace PaymentService.Application.Services
                     break;
             }
         }
-        private async Task HandleRefundUpdatedAndNotifyAsync(string refundId, string? refundStatus, long? refundAmount, CancellationToken cancellationToken)
+        private async Task HandleRefundUpdatedAndNotifyAsync(string paymentIntentId, string refundId, string? refundStatus, long? refundAmount, string currency, CancellationToken cancellationToken)
         {
-            var payment = await _unitOfWork.Payments.GetByStripeRefundIdAsync(refundId, cancellationToken);
+            var payment = await _unitOfWork.Payments.GetByStripePaymentIntentIdAsync(paymentIntentId, cancellationToken);
 
             if (payment is null)
                 throw new InvalidOperationException("Payment not found.");
@@ -122,7 +122,7 @@ namespace PaymentService.Application.Services
                         payment.MarkAsRefunded(refundId);
                         //notify refunded if didnt already do it
                         await _notificationServiceClient.SendPaymentRefundedAsync(payment.UserId, payment.CustomerEmail, "Customer", payment.OrderId, 
-                            payment.Id, refundAmount!.Value / 100m, cancellationToken);
+                            payment.Id, refundAmount!.Value / 100m, currency, cancellationToken);
                     }
                     break;
 
@@ -140,9 +140,9 @@ namespace PaymentService.Application.Services
                     break;
             }
         }
-        private async Task HandleRefundFailedAsync(string refundId, string? failureReason, long? refundAmount, CancellationToken cancellationToken)
+        private async Task HandleRefundFailedAsync(string paymentIntentId, string refundId, string? failureReason, long? refundAmount, CancellationToken cancellationToken)
         {
-            var payment = await _unitOfWork.Payments.GetByStripeRefundIdAsync(refundId, cancellationToken);
+            var payment = await _unitOfWork.Payments.GetByStripePaymentIntentIdAsync(paymentIntentId, cancellationToken);
 
             if (payment is null)
                 throw new InvalidOperationException("Payment not found.");
@@ -238,15 +238,17 @@ namespace PaymentService.Application.Services
 
                 // refunds
                 case "refund.created":
-                    await HandleRefundCreatedAndNotifyAsync(webhookEvent.RefundId, webhookEvent.RefundStatus, webhookEvent.RefundAmount, cancellationToken);
+                    await HandleRefundCreatedAndNotifyAsync
+                        (webhookEvent.PaymentIntentId, webhookEvent.RefundId, webhookEvent.RefundStatus, webhookEvent.RefundAmount, webhookEvent.Currency, cancellationToken);
                     break;
 
                 case "refund.updated":
-                    await HandleRefundUpdatedAndNotifyAsync(webhookEvent.RefundId, webhookEvent.RefundStatus, webhookEvent.RefundAmount, cancellationToken);
+                    await HandleRefundUpdatedAndNotifyAsync
+                        (webhookEvent.PaymentIntentId, webhookEvent.RefundId, webhookEvent.RefundStatus, webhookEvent.RefundAmount, webhookEvent.Currency, cancellationToken);
                     break;
 
                 case "refund.failed":
-                    await HandleRefundFailedAsync(webhookEvent.RefundId, webhookEvent.FailureReason, webhookEvent.RefundAmount, cancellationToken);
+                    await HandleRefundFailedAsync(webhookEvent.PaymentIntentId, webhookEvent.RefundId, webhookEvent.FailureReason, webhookEvent.RefundAmount, cancellationToken);
                     break;
             }
 
