@@ -149,7 +149,7 @@ namespace OrderService.Domain.Orders
         public void Cancel(bool cancelledWithRefund = false)
         {
             if (Status != OrderStatus.Pending && Status != OrderStatus.Confirmed && !(Status == OrderStatus.Completed && cancelledWithRefund))
-                throw new InvalidOrderException("Only pending or confirmed orders can be cancelled.");
+                throw new InvalidOrderException("Only pending or confirmed orders can be cancelled, or completed orders can be cancelled with a refund.");
 
             Status = cancelledWithRefund ? OrderStatus.CancelledAndRefunded : OrderStatus.Cancelled;
         }
