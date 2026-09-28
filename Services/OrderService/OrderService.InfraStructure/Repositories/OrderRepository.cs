@@ -58,5 +58,12 @@ namespace OrderService.Domain.Contracts
         {
             return await _context.Orders.Include(x => x.Items).Where(x => x.ExpiresAt <= DateTime.UtcNow && x.Status == OrderStatus.Confirmed).ToListAsync(cancellationToken);
         }
+
+        public async Task<IReadOnlyList<Order>> GetCancelledOrdersPendingStockCompensationAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Orders.Include(x => x.Items)
+                .Where(x => (x.Status == OrderStatus.Cancelled || x.Status == OrderStatus.CancelledAndRefunded) && x.ConfirmedAt != null && !x.IsStockCompensated)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

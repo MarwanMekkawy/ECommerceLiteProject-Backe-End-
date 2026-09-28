@@ -33,6 +33,7 @@ namespace OrderService.Application.Extentions.App
             services.AddAutoMapper(cfg => { cfg.AddMaps(typeof(AutoMapperMarker).Assembly); });
 
             services.AddScoped<ICancelExpiredOrdersService, CancelExpiredOrdersService>();
+            services.AddScoped<IStockCompensationService, StockCompensationService>();
 
             return services;
         }

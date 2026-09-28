@@ -42,7 +42,10 @@ namespace OrderService.InfraStructure.Data.Configrations
                 .IsRequired(false);
 
             builder.Property(x => x.IsCancelledDueToExpiry)
-                .IsRequired();    
+                .IsRequired();
+
+            builder.Property(x => x.IsStockCompensated)
+                .IsRequired();
 
             //user can have only one Pending order at a time
             builder.HasIndex(x => x.UserId)

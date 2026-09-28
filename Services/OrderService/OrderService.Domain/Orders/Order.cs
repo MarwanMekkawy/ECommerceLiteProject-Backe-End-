@@ -19,6 +19,7 @@ namespace OrderService.Domain.Orders
         public DateTime? ConfirmedAt { get; private set; }
         public DateTime? ExpiresAt { get; private set; }
         public bool IsCancelledDueToExpiry { get; private set; } = false;
+        public bool IsStockCompensated { get; private set; } = false;
 
         public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
 
@@ -161,6 +162,12 @@ namespace OrderService.Domain.Orders
 
             IsCancelledDueToExpiry = true;
             Status = OrderStatus.Cancelled;
+        }
+
+        // mark compensated stock for order
+        public void MarkStockCompensated()
+        {
+            IsStockCompensated = true;  
         }
     }
 }

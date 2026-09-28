@@ -14,5 +14,6 @@ namespace OrderService.Domain.Contracts
         Task<IReadOnlyList<Order>> GetPagedByUserIdAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<Order>> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<Order>> GetConfirmedOrdersPastExpiryDateAsync(CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<Order>> GetCancelledOrdersPendingStockCompensationAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -11,12 +11,11 @@ namespace OrderService.Application.Tests
     public class CancelExpiredOrdersServiceTests
     {
         private readonly Mock<IOrderRepository> orderRepositoryMock = new();
-        private readonly Mock<IProductServiceClient> productServiceClientMock = new();
         private readonly Mock<INotificationServiceClient> notificationServiceClientMock = new();
         private readonly Mock<IUnitOfWork> uowMock = new();
 
         [Fact]
-        public async Task CancelExpiredAsync_ShouldRestoreStockAndCancelOrder()
+        public async Task CancelExpiredAsync_ShouldCancelExpiredOrder()
         {
             // Arrange
             var productId = Guid.NewGuid();
@@ -34,11 +33,7 @@ namespace OrderService.Application.Tests
 
             orderRepositoryMock.Setup(x => x.GetConfirmedOrdersPastExpiryDateAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Order> { order });
 
-            productServiceClientMock
-                .Setup(x => x.IncreaseStockAsync(productId, 2, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-
-            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, productServiceClientMock.Object, notificationServiceClientMock.Object, uowMock.Object);
+            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, notificationServiceClientMock.Object, uowMock.Object);
 
             // Act
             await service.CancelExpiredAsync(TestContext.Current.CancellationToken);
@@ -47,56 +42,85 @@ namespace OrderService.Application.Tests
             Assert.Equal(OrderStatus.Cancelled, order.Status);
             Assert.True(order.IsCancelledDueToExpiry);
 
-            productServiceClientMock.Verify(
-                x => x.IncreaseStockAsync(productId, 2, It.IsAny<CancellationToken>()), Times.Once);
-
-            uowMock.Verify(x => x.SaveChangesAsync( It.IsAny<CancellationToken>()), Times.Once);
+            uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
-        public async Task CancelExpiredAsync_ShouldRestoreStockForAllItems()
+        public async Task CancelExpiredAsync_ShouldCancelAllExpiredOrders()
         {
             // Arrange
             var productId1 = Guid.NewGuid();
             var productId2 = Guid.NewGuid();
 
-            var order = new Order(Guid.NewGuid(), "example@gmail.com");
+            var order1 = new Order(Guid.NewGuid(), "example@gmail.com");
+            var order2 = new Order(Guid.NewGuid(), "example@gmail.com");
 
-            order.AddItem(productId1, 2);
-            order.AddItem(productId2, 5);
+            order1.AddItem(productId1, 2);
+            order2.AddItem(productId2, 5);
 
-            order.Confirm(
+            order1.Confirm(
                 new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
                 {
-                    [productId1] = ("Test Product 1", 100m, CurrencyCode.USD),
-                    [productId2] = ("Test Product 2", 50m, CurrencyCode.USD)
+                    [productId1] = ("Test Product 1", 100m, CurrencyCode.USD)
                 },
                 DateTime.UtcNow.AddDays(-4));
 
-            orderRepositoryMock.Setup(x => x.GetConfirmedOrdersPastExpiryDateAsync(
-                    It.IsAny<CancellationToken>())).ReturnsAsync(new List<Order> { order });
+            order2.Confirm(
+                new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
+                {
+                    [productId2] = ("Test Product 2", 50m, CurrencyCode.USD)
+                },
+                DateTime.UtcNow.AddDays(-5));
 
-            productServiceClientMock
-                .Setup(x => x.IncreaseStockAsync(
-                    It.IsAny<Guid>(),
-                    It.IsAny<int>(),
-                    It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
+            orderRepositoryMock.Setup(x => x.GetConfirmedOrdersPastExpiryDateAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Order> { order1, order2 });
 
-            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, productServiceClientMock.Object, notificationServiceClientMock.Object, uowMock.Object);
+            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, notificationServiceClientMock.Object, uowMock.Object);
 
             // Act
             await service.CancelExpiredAsync(TestContext.Current.CancellationToken);
 
             // Assert
-            productServiceClientMock.Verify(
-                x => x.IncreaseStockAsync(productId1, 2, It.IsAny<CancellationToken>()), Times.Once);
+            Assert.Equal(OrderStatus.Cancelled, order1.Status);
+            Assert.True(order1.IsCancelledDueToExpiry);
 
-            productServiceClientMock.Verify(
-                x => x.IncreaseStockAsync(productId2, 5, It.IsAny<CancellationToken>()), Times.Once);
+            Assert.Equal(OrderStatus.Cancelled, order2.Status);
+            Assert.True(order2.IsCancelledDueToExpiry);
 
-            Assert.Equal(OrderStatus.Cancelled, order.Status);
-            Assert.True(order.IsCancelledDueToExpiry);
+            uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task CancelExpiredAsync_ShouldSendCancellationNotification()
+        {
+            // Arrange
+            var productId = Guid.NewGuid();
+
+            var order = new Order(Guid.NewGuid(), "example@gmail.com");
+
+            order.AddItem(productId, 2);
+
+            order.Confirm(
+                new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
+                {
+                    [productId] = ("Test Product", 100m, CurrencyCode.USD)
+                },
+                DateTime.UtcNow.AddDays(-4));
+
+            orderRepositoryMock.Setup(x => x.GetConfirmedOrdersPastExpiryDateAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Order> { order });
+
+            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, notificationServiceClientMock.Object, uowMock.Object);
+
+            // Act
+            await service.CancelExpiredAsync(TestContext.Current.CancellationToken);
+
+            // Assert
+            notificationServiceClientMock.Verify(
+                x => x.SendOrderCancelledDueExpirationAsync(
+                    order.UserId,
+                    order.CustomerEmail,
+                    "Customer",
+                    order.Id,
+                    It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -106,50 +130,21 @@ namespace OrderService.Application.Tests
             orderRepositoryMock
                 .Setup(x => x.GetConfirmedOrdersPastExpiryDateAsync(It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
-            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, productServiceClientMock.Object, notificationServiceClientMock.Object, uowMock.Object);
+            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, notificationServiceClientMock.Object, uowMock.Object);
 
             // Act
             await service.CancelExpiredAsync(TestContext.Current.CancellationToken);
 
             // Assert
-            productServiceClientMock.Verify(
-                x => x.IncreaseStockAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
+            notificationServiceClientMock.Verify(
+                x => x.SendOrderCancelledDueExpirationAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()), Times.Never);
 
             uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task CancelExpiredAsync_ShouldNotCancelOrder_WhenStockRestorationFails()
-        {
-            // Arrange
-            var productId = Guid.NewGuid();
-
-            var order = new Order(Guid.NewGuid(), "example@gmail.com");
-
-            order.AddItem(productId, 2);
-
-            order.Confirm(
-                new Dictionary<Guid, (string Name, decimal UnitPrice, CurrencyCode Currency)>
-                {
-                    [productId] = ("Test Product", 100m, CurrencyCode.USD)
-                },
-                DateTime.UtcNow.AddDays(-4));
-
-            orderRepositoryMock.Setup(x => x.GetConfirmedOrdersPastExpiryDateAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Order> { order });
-
-            productServiceClientMock
-                .Setup(x => x.IncreaseStockAsync(productId, 2, It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new Exception("Product service unavailable"));
-
-            var service = new CancelExpiredOrdersService(orderRepositoryMock.Object, productServiceClientMock.Object, notificationServiceClientMock.Object, uowMock.Object);
-
-            // Act & Assert
-            await Assert.ThrowsAsync<Exception>(() => service.CancelExpiredAsync(TestContext.Current.CancellationToken));
-
-            Assert.Equal(OrderStatus.Confirmed, order.Status);
-            Assert.False(order.IsCancelledDueToExpiry);
-
-            uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }

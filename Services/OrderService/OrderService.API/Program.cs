@@ -24,6 +24,7 @@ namespace OrderService.API
 
             // Register the {background} cleaning expired pending orders
             builder.Services.AddHostedService<CancelExpiredOrdersBackgroundService>();
+            builder.Services.AddHostedService<StockCompensationBackgroundService>();
 
             // Add services to the container.
             builder.Services.AddControllers()
