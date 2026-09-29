@@ -4,6 +4,7 @@ using PaymentService.Application.DTOs;
 using PaymentService.Domain.Contracts;
 using PaymentService.Domain.Entities;
 using PaymentService.Domain.Enums;
+using PaymentService.Domain.Exceptions;
 using PaymentService.Domain.ValueObjects;
 
 namespace PaymentService.Application.Services
@@ -169,7 +170,7 @@ namespace PaymentService.Application.Services
                     };
                 }
 
-                throw new InvalidOperationException("A payment already exists for this order.");
+                throw new InvalidOperationException("A payment already exists for this order."); 
             }
 
             var payment = new Payment(orderId, userId, new Money(amount, currency), email);
@@ -183,6 +184,24 @@ namespace PaymentService.Application.Services
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return new CreatePaymentResponseDto { PaymentId = payment.Id, ClientSecret = stripeResult.ClientSecret, Status = payment.Status };
+        }
+
+        public async Task<RetryPaymentResponseDto> RetryPaymentAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default)
+        {
+            var payment = await _unitOfWork.Payments.GetByOrderIdAsync(orderId, cancellationToken);
+
+            if (payment is null || payment.UserId != userId)
+                throw new NotFoundException("Payment not found.");
+
+            if (payment.Status != PaymentStatus.Failed)
+                throw new InvalidOperationException("Payment cannot be retried.");
+
+            var stripeResult = await _stripePaymentClient.GetPaymentIntentAsync(payment.StripePaymentIntentId!, cancellationToken);
+
+            if (stripeResult.Status is not ("requires_payment_method" or "requires_confirmation" or "requires_action"))            
+                throw new InvalidOperationException("The payment can no longer be retried.");
+
+            return new RetryPaymentResponseDto { PaymentId = payment.Id, ClientSecret = stripeResult.ClientSecret, Status = payment.Status };
         }
 
         public async Task RefundPaymentAsync(Guid paymentId, CancellationToken cancellationToken = default)

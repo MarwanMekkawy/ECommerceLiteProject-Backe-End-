@@ -6,6 +6,7 @@ namespace PaymentService.Application.Abstractions.ClientsAbstractions
     public interface IStripePaymentClient
     {
         Task<StripePaymentResultDto> CreatePaymentIntentAsync(decimal amount, CurrencyCode currency, Guid paymentId, CancellationToken cancellationToken = default);
+        Task<StripePaymentResultDto> GetPaymentIntentAsync(string paymentIntentId, CancellationToken cancellationToken = default);
         Task<string> CreateRefundAsync(string paymentIntentId, CancellationToken cancellationToken = default);
         StripeWebhookEventDto ConstructWebhookEvent(string json, string stripeSignature);
     }

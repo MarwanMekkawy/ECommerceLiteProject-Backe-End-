@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PaymentService.Application.Abstractions;
 using PaymentService.Application.DTOs;
 using PaymentService.Domain.Enums;
+using System.Security.Claims;
 
 namespace PaymentService.API.Controllers
 {
@@ -24,6 +25,23 @@ namespace PaymentService.API.Controllers
         public async Task<ActionResult<CreatePaymentResponseDto>> CreatePayment(CreatePaymentRequestDto request, CancellationToken cancellationToken)
         {
             var result = await paymentAppService.CreatePaymentAsync(request.OrderId, request.UserId, request.Amount, request.Currency, request.Email, cancellationToken);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Retries a failed payment for the specified order using the existing Stripe PaymentIntent.
+        /// </summary>
+        /// <param name="orderId">The identifier of the order associated with the payment.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>The payment retry details, including the payment identifier, Stripe client secret, and payment status.</returns>
+        [HttpPost("orders/{orderId}/retry")]
+        [Authorize]
+        public async Task<ActionResult<RetryPaymentResponseDto>> RetryPayment(Guid orderId,CancellationToken cancellationToken)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var result = await paymentAppService.RetryPaymentAsync(orderId, userId, cancellationToken);
 
             return Ok(result);
         }

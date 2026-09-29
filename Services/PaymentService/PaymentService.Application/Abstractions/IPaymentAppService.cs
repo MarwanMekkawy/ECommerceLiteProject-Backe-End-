@@ -6,6 +6,7 @@ namespace PaymentService.Application.Abstractions
     public interface IPaymentAppService
     {
         Task<CreatePaymentResponseDto> CreatePaymentAsync(Guid orderId, Guid userId, decimal amount, CurrencyCode currency,string email, CancellationToken cancellationToken = default);
+        Task<RetryPaymentResponseDto> RetryPaymentAsync(Guid orderId, Guid userId, CancellationToken cancellationToken = default);
         Task RefundPaymentAsync(Guid paymentId, CancellationToken cancellationToken = default);
         Task HandleStripeWebhookAsync(string json, string stripeSignature, CancellationToken cancellationToken = default);
     }
