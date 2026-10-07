@@ -34,11 +34,7 @@ namespace IdentityService.API.Controllers
         {
             await emailVerificationService.ConfirmEmailAsync(token, cancellationToken);
 
-            //@ add valid url to redirect
             return Redirect($"{config["FrontendBaseUrlForRedirect"]}/login");
-
-            //@ for testing
-            //return Ok("confirmed");
         }
 
         /// <summary>
@@ -70,11 +66,8 @@ namespace IdentityService.API.Controllers
 
             await changeEmailVerificationUseCase.EmailChangeAsync(claims.UserId, dto, cancellationToken);
 
-            //@ add valid url to redirect
-            //return Redirect($"{config["FrontendBaseUrlForRedirect"]}/resendemail");
+            return Redirect($"{config["FrontendBaseUrlForRedirect"]}/resendemail");
 
-            //@ for testing
-            return Ok();
         }
 
         /// <summary>
@@ -89,11 +82,7 @@ namespace IdentityService.API.Controllers
         {
             await confirmEmailChangeUseCase.SendEmailChangeConfirmationAsync(token, cancellationToken);
 
-            //@ add valid url to redirect
             return Redirect($"{config["FrontendBaseUrlForRedirect"]}/login");
-
-            //@ for testing
-            //return Ok();
         }
     }
 }

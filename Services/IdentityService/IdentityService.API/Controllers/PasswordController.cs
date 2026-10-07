@@ -27,11 +27,7 @@ namespace IdentityService.API.Controllers
         {
             await forgotPasswordVerificationUseCase.ForgotPasswordAsync(dto, cancellationToken);
 
-            //@ add valid url to redirect
-            //return Redirect($"{config["FrontendBaseUrlForRedirect"]}/resendemail");
-
-            //@ for testing
-            return Ok();
+            return Redirect($"{config["FrontendBaseUrlForRedirect"]}/resendemail");
         }
 
         /// <summary>
@@ -48,11 +44,7 @@ namespace IdentityService.API.Controllers
 
             CookieHelper.DeleteRefreshTokenCookie(Response);
 
-            //@ add valid url to redirect
-            //return Redirect($"{config["FrontendBaseUrlForRedirect"]}/login");
-
-            //@ for testing
-            return Ok();
+            return Redirect($"{config["FrontendBaseUrlForRedirect"]}/login");
         }
     }
 }
