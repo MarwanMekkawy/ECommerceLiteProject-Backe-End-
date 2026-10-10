@@ -1,13 +1,16 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OrderService.API.BackgroundTasks;
 using OrderService.API.Middleware;
 using OrderService.Application.Extentions.App;
+using OrderService.InfraStructure;
 using OrderService.InfraStructure.Extentions.Infra;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 
 
@@ -15,7 +18,7 @@ namespace OrderService.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -126,6 +129,13 @@ namespace OrderService.API
             });
 
             var app = builder.Build();
+
+            //auotmigrate on startup
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
+                await context.Database.MigrateAsync();
+            }
 
             app.UseHttpsRedirection();
 

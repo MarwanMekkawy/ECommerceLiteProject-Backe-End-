@@ -1,0 +1,19 @@
+# .NET build output
+**/bin/
+**/obj/
+
+# Tests
+**/*Tests/
+**/*Test/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vs/
+.vscode/
+
+# Docker
+Dockerfile*
+docker-compose*.yml

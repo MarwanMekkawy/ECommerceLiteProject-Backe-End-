@@ -1,19 +1,22 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NotificationService.API.BackgroundTasks;
 using NotificationService.API.Middlewere;
 using NotificationService.Application.Extentions.App;
+using NotificationService.Infrastructure;
 using NotificationService.Infrastructure.Extentions.Infra;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Threading.Tasks;
 
 
 namespace NotificationService.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -78,6 +81,13 @@ namespace NotificationService.API
 
 
             var app = builder.Build();
+
+            //auotmigrate on startup
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
+                await context.Database.MigrateAsync();
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

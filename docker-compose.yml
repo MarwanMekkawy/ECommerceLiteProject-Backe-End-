@@ -1,0 +1,248 @@
+# ==============================================================================================================================
+# COMMON ENVIRONMENT
+# ==============================================================================================================================
+
+x-common-env: &common-env
+  ASPNETCORE_ENVIRONMENT: Production
+
+  # JWT - shared by all services
+  Jwt__Secret: ${Jwt__Secret}
+
+  # RSA public key - shared by services that validate service-client JWTs
+  JwtForServiceClient__PublicKey: ${JwtForServiceClient__PublicKey}
+
+
+services:
+
+  # ============================================================================================================================
+  # IDENTITY SERVICE
+  # ============================================================================================================================
+
+  identity:
+    image: ecommercelite-identity:1.0
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: identity
+
+    environment:
+      # Common environment
+      <<: *common-env
+   
+      # Database
+      ConnectionStrings__IdentitySqlServerConnection: "Server=sqlserver,1433;Database=ECommerceLiteIdentityDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+
+      # JWT
+      Jwt__ExpiryInMinutes: ${Jwt__ExpiryInMinutes}
+
+      # Refresh Token
+      RefreshToken__Secret: ${RefreshToken__Secret}
+      RefreshToken__ExpiryInMinutes: ${RefreshToken__ExpiryInMinutes}
+      RefreshToken__ExpiryInMinutesRememberMe: ${RefreshToken__ExpiryInMinutesRememberMe}
+
+      # Service-client JWT private key
+      JwtForServiceClient__PrivateKey: ${JwtForServiceClient__PrivateKey}
+
+      # Service credentials
+      ClientsCredentials__ProductService__ServiceId: ${ClientsCredentials__ProductService__ServiceId}
+      ClientsCredentials__ProductService__ServiceSecret: ${ClientsCredentials__ProductService__ServiceSecret}
+
+      ClientsCredentials__OrderService__ServiceId: ${ClientsCredentials__OrderService__ServiceId}
+      ClientsCredentials__OrderService__ServiceSecret: ${ClientsCredentials__OrderService__ServiceSecret}
+
+      ClientsCredentials__PaymentService__ServiceId: ${ClientsCredentials__PaymentService__ServiceId}
+      ClientsCredentials__PaymentService__ServiceSecret: ${ClientsCredentials__PaymentService__ServiceSecret}
+
+      ClientsCredentials__NotificationService__ServiceId: ${ClientsCredentials__NotificationService__ServiceId}
+      ClientsCredentials__NotificationService__ServiceSecret: ${ClientsCredentials__NotificationService__ServiceSecret}
+
+      ClientsCredentials__IdentityService__ServiceId: ${ClientsCredentials__IdentityService__ServiceId}
+      ClientsCredentials__IdentityService__ServiceSecret: ${ClientsCredentials__IdentityService__ServiceSecret}
+
+      # HTTP Clients
+      HttpClients__IdentityService__BaseUrl: ${HttpClients__IdentityService__BaseUrl}
+      HttpClients__NotificationService__BaseUrl: ${HttpClients__NotificationService__BaseUrl}
+
+      # Default Admin
+      DefaultAdmin__FirstName: ${DefaultAdmin__FirstName}
+      DefaultAdmin__LastName: ${DefaultAdmin__LastName}
+      DefaultAdmin__Email: ${DefaultAdmin__Email}
+      DefaultAdmin__Password: ${DefaultAdmin__Password}
+
+      # Frontend
+      FrontendBaseUrlForRedirect: ${FrontendBaseUrlForRedirect}
+
+    ports:
+      - "7050:7050"
+    restart: unless-stopped
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+
+  # ============================================================================================================================
+  # PRODUCT SERVICE
+  # ============================================================================================================================
+
+  product:
+    image: ecommercelite-product:1.0
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: product
+
+    environment:
+      # Common environment
+      <<: *common-env
+
+      # Database
+      ConnectionStrings__ProductSqlServerConnection: "Server=sqlserver,1433;Database=ECommerceLiteProductsDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+
+    ports:
+      - "7060:7060"
+    restart: unless-stopped
+    depends_on:
+      sqlserver:
+        condition: service_healthy  
+
+
+  # ============================================================================================================================
+  # ORDER SERVICE
+  # ============================================================================================================================
+
+  order:
+    image: ecommercelite-order:1.0
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: order
+
+    environment:
+      # Common environment
+      <<: *common-env
+
+      # Database
+      ConnectionStrings__OrderSqlServerConnection: "Server=sqlserver,1433;Database=ECommerceLiteOrdersDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+
+      # Service credentials
+      OrderService__ServiceSecret: ${ClientsCredentials__OrderService__ServiceSecret}
+
+      # HTTP Clients
+      HttpClients__IdentityService__BaseUrl: ${HttpClients__IdentityService__BaseUrl}
+      HttpClients__ProductService__BaseUrl: ${HttpClients__ProductService__BaseUrl}
+      HttpClients__PaymentService__BaseUrl: ${HttpClients__PaymentService__BaseUrl}
+      HttpClients__NotificationService__BaseUrl: ${HttpClients__NotificationService__BaseUrl}
+
+    ports:
+      - "7070:7070"
+    restart: unless-stopped
+    depends_on:
+      sqlserver:
+        condition: service_healthy  
+
+
+  # ============================================================================================================================
+  # PAYMENT SERVICE
+  # ============================================================================================================================
+
+  payment:
+    image: ecommercelite-payment:1.0
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: payment
+
+    environment:
+      # Common environment
+      <<: *common-env
+
+      # Database
+      ConnectionStrings__paymentSqlServerConnection: "Server=sqlserver,1433;Database=ECommerceLitePaymentDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+
+      # Stripe
+      Stripe__SecretKey: ${Stripe__SecretKey}
+      Stripe__WebhookSecret: ${Stripe__WebhookSecret}
+
+      # Service credentials
+      PaymentService__ServiceSecret: ${ClientsCredentials__PaymentService__ServiceSecret}
+
+      # HTTP Clients
+      HttpClients__IdentityService__BaseUrl: ${HttpClients__IdentityService__BaseUrl}
+      HttpClients__OrderService__BaseUrl: ${HttpClients__OrderService__BaseUrl}
+      HttpClients__NotificationService__BaseUrl: ${HttpClients__NotificationService__BaseUrl}
+
+    ports:
+      - "7080:7080"
+    restart: unless-stopped
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+
+  # ============================================================================================================================
+  # NOTIFICATION SERVICE
+  # ============================================================================================================================
+
+  notification:
+    image: ecommercelite-notification:1.0
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: notification
+
+    environment:
+      # Common environment
+      <<: *common-env
+
+      # Database
+      ConnectionStrings__NotificationSqlServerConnection: "Server=sqlserver,1433;Database=ECommerceLiteNotificationDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+
+      # Mailjet
+      Mailjet__ApiKey: ${Mailjet__ApiKey}
+      Mailjet__SecretKey: ${Mailjet__SecretKey}
+      Mailjet__FromEmail: ${Mailjet__FromEmail}
+      Mailjet__FromName: ${Mailjet__FromName}
+
+      Mailjet__MailjetWebhook__Username: ${Mailjet__MailjetWebhook__Username}
+      Mailjet__MailjetWebhook__Password: ${Mailjet__MailjetWebhook__Password}
+
+      # Service credentials
+      NotificationService__ServiceSecret: ${ClientsCredentials__NotificationService__ServiceSecret}
+
+    ports:
+      - "7090:7090"
+    restart: unless-stopped
+    depends_on:
+      sqlserver:
+        condition: service_healthy  
+
+
+  # ============================================================================================================================
+  # SQL Server SERVICE
+  # ============================================================================================================================
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ecommercelite-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  sqlserver_data:

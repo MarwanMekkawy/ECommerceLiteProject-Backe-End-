@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProductService.API.Middleware;
 using ProductService.Application.Extentions.App;
@@ -139,6 +140,7 @@ namespace ProductService.API
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
+                await context.Database.MigrateAsync();
                 await DbInitializer.InitializeAsync(context, app.Environment.ContentRootPath);
             }
 
