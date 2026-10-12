@@ -18,9 +18,7 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
 
             httpRequest.Content = JsonContent.Create(request);
 
-            using var response = await httpClient.SendAsync(
-                httpRequest,
-                HttpCompletionOption.ResponseHeadersRead);
+            using var response = await httpClient.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -60,7 +58,7 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
         {
             var token = await GetTokenAsync(cancellationToken);
 
-            var baseUrl = config["HttpClients:IdentityService:BaseUrl"];
+            var baseUrl = config["HttpClients:IdentityService:BaseUrl"]; //TODO
 
             var confirmationUrl = $"{baseUrl}email/confirm?token={Uri.EscapeDataString(emailConfirmationToken)}";
 
