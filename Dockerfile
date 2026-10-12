@@ -79,6 +79,7 @@ RUN dotnet publish "Services/NotificationService/NotificationService.API/Notific
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS identity
 WORKDIR /appImage
 COPY --from=build /app/Identitypublish .
+ENV ASPNETCORE_URLS=http://+:7050
 EXPOSE 7050
 ENTRYPOINT [ "dotnet", "IdentityService.API.dll"]
 
@@ -88,6 +89,7 @@ ENTRYPOINT [ "dotnet", "IdentityService.API.dll"]
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS product
 WORKDIR /appImage
 COPY --from=build /app/Productpublish .
+ENV ASPNETCORE_URLS=http://+:7060
 EXPOSE 7060
 ENTRYPOINT [ "dotnet", "ProductService.API.dll"]
 
@@ -97,6 +99,7 @@ ENTRYPOINT [ "dotnet", "ProductService.API.dll"]
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS order
 WORKDIR /appImage
 COPY --from=build /app/Orderpublish .
+ENV ASPNETCORE_URLS=http://+:7070
 EXPOSE 7070
 ENTRYPOINT [ "dotnet", "OrderService.API.dll"]
 
@@ -106,6 +109,7 @@ ENTRYPOINT [ "dotnet", "OrderService.API.dll"]
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS payment
 WORKDIR /appImage
 COPY --from=build /app/Paymentpublish .
+ENV ASPNETCORE_URLS=http://+:7080
 EXPOSE 7080
 ENTRYPOINT [ "dotnet", "PaymentService.API.dll"]
 
@@ -115,5 +119,6 @@ ENTRYPOINT [ "dotnet", "PaymentService.API.dll"]
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS notification
 WORKDIR /appImage
 COPY --from=build /app/Notificationpublish .
+ENV ASPNETCORE_URLS=http://+:7090
 EXPOSE 7090
 ENTRYPOINT [ "dotnet", "NotificationService.API.dll"]
