@@ -60,8 +60,8 @@
 
         public class PaginationQueryDto
         {
-            public int Page { get; set; }
-            public int PageSize { get; set; }
+            public int pageNumber { get; set; }
+            public int pageSize { get; set; }
         }
 
         public enum RoleType

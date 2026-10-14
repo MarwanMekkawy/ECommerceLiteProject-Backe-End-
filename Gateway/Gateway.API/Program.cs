@@ -1,4 +1,6 @@
 
+using Gateway.API.Middleware;
+
 namespace Gateway.API
 {
     public class Program
@@ -24,9 +26,9 @@ namespace Gateway.API
             }
 
             app.UseHttpsRedirection();
-
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+            app.UseAuthentication();
             app.UseAuthorization();          
-
             app.Run();
         }
     }
