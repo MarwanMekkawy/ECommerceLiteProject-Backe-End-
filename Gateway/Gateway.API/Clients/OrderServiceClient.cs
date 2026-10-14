@@ -57,6 +57,13 @@ namespace Gateway.API.Clients
 
             return result ?? throw new InvalidOperationException($"OrderService returned an empty response for {endpoint}.");
         }
+
+        private async Task<T?> SendForNullableResultAsync<T>(HttpMethod method, string endpoint, object? request = null, CancellationToken cancellationToken = default)
+        {
+            using var response = await SendAsync(method, endpoint, request, cancellationToken);
+
+            return await response.Content.ReadFromJsonAsync<T>(cancellationToken: cancellationToken);
+        }
         #endregion =================================================================================================================================================
 
         public async Task<IReadOnlyList<OrderResponseDto>> GetCurrentUserOrdersAsync(int pageNumber = 1, int pageSize = 5, CancellationToken cancellationToken = default)
@@ -65,14 +72,16 @@ namespace Gateway.API.Clients
                 HttpMethod.Get, $"orders?pageNumber={pageNumber}&pageSize={pageSize}", cancellationToken: cancellationToken);
         }
 
-        public async Task<OrderResponseDto> GetLatestOrderAsync(CancellationToken cancellationToken = default)
+        public async Task<OrderResponseDto?> GetLatestOrderAsync(CancellationToken cancellationToken = default)
         {
-            return await SendForResultAsync<OrderResponseDto>(HttpMethod.Get, "orders/latest", cancellationToken: cancellationToken);
+            return await SendForNullableResultAsync<OrderResponseDto>(
+                HttpMethod.Get, "orders/latest", cancellationToken: cancellationToken);
         }
 
-        public async Task<OrderResponseDto> GetCurrentUserOrderByIdAsync(Guid orderId, CancellationToken cancellationToken = default)
+        public async Task<OrderResponseDto?> GetCurrentUserOrderByIdAsync(Guid orderId, CancellationToken cancellationToken = default)
         {
-            return await SendForResultAsync<OrderResponseDto>(HttpMethod.Get, $"orders/{orderId}", cancellationToken: cancellationToken);
+            return await SendForNullableResultAsync<OrderResponseDto>(
+                HttpMethod.Get, $"orders/{orderId}", cancellationToken: cancellationToken);
         }
 
         public async Task CreateUserOrderAsync(List<CreateOrderItemDto> items, CancellationToken cancellationToken = default)
@@ -97,7 +106,8 @@ namespace Gateway.API.Clients
 
         public async Task<CheckoutOrderDto> CheckoutAsync(Guid orderId, CancellationToken cancellationToken = default)
         {
-            return await SendForResultAsync<CheckoutOrderDto>(HttpMethod.Post, $"orders/{orderId}/checkout", cancellationToken: cancellationToken);
+            return await SendForResultAsync<CheckoutOrderDto>(
+                HttpMethod.Post, $"orders/{orderId}/checkout", cancellationToken: cancellationToken);
         }
 
         public async Task CancelOrderAsync(Guid orderId, CancellationToken cancellationToken = default)
@@ -107,17 +117,20 @@ namespace Gateway.API.Clients
 
         public async Task<IReadOnlyList<OrderResponseDto>> GetAllOrdersAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            return await SendForResultAsync<List<OrderResponseDto>>(HttpMethod.Get, $"orders/admin?pageNumber={pageNumber}&pageSize={pageSize}", cancellationToken: cancellationToken);
+            return await SendForResultAsync<List<OrderResponseDto>>(
+                HttpMethod.Get, $"orders/admin?pageNumber={pageNumber}&pageSize={pageSize}", cancellationToken: cancellationToken);
         }
 
-        public async Task<OrderResponseDto> GetOrderByIdForAdminAsync(Guid orderId, CancellationToken cancellationToken = default)
+        public async Task<OrderResponseDto?> GetOrderByIdForAdminAsync(Guid orderId, CancellationToken cancellationToken = default)
         {
-            return await SendForResultAsync<OrderResponseDto>( HttpMethod.Get, $"orders/admin/{orderId}", cancellationToken: cancellationToken);
+            return await SendForNullableResultAsync<OrderResponseDto>(
+                HttpMethod.Get, $"orders/admin/{orderId}", cancellationToken: cancellationToken);
         }
 
         public async Task<IReadOnlyList<OrderResponseDto>> GetUserOrdersForAdminAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            return await SendForResultAsync<List<OrderResponseDto>>(HttpMethod.Get, $"orders/admin/user/{userId}?pageNumber={pageNumber}&pageSize={pageSize}", cancellationToken: cancellationToken);
+            return await SendForResultAsync<List<OrderResponseDto>>(
+                HttpMethod.Get, $"orders/admin/user/{userId}?pageNumber={pageNumber}&pageSize={pageSize}", cancellationToken: cancellationToken);
         }
     }
 }

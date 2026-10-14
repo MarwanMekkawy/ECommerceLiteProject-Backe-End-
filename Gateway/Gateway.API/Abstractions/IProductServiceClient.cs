@@ -33,7 +33,7 @@ namespace Gateway.API.Abstractions
         Task DeactivateProductAsync(Guid id, CancellationToken cancellationToken);
         Task IncreaseStockAsync(Guid id, int quantity, CancellationToken cancellationToken);
         Task DecreaseStockAsync(Guid id, int quantity, CancellationToken cancellationToken);
-        Task<IReadOnlyList<ProductDto>> GetAllProductsForAdminAsync(int pageNumber, int pageSize, Guid? categoryId, CancellationToken cancellationToken);
+        Task<IReadOnlyList<ProductWithCategoryDto>> GetAllProductsForAdminAsync(int pageNumber, int pageSize, Guid? categoryId, CancellationToken cancellationToken);
         Task<ProductDto?> GetProductByIdForAdminAsync(Guid id, CancellationToken cancellationToken);
         Task<ProductDto?> GetProductByNameForAdminAsync(string name, CancellationToken cancellationToken);
         Task<IReadOnlyList<ProductDto>> SearchProductsForAdminAsync(string name, CancellationToken cancellationToken);
