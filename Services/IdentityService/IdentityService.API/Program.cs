@@ -94,7 +94,7 @@ namespace IdentityService.API
 
                 options.AddPolicy("Production", policy =>
                 {
-                    policy.WithOrigins("https://myfrontend.com")
+                    policy.WithOrigins(builder.Configuration["FrontendBaseUrlForRedirect"]!)
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();

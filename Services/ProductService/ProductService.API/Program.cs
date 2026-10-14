@@ -116,24 +116,6 @@ namespace ProductService.API
                 });
             });
 
-            // CORS
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("Development", policy =>
-                {
-                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-                });
-
-                options.AddPolicy("Production", policy =>
-                {
-                    policy.WithOrigins("https://myfrontend.com")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
-                });
-            });
-
-
             var app = builder.Build();
 
             // seeding data [products - categories]
