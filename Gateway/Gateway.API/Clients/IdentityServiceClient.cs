@@ -47,14 +47,11 @@ namespace Gateway.API.Clients
         private async Task SendNoContentAsync(HttpMethod method, string endpoint, object? request = null, CancellationToken cancellationToken = default)
         {
             using var response = await SendAsync(method, endpoint, request, cancellationToken);
-            response.EnsureSuccessStatusCode();
         }
 
         private async Task<T> SendForResultAsync<T>(HttpMethod method, string endpoint, object? request = null, CancellationToken cancellationToken = default)
         {
             using var response = await SendAsync(method, endpoint, request, cancellationToken);
-
-            response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadFromJsonAsync<T>(cancellationToken: cancellationToken);
 
