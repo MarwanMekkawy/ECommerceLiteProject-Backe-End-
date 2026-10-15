@@ -1,6 +1,4 @@
-﻿
-
-namespace IdentityService.API.CookiesHelpers
+﻿namespace IdentityService.API.CookiesHelpers
 {
     public static class CookieHelper
     {
@@ -13,7 +11,7 @@ namespace IdentityService.API.CookiesHelpers
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
-                    Path = "/api/v1/auth",
+                    Path = "/",
                     Expires = DateTimeOffset.UtcNow.AddDays(15)
                 });
         }
@@ -21,7 +19,7 @@ namespace IdentityService.API.CookiesHelpers
         // Removes the refresh token cookie
         public static void DeleteRefreshTokenCookie(HttpResponse response)
         {
-            response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/api/v1/auth" });
+            response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/" });
         }
     }
 }

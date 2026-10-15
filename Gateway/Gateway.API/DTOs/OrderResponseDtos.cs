@@ -5,7 +5,7 @@
         public Guid OrderId { get; set; }
         public IReadOnlyList<CheckoutOrderItemDto> Items { get; set; } = [];
         public decimal Total { get; set; }
-        public CurrencyCode Currency { get; set; }
+        public string Currency { get; set; } = string.Empty;
 
         public Guid PaymentId { get; set; }
         public string ClientSecret { get; set; } = null!;
@@ -23,11 +23,11 @@
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
-        public OrderStatus Status { get; set; }
+        public string Status { get; set; } = string.Empty;
         public bool IsCancelledDueToExpiry { get; set; }
         public DateTime? ExpiresAt { get; set; }
         public decimal Total { get; set; }
-        public CurrencyCode Currency { get; set; }
+        public string Currency { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public List<OrderItemResponseDto> Items { get; set; } = [];
     }
@@ -36,21 +36,7 @@
         public Guid ProductId { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
-        public CurrencyCode Currency { get; set; }
+        public string Currency { get; set; } = string.Empty;
         public decimal Total { get; set; }
-    }
-    public enum OrderStatus
-    {
-        Pending,
-        Confirmed,
-        Completed,
-        Cancelled,
-        CancelledAndRefunded
-    }
-    public enum CurrencyCode
-    {
-        USD,
-        EUR,
-        EGP
     }
 }

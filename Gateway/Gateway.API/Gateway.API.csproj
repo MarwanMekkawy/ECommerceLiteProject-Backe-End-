@@ -7,13 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="HotChocolate.AspNetCore" Version="16.6.8" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="GraphQL\Mutations\" />
-    <Folder Include="GraphQL\Queries\" />
   </ItemGroup>
 
 </Project>
