@@ -25,7 +25,8 @@ namespace Gateway.API.Extentions
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false, AllowAutoRedirect = false });
 
             services.AddGraphQLServer().AddQueryType<Query>().AddMutationType<Mutation>()
-                .AddTypeExtension<ProductQueries>().AddTypeExtension<ProductMutations>();
+                .AddTypeExtension<ProductQueries>().AddTypeExtension<ProductMutations>()
+                .AddTypeExtension<OrderQueries>().AddTypeExtension<OrderMutations>();
 
             return services;
         }
