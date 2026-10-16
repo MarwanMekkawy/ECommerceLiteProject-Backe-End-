@@ -55,18 +55,12 @@
         // Admin requests
         public class ChangeUserRoleRequestDto
         {
-            public RoleType Role { get; set; }
+            public string Role { get; set; } = string.Empty;
         }
 
         public class PaginationQueryDto
         {
             public int pageNumber { get; set; }
             public int pageSize { get; set; }
-        }
-
-        public enum RoleType
-        {
-            Buyer,
-            Admin
         }
 }

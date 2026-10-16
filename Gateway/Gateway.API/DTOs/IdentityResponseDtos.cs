@@ -14,7 +14,7 @@
         public string? PhoneNumber { get; set; }
         public bool IsEmailConfirmed { get; set; }
         public bool IsActive { get; set; }
-        public RoleType Role { get; set; }
+        public string Role { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
     }
 
