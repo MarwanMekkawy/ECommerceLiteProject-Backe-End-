@@ -26,7 +26,9 @@ namespace Gateway.API.Extentions
 
             services.AddGraphQLServer().AddQueryType<Query>().AddMutationType<Mutation>()
                 .AddTypeExtension<ProductQueries>().AddTypeExtension<ProductMutations>()
-                .AddTypeExtension<OrderQueries>().AddTypeExtension<OrderMutations>();
+                .AddTypeExtension<OrderQueries>().AddTypeExtension<OrderMutations>()
+                .AddTypeExtension<IdentityQueries>().AddTypeExtension<IdentityMutations>()
+                .AddTypeExtension<PaymentMutations>();
 
             return services;
         }

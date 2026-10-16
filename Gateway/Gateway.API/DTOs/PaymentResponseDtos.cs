@@ -4,21 +4,6 @@
     {
         public Guid PaymentId { get; set; }
         public string ClientSecret { get; set; } = null!;
-        public PaymentStatus Status { get; set; }
-    }
-
-    public enum PaymentStatus
-    {
-        Pending,
-        RequiresAction,
-        Processing,
-        Succeeded,
-        Failed,
-        Cancelled,
-
-        RefundInitiated,
-        RefundingByStripe,
-        Refunded,
-        RefundFailed
-    }
+        public string Status { get; set; } = string.Empty;
+    }    
 }
