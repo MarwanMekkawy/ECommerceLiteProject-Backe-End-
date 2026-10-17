@@ -4,19 +4,9 @@ namespace Gateway.API.Abstractions
 {
     public interface IIdentityServiceClient
     {
-        // Authentication
-        Task RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken = default);
-        Task<JwtResponsetDto> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken = default);
-        Task LogoutAsync(CancellationToken cancellationToken = default);
-        Task<JwtResponsetDto> RefreshTokenAsync(CancellationToken cancellationToken = default);
-
         // Email
         Task ResendVerificationAsync(CancellationToken cancellationToken = default);
         Task RequestEmailChangeAsync(ChangeEmailRequestDto request, CancellationToken cancellationToken = default);
-
-        // Password
-        Task ForgotPasswordAsync(ForgotPasswordRequestDto request, CancellationToken cancellationToken = default);
-        Task ResetPasswordAsync(ResetPasswordRequestDto request, CancellationToken cancellationToken = default);
 
         // Current user
         Task<UserDto> GetCurrentUserAsync(CancellationToken cancellationToken = default);

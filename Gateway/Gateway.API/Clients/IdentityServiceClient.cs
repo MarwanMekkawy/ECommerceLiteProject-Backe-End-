@@ -59,28 +59,6 @@ namespace Gateway.API.Clients
         }
         #endregion =================================================================================================================================================
 
-        // Authentication
-
-        public async Task RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken = default)
-        {
-            await SendNoContentAsync(HttpMethod.Post, "auth/register", request, cancellationToken);
-        }
-
-        public async Task<JwtResponsetDto> LoginAsync( LoginRequestDto request,CancellationToken cancellationToken = default)
-        {
-            return await SendForResultAsync<JwtResponsetDto>(HttpMethod.Post, "auth/login", request, cancellationToken);
-        }
-
-        public async Task LogoutAsync(CancellationToken cancellationToken = default)
-        {
-            await SendNoContentAsync(HttpMethod.Post, "auth/logout", cancellationToken: cancellationToken);
-        }
-
-        public async Task<JwtResponsetDto> RefreshTokenAsync(CancellationToken cancellationToken = default)
-        {
-            return await SendForResultAsync<JwtResponsetDto>(HttpMethod.Post, "auth/refresh", cancellationToken: cancellationToken);
-        }
-
         // Email
 
         public async Task ResendVerificationAsync(CancellationToken cancellationToken = default)
@@ -91,25 +69,6 @@ namespace Gateway.API.Clients
         public async Task RequestEmailChangeAsync(ChangeEmailRequestDto request, CancellationToken cancellationToken = default)
         {
             await SendNoContentAsync(HttpMethod.Post, "email/change-request", request, cancellationToken);
-        }
-
-        // Password
-
-        public async Task ForgotPasswordAsync( ForgotPasswordRequestDto request,   CancellationToken cancellationToken = default)
-        {
-            await SendNoContentAsync(HttpMethod.Post, "password/forgot", request, cancellationToken);
-        }
-
-        public async Task ResetPasswordAsync( ResetPasswordRequestDto request, CancellationToken cancellationToken = default)
-        {
-            var context = httpContextAccessor.HttpContext;
-
-            var token = context?.Request.Query["token"].ToString();
-
-            if (string.IsNullOrWhiteSpace(token))           
-                throw new InvalidOperationException("The password reset token is missing from the incoming request query.");
-
-            await SendNoContentAsync(HttpMethod.Post, $"password/reset?token={Uri.EscapeDataString(token)}", request, cancellationToken);
         }
 
         // Current user
