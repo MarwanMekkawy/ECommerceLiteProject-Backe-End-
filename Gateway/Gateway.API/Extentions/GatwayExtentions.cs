@@ -1,5 +1,6 @@
 ﻿using Gateway.API.Abstractions;
 using Gateway.API.Clients;
+using Gateway.API.Exceptions;
 using Gateway.API.GraphQL.Mutations;
 using Gateway.API.GraphQL.Queries;
 
@@ -24,7 +25,7 @@ namespace Gateway.API.Extentions
                 ?? throw new InvalidOperationException("ProductService URL is not configured.")); })
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false, AllowAutoRedirect = false });
 
-            services.AddGraphQLServer().AddAuthorization()
+            services.AddGraphQLServer().AddAuthorization().AddErrorFilter<GatewayErrorFilter>()
                 .AddQueryType<Query>().AddMutationType<Mutation>()
                 .AddTypeExtension<ProductQueries>().AddTypeExtension<ProductMutations>()
                 .AddTypeExtension<OrderQueries>().AddTypeExtension<OrderMutations>()

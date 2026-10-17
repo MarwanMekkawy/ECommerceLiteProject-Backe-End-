@@ -1,6 +1,6 @@
 ﻿using Gateway.API.Abstractions;
 using Gateway.API.DTOs;
-using Gateway.API.Middleware;
+using Gateway.API.Exceptions;
 
 namespace Gateway.API.Clients
 {

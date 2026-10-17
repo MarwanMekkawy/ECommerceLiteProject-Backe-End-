@@ -1,8 +1,6 @@
 ﻿using Gateway.API.Abstractions;
 using Gateway.API.DTOs;
-using Gateway.API.Middleware;
-using Microsoft.AspNetCore.Http;
-using System.Net.Http;
+using Gateway.API.Exceptions;
 
 namespace Gateway.API.Clients
 {
