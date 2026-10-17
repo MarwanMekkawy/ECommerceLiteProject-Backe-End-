@@ -89,10 +89,10 @@ namespace Gateway.API
             }
 
             app.UseHttpsRedirection();
-            app.MapGraphQL("/graphql");
             app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();          
+            app.MapGraphQL("/graphql");
             app.Run();
         }
     }
