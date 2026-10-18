@@ -1,5 +1,6 @@
 ﻿using Gateway.API.Abstractions;
 using Gateway.API.DTOs;
+using HotChocolate.Authorization;
 
 namespace Gateway.API.GraphQL.Mutations
 {
@@ -7,22 +8,25 @@ namespace Gateway.API.GraphQL.Mutations
     public class OrderMutations
     {
         // Cart
+        [Authorize]
         public async Task<OrderMutationPayload> CreateUserOrder(IOrderServiceClient client, List<CreateOrderItemDto> items, CancellationToken cancellationToken = default)
         { 
             await client.CreateUserOrderAsync(items, cancellationToken); 
             return new OrderMutationPayload(true); 
         }
-
+        [Authorize]
         public async Task<OrderMutationPayload> AddItemToCart(IOrderServiceClient client, CreateOrderItemDto item, CancellationToken cancellationToken = default) 
         { 
             await client.AddItemToCartAsync(item, cancellationToken); 
             return new OrderMutationPayload(true); 
         }
+        [Authorize]
         public async Task<OrderMutationPayload> IncreaseItemQuantity(IOrderServiceClient client, Guid orderId, Guid productId, int quantity, CancellationToken cancellationToken = default) 
         {
             await client.IncreaseItemQuantityAsync(orderId, productId, quantity, cancellationToken); 
             return new OrderMutationPayload(true); 
         }
+        [Authorize]
         public async Task<OrderMutationPayload> DecreaseItemQuantity(IOrderServiceClient client, Guid orderId, Guid productId, int quantity, CancellationToken cancellationToken = default) 
         { 
             await client.DecreaseItemQuantityAsync(orderId, productId, quantity, cancellationToken); 
@@ -31,9 +35,10 @@ namespace Gateway.API.GraphQL.Mutations
 
 
         // Checkout
+        [Authorize]
         public Task<CheckoutOrderDto> CheckoutOrder(IOrderServiceClient client, Guid orderId, CancellationToken cancellationToken = default)
             => client.CheckoutAsync(orderId, cancellationToken);
-
+        [Authorize]
         public async Task<OrderMutationPayload> CancelOrder(IOrderServiceClient client, Guid orderId, CancellationToken cancellationToken = default) 
         { 
             await client.CancelOrderAsync(orderId, cancellationToken); 
