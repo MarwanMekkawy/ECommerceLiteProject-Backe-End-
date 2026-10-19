@@ -221,6 +221,36 @@ services:
       sqlserver:
         condition: service_healthy  
 
+  # ============================================================================================================================
+  # GraphQL Gateway
+  # ============================================================================================================================
+
+  Gateway:
+    image: ecommercelite-Gateway:1.0
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: gateway
+
+    environment:
+      # Common environment
+      <<: *common-env
+
+      # HTTP Clients
+      HttpClients__IdentityService__BaseUrl: ${HttpClients__IdentityService__BaseUrl}
+      HttpClients__ProductService__BaseUrl: ${HttpClients__ProductService__BaseUrl}
+      HttpClients__OrderService__BaseUrl: ${HttpClients__OrderService__BaseUrl}
+      HttpClients__PaymentService__BaseUrl: ${HttpClients__PaymentService__BaseUrl}
+
+    ports:
+      - "7090:7000"
+    restart: unless-stopped
+    depends_on:
+      - identity
+      - product
+      - order
+      - payment
 
   # ============================================================================================================================
   # SQL Server SERVICE

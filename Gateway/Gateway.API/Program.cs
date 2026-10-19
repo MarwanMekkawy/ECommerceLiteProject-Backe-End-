@@ -68,7 +68,7 @@ namespace Gateway.API
                 {
                     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 });
-
+                //will not be used after ngnix
                 options.AddPolicy("Production", policy =>
                 {
                     policy.WithOrigins(builder.Configuration["FrontendBaseUrlForRedirect"]!)
@@ -84,6 +84,7 @@ namespace Gateway.API
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
+                app.UseCors("Development");
                 app.UseSwagger();
                 app.UseSwaggerUI();
                 app.UseHttpsRedirection();

@@ -48,6 +48,12 @@ COPY ["Services/NotificationService/NotificationService.Infrastructure/Notificat
 COPY ["Services/NotificationService/NotificationService.Domain/NotificationService.Domain.csproj", "Services/NotificationService/NotificationService.Domain/"]
 
 # ============================================================
+# Gateway
+# ============================================================
+
+COPY ["Gateway/Gateway.API/Gateway.API.csproj", "Gateway/Gateway.API/"]
+
+# ============================================================
 # Restore
 # ============================================================
 
@@ -56,12 +62,14 @@ RUN dotnet restore "Services/ProductService/ProductService.API/ProductService.AP
 RUN dotnet restore "Services/OrderService/OrderService.API/OrderService.API.csproj"
 RUN dotnet restore "Services/PaymentService/PaymentService.API/PaymentService.API.csproj"
 RUN dotnet restore "Services/NotificationService/NotificationService.API/NotificationService.API.csproj"
+RUN dotnet restore "Gateway/Gateway.API/Gateway.API.csproj"
 
 # ============================================================
 # Copy source code
 # ============================================================
 
 COPY Services/ ./Services/
+COPY Gateway/ ./Gateway/
 
 # ============================================================
 # Publish
@@ -72,6 +80,9 @@ RUN dotnet publish "Services/ProductService/ProductService.API/ProductService.AP
 RUN dotnet publish "Services/OrderService/OrderService.API/OrderService.API.csproj" -c Release -o /app/Orderpublish --no-restore
 RUN dotnet publish "Services/PaymentService/PaymentService.API/PaymentService.API.csproj" -c Release -o /app/Paymentpublish --no-restore
 RUN dotnet publish "Services/NotificationService/NotificationService.API/NotificationService.API.csproj" -c Release -o /app/Notificationpublish --no-restore
+RUN dotnet publish "Gateway/Gateway.API/Gateway.API.csproj" -c Release -o /app/Gatewaypublish --no-restore
+
+
 
 # ============================================================
 # stage 2 [identity]
@@ -122,3 +133,13 @@ COPY --from=build /app/Notificationpublish .
 ENV ASPNETCORE_URLS=http://+:7090
 EXPOSE 7090
 ENTRYPOINT [ "dotnet", "NotificationService.API.dll"]
+
+# ============================================================
+# stage 6 [Notification]
+# ============================================================
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS gateway
+WORKDIR /appImage
+COPY --from=build /app/Gatewaypublish .
+ENV ASPNETCORE_URLS=http://+:7000
+EXPOSE 7000
+ENTRYPOINT [ "dotnet", "Gateway.API.dll"]
