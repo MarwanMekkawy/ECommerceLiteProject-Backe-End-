@@ -43,6 +43,7 @@ namespace IdentityService.API.Controllers
         /// <param name="cancellationToken">A token to cancel the request.</param>
         /// <returns>No content if the verification email was successfully requested.</returns>
         [HttpPost("resend-verification")]
+        [Authorize]
         public async Task<IActionResult> ResendEmailVerificationToken(CancellationToken cancellationToken)
         {
             var claims = UserClaimsFactory.ExtractFrom(User);
@@ -66,7 +67,7 @@ namespace IdentityService.API.Controllers
 
             await changeEmailVerificationUseCase.EmailChangeAsync(claims.UserId, dto, cancellationToken);
 
-            return Redirect($"{config["FrontendBaseUrlForRedirect"]}/resendemail");
+            return NoContent();
 
         }
 
