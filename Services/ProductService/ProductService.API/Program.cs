@@ -39,7 +39,7 @@ namespace ProductService.API
                     options.IncludeXmlComments(xmlPath);
                 });
 
-            //====== Auth JWT config ======//
+            #region//====== Auth JWT config ======//
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -115,29 +115,26 @@ namespace ProductService.API
                         (context =>context.User.IsInRole("Admin") || context.User.HasClaim("token_type", "service"));
                 });
             });
+            #endregion======================================================================================================================
 
             var app = builder.Build();
 
-            // seeding data [products - categories]
+            #region// seeding data [products - categories] & automigrate on startup
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
                 await context.Database.MigrateAsync();
                 await DbInitializer.InitializeAsync(context, app.Environment.ContentRootPath);
             }
+            #endregion
 
-            app.UseHttpsRedirection();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseCors("Development");               // allow all CORS
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            else
-            {
-                app.UseCors("Production");
-            }
+
             app.UseMiddleware<GlobalHandlingMiddleware>();     // global Exception middleware
             app.UseAuthentication();
             app.UseAuthorization();

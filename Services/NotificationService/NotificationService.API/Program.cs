@@ -42,7 +42,7 @@ namespace NotificationService.API
                     options.IncludeXmlComments(xmlPath);
                 });
 
-            //====== Auth JWT config ======//
+            #region//====== Auth JWT config ======//
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = "ServiceJwt";
@@ -79,31 +79,30 @@ namespace NotificationService.API
                 };
             });
 
+            builder.Services.AddAuthorization();
+            #endregion=========================================================================================
+
 
             var app = builder.Build();
 
-            //auotmigrate on startup
+            #region//auotmigrate on startup
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
                 await context.Database.MigrateAsync();
             }
+            #endregion
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseCors("Development");                     // allow all CORS
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
-            else
-            {
-                app.UseCors("Production");
             }
 
             app.UseMiddleware<GlobalHandlingMiddleware>();
             app.UseMiddleware<MailjetWebhookAuthenticationMiddleware>();
-            app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
 

@@ -41,7 +41,7 @@ namespace PaymentService.API
                     options.IncludeXmlComments(xmlPath);
                 });
 
-            //====== Auth JWT config ======//
+            #region//====== Auth JWT config ======//
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -106,29 +106,26 @@ namespace PaymentService.API
                 };
             });
 
-            builder.Services.AddAuthorization();          
+            builder.Services.AddAuthorization();
+            #endregion=============================================================
 
             var app = builder.Build();
 
-            //auotmigrate on startup
+            #region//auotmigrate on startup
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<PaymentDbContext>();
                 await context.Database.MigrateAsync();
             }
+            #endregion
 
             app.UseHttpsRedirection();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseCors("Development");                     // allow all CORS
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
-            else
-            {
-                app.UseCors("Production");
             }
 
             app.UseMiddleware<GlobalHandlingMiddleware>();

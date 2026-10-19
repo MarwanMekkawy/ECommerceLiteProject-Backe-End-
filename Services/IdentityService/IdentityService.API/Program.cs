@@ -43,8 +43,7 @@ namespace IdentityService.API
                     options.IncludeXmlComments(xmlPath);
                 });
 
-
-            //====== Auth JWT config ======//
+            #region//====== Auth JWT config ======//
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -83,28 +82,21 @@ namespace IdentityService.API
                 {
                     options.AddPolicy("VerifiedEmail", policy => policy.RequireClaim("emailVerified", "true"));
                 });
+            #endregion======================================================================================================================
 
-            // CORS
+            #region// CORS===================================
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("Development", policy =>
                 {
                     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 });
-
-                options.AddPolicy("Production", policy =>
-                {
-                    policy.WithOrigins(builder.Configuration["FrontendBaseUrlForRedirect"]!)
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
-                });
             });
-
+            #endregion========================================
 
             var app = builder.Build();
 
-            // seeding default admin & Service Cliensts=====================================
+            #region// seeding default admin & Service Cliensts & automigrate on startup
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -117,9 +109,8 @@ namespace IdentityService.API
                     services.GetRequiredService<IOneTimeTokenService>(),
                     services.GetRequiredService<ILoggerFactory>());
             }
-            //===============================================================================
+            #endregion===============================================================================
 
-            app.UseHttpsRedirection();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -127,10 +118,7 @@ namespace IdentityService.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            else
-            {
-                app.UseCors("Production");
-            }
+
             app.UseMiddleware<GlobalHandlingMiddleware>();     // global Exception middleware
             app.UseAuthentication();
             app.UseAuthorization();

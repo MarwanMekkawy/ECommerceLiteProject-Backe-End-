@@ -86,13 +86,15 @@ namespace Gateway.API
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                app.UseHttpsRedirection();
             }
 
-            app.UseHttpsRedirection();
             app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();          
             app.MapGraphQL("/graphql");
+
+
             app.Run();
         }
     }

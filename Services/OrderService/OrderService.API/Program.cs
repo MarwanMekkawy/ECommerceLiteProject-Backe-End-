@@ -10,7 +10,6 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 
 
@@ -44,7 +43,7 @@ namespace OrderService.API
                     options.IncludeXmlComments(xmlPath);
                 });
 
-            //====== Auth JWT config ======//
+            #region//====== Auth JWT config ======//
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -110,28 +109,25 @@ namespace OrderService.API
             });
 
             builder.Services.AddAuthorization();         
+            #endregion=======================================================================================================
 
             var app = builder.Build();
 
-            //auotmigrate on startup
+            #region//automigrate on startup
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
                 await context.Database.MigrateAsync();
             }
+            #endregion
 
             app.UseHttpsRedirection();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseCors("Development");                     // allow all CORS
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
-            else
-            {
-                app.UseCors("Production");
             }
 
             app.UseMiddleware<GlobalHandlingMiddleware>();
