@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using OrderService.Domain.Contracts;
 using OrderService.Domain.Enums;
 using OrderService.Domain.Orders;
-using OrderService.InfraStructure;
+using OrderService.Infrastructure;
 using Xunit;
 
 namespace OrderService.Infrastructure.Tests

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace OrderService.InfraStructure.Extentions.Infra
+namespace OrderService.Infrastructure.Extentions.Infra
 {
     public static class DbContextConfiguration
     {

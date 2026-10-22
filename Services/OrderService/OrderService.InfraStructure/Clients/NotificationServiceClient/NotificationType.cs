@@ -1,4 +1,4 @@
-﻿namespace OrderService.InfraStructure.Clients.NotificationServiceClient
+﻿namespace OrderService.Infrastructure.Clients.NotificationServiceClient
 {
     public enum NotificationType
     {

@@ -1,6 +1,6 @@
 ﻿using Domain.Exceptions;
 using Microsoft.Extensions.Configuration;
-using OrderService.InfraStructure.Clients.IdentityServiceTokenAuthClient;
+using OrderService.Infrastructure.Clients.IdentityServiceTokenAuthClient;
 using System.Net;
 using Xunit;
 

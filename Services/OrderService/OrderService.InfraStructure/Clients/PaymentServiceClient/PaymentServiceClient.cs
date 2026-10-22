@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace OrderService.InfraStructure.Clients.PaymentServiceClient
+namespace OrderService.Infrastructure.Clients.PaymentServiceClient
 {
     public class PaymentServiceClient(HttpClient httpClient, IServiceTokenClient serviceTokenClient) : IPaymentServiceClient
     {

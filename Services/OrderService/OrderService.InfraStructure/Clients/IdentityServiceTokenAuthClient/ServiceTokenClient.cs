@@ -1,12 +1,12 @@
 ﻿using Domain.Exceptions;
 using Microsoft.Extensions.Configuration;
 using OrderService.Application.Abstractions.ClientsAbstractions;
-using OrderService.InfraStructure.Clients.IdentityServiceTokenAuthClient.DTOIdentityContracts;
+using OrderService.Infrastructure.Clients.IdentityServiceTokenAuthClient.DTOIdentityContracts;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace OrderService.InfraStructure.Clients.IdentityServiceTokenAuthClient
+namespace OrderService.Infrastructure.Clients.IdentityServiceTokenAuthClient
 {
     public class ServiceTokenClient(HttpClient httpClient, IConfiguration configuration, IServiceTokenCache cache) : IServiceTokenClient
     {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using OrderService.Domain.Orders;
-using OrderService.InfraStructure;
-using OrderService.InfraStructure.Repositories;
+using OrderService.Infrastructure;
+using OrderService.Infrastructure.Repositories;
 using Xunit;
 
 namespace OrderService.Infrastructure.Tests

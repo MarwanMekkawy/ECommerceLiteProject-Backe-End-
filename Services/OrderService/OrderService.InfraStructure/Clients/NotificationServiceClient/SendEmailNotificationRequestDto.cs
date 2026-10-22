@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace OrderService.InfraStructure.Clients.NotificationServiceClient
+namespace OrderService.Infrastructure.Clients.NotificationServiceClient
 {
     public class SendEmailNotificationRequestDto
     {

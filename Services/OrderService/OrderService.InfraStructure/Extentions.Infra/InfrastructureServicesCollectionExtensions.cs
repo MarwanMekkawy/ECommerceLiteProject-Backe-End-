@@ -2,13 +2,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using OrderService.Application.Abstractions.ClientsAbstractions;
 using OrderService.Domain.Contracts;
-using OrderService.InfraStructure.Clients.IdentityServiceTokenAuthClient;
-using OrderService.InfraStructure.Clients.NotificationServiceClient;
-using OrderService.InfraStructure.Clients.PaymentServiceClient;
-using OrderService.InfraStructure.Clients.ProductServiceClient;
-using OrderService.InfraStructure.Repositories;
+using OrderService.Infrastructure.Clients.IdentityServiceTokenAuthClient;
+using OrderService.Infrastructure.Clients.NotificationServiceClient;
+using OrderService.Infrastructure.Clients.PaymentServiceClient;
+using OrderService.Infrastructure.Clients.ProductServiceClient;
+using OrderService.Infrastructure.Repositories;
 
-namespace OrderService.InfraStructure.Extentions.Infra
+namespace OrderService.Infrastructure.Extentions.Infra
 {
     public static class InfrastructureServicesCollectionExtensions
     {

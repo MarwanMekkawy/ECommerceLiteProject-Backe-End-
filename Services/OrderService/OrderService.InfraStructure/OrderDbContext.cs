@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrderService.Domain.Orders;
 
-namespace OrderService.InfraStructure
+namespace OrderService.Infrastructure
 {
     public class OrderDbContext : DbContext
     {

@@ -1,4 +1,4 @@
-﻿namespace OrderService.InfraStructure.Clients.IdentityServiceTokenAuthClient.DTOIdentityContracts
+﻿namespace OrderService.Infrastructure.Clients.IdentityServiceTokenAuthClient.DTOIdentityContracts
 {
     public class ServiceTokenRequest
     {

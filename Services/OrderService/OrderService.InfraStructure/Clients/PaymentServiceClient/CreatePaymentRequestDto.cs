@@ -1,6 +1,6 @@
 ﻿using OrderService.Domain.Enums;
 
-namespace OrderService.InfraStructure.Clients.PaymentServiceClient
+namespace OrderService.Infrastructure.Clients.PaymentServiceClient
 {
     public class CreatePaymentRequestDto
     {

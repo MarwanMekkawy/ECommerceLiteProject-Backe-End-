@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.API", "OrderSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Application", "OrderService.Application\OrderService.Application.csproj", "{8780FDF0-673B-4D26-9219-763B0363250A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.InfraStructure", "OrderService.InfraStructure\OrderService.InfraStructure.csproj", "{2FFEEBAE-8BE5-46DF-BEA6-0A678A696E66}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Infrastructure", "OrderService.InfraStructure\OrderService.Infrastructure.csproj", "{2FFEEBAE-8BE5-46DF-BEA6-0A678A696E66}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Domain", "OrderService.Domain\OrderService.Domain.csproj", "{B35645E7-B038-44A2-90B8-4B345F41CBAF}"
 EndProject

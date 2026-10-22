@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrderService.Domain.Orders;
-using OrderService.InfraStructure;
+using OrderService.Infrastructure;
 
 namespace OrderService.Domain.Contracts
 {

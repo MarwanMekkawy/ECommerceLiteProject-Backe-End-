@@ -1,4 +1,4 @@
-﻿namespace OrderService.InfraStructure.Repositories
+﻿namespace OrderService.Infrastructure.Repositories
 {
     public class UnitOfWork(OrderDbContext _context) : IUnitOfWork
     {

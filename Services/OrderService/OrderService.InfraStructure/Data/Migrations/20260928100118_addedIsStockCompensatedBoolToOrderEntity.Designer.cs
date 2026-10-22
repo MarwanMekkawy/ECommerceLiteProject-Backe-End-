@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using OrderService.InfraStructure;
+using OrderService.Infrastructure;
 
 #nullable disable
 
-namespace OrderService.InfraStructure.Data.Migrations
+namespace OrderService.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
     [Migration("20260928100118_addedIsStockCompensatedBoolToOrderEntity")]

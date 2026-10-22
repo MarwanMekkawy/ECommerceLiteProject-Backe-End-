@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace OrderService.InfraStructure.Data.Migrations
+namespace OrderService.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
     public partial class OrderEntityIsCancelledDueToExpiry : Migration

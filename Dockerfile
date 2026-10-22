@@ -26,7 +26,7 @@ COPY ["Services/ProductService/ProductService.Domain/ProductService.Domain.cspro
 
 COPY ["Services/OrderService/OrderService.API/OrderService.API.csproj", "Services/OrderService/OrderService.API/"]
 COPY ["Services/OrderService/OrderService.Application/OrderService.Application.csproj", "Services/OrderService/OrderService.Application/"]
-COPY ["Services/OrderService/OrderService.InfraStructure/OrderService.Infrastructure.csproj", "Services/OrderService/OrderService.InfraStructure/"]
+COPY ["Services/OrderService/OrderService.Infrastructure/OrderService.Infrastructure.csproj", "Services/OrderService/OrderService.Infrastructure/"]
 COPY ["Services/OrderService/OrderService.Domain/OrderService.Domain.csproj", "Services/OrderService/OrderService.Domain/"]
 
 # ============================================================
