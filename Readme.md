@@ -17,10 +17,10 @@ Features, architecture, integrations, and service communication are still active
 |---|---|
 | 🔐 Identity Service | 🟢 **Fully Implemented** |
 | 📦 Product Service | 🟢 **Fully Implemented** |
-| 🛒 Order Service | 🟢 **Fully Implemented** [![OrderService Tests](https://github.com/MarwanMekkawy/ECommerceLiteProject-Backe-End-/actions/workflows/order-service-ci.yml/badge.svg?branch=orderService)](https://github.com/MarwanMekkawy/ECommerceLiteProject-Backe-End-/actions/workflows/order-service-ci.yml) |
+| 🛒 Order Service | 🟢 **Fully Implemented** [![OrderService Tests](https://github.com/MarwanMekkawy/ECommerceLiteProject-Backe-End-/actions/workflows/order-service-ci.yml/badge.svg?branch=main)](https://github.com/MarwanMekkawy/ECommerceLiteProject-Backe-End-/actions/workflows/order-service-ci.yml) |
 | 💳 Payment Service | 🟢 **Fully Implemented** |
 | 🔔 Notification Service | 🟢 **Fully Implemented** |
-| 🌐 API Gateway | 🟡 **Ongoing** |
+| 🌐 API Gateway | 🟢 **Fully Implemented** |
 | 🐳 Dockerization | 🟡 **Ongoing** |
 | 🔗 Service Integration | 🟡 **Ongoing** |
 | 📚 Documentation | 🟡 **Ongoing** |
