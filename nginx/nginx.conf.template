@@ -1,0 +1,106 @@
+# [ngx-] prefix is forcustom names inside ngnix
+events {
+    worker_connections 1024;
+}
+
+http {
+    # Backend destinations
+    upstream ngx-gateway {
+        server gateway:7000;
+    }
+    upstream ngx-identity {
+        server identity:7050;
+    }
+    upstream ngx-payment {
+        server payment:7080;
+    }
+    upstream ngx-notification {
+        server notification:7090;
+    }
+
+    #--Rate Limit--
+    limit_req_zone $binary_remote_addr zone=ngx-api-limit:10m rate=10r/s;
+    limit_req_zone $binary_remote_addr zone=ngx-auth-limit:10m rate=5r/s; 
+    limit_req_status 429;
+
+    #--Connection Limit--
+    limit_conn_zone $binary_remote_addr zone=ngx-conn-limit:10m;
+
+    # Public HTTP entry point
+    server {
+        listen 80;
+        server_name {BACKEND_SERVER_NAME};
+
+        # GraphQL -> Gateway
+        location /graphql {
+            proxy_pass http://ngx-gateway;
+
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            #Rate Limit
+            limit_req zone=ngx-api-limit burst=20 nodelay;
+            #Connection Limit
+            limit_conn ngx-conn-limit 20;
+            #Proxy Timeouts
+            proxy_connect_timeout 5s;
+            proxy_send_timeout 30s;
+            proxy_read_timeout 60s;
+        }
+
+        # Stripe webhook -> PaymentService
+        location = /api/v1/payments/webhook {
+            proxy_pass http://ngx-payment;
+        }
+
+        # Mailjet webhook -> NotificationService
+        location = /api/v1/notifications/webhook {
+            proxy_pass http://ngx-notification;
+        }
+
+        # Authentication -> IdentityService
+        location /api/v1/auth/ {
+            proxy_pass http://ngx-identity;
+
+            #Rate Limit
+            limit_req zone=ngx-auth-limit;
+            #Connection Limit
+            limit_conn ngx-conn-limit 10;
+            #Proxy Timeouts
+            proxy_connect_timeout 5s;
+            proxy_send_timeout 30s;
+            proxy_read_timeout 60s;
+        }
+
+        # Email confirmation -> IdentityService
+        location /api/v1/email/ {
+            proxy_pass http://ngx-identity;
+
+            #Rate Limit
+            limit_req zone=ngx-auth-limit;
+            #Connection Limit
+            limit_conn ngx-conn-limit 10;
+            #Proxy Timeouts
+            proxy_connect_timeout 5s;
+            proxy_send_timeout 30s;
+
+            proxy_read_timeout 60s;
+        }
+
+        # Password operations -> IdentityService
+        location /api/v1/password/ {
+            proxy_pass http://ngx-identity;
+
+            #Rate Limit
+            limit_req zone=ngx-auth-limit;
+            #Connection Limit
+            limit_conn ngx-conn-limit 10;
+            #Proxy Timeouts
+            proxy_connect_timeout 5s;
+            proxy_send_timeout 30s;
+            proxy_read_timeout 60s;
+        }
+    }
+}
