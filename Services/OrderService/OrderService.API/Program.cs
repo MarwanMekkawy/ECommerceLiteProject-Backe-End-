@@ -121,8 +121,6 @@ namespace OrderService.API
             }
             #endregion
 
-            app.UseHttpsRedirection();
-
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

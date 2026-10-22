@@ -9,7 +9,6 @@ using NotificationService.Infrastructure.Extentions.Infra;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 
 namespace NotificationService.API
