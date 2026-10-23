@@ -15,14 +15,14 @@ Features, architecture, integrations, and service communication are still active
 
 | Service | Status |
 |---|---|
-| 🔐 Identity Service | 🟢 **Fully Implemented** |
-| 📦 Product Service | 🟢 **Fully Implemented** |
-| 🛒 Order Service | 🟢 **Fully Implemented** [![OrderService Tests](https://github.com/MarwanMekkawy/ECommerceLiteProject-Backe-End-/actions/workflows/order-service-ci.yml/badge.svg?branch=main)](https://github.com/MarwanMekkawy/ECommerceLiteProject-Backe-End-/actions/workflows/order-service-ci.yml) |
-| 💳 Payment Service | 🟢 **Fully Implemented** |
-| 🔔 Notification Service | 🟢 **Fully Implemented** |
-| 🌐 API Gateway | 🟢 **Fully Implemented** |
-| 🐳 Dockerization | 🟡 **Ongoing** |
-| 🔗 Service Integration | 🟡 **Ongoing** |
+| 🔐 Identity Service | 🟢 **Completed** |
+| 📦 Product Service | 🟢 **Completed** |
+| 🛒 Order Service | 🟢 **Completed** [![OrderService Tests](https://github.com/MarwanMekkawy/ECommerceLiteProject-Backe-End-/actions/workflows/order-service-ci.yml/badge.svg?branch=main)](https://github.com/MarwanMekkawy/ECommerceLiteProject-Backe-End-/actions/workflows/order-service-ci.yml) |
+| 💳 Payment Service | 🟢 **Completed** |
+| 🔔 Notification Service | 🟢 **Completed** |
+| 🌐 API Gateway | 🟢 **Completed** |
+| 🐳 Dockerization | 🟢 **Completed** |
+| 🔗 Service Integration | 🟢 **Completed** |
 | 📚 Documentation | 🟡 **Ongoing** |
 
 ---

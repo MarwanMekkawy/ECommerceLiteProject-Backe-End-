@@ -225,7 +225,7 @@ services:
   # GraphQL Gateway
   # ============================================================================================================================
 
-  Gateway:
+  gateway:
     image: ecommercelite-gateway:1.0
 
     build:
@@ -244,7 +244,7 @@ services:
       HttpClients__PaymentService__BaseUrl: ${HttpClients__PaymentService__BaseUrl}
 
     ports:
-      - "7090:7000"
+      - "7000:7000"
     restart: unless-stopped
     depends_on:
       - identity
@@ -254,7 +254,7 @@ services:
 
 
   # ============================================================================================================================
-  # SQL Server SERVICE
+  # nginx SERVICE
   # ============================================================================================================================
 
   nginx:
@@ -265,6 +265,10 @@ services:
       BACKEND_SERVER_NAME: ${BACKEND_SERVER_NAME}
     volumes:
       - ./nginx/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+    restart: unless-stopped
+    depends_on:
+      - gateway
+
       
   # ============================================================================================================================
   # SQL Server SERVICE
@@ -277,7 +281,7 @@ services:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
     ports:
-      - "127.0.0.1:1433:1433"
+      - "127.0.0.1:11433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
     restart: unless-stopped
