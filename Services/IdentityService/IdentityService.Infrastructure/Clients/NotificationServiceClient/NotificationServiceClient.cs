@@ -58,7 +58,7 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
         {
             var token = await GetTokenAsync(cancellationToken);
 
-            var baseUrl = config["HttpClients:IdentityService:BaseUrl"]; //TODO
+            var baseUrl = config["FrontendBaseUrlForTokenAppend"] ?? throw new InvalidOperationException("FrontendBaseUrlForTokenAppend value is not configured.");
 
             var confirmationUrl = $"{baseUrl}email/confirm?token={Uri.EscapeDataString(emailConfirmationToken)}";
 
@@ -81,7 +81,7 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
         {
             var token = await GetTokenAsync(cancellationToken);
 
-            var baseUrl = config["HttpClients:IdentityService:BaseUrl"];
+            var baseUrl = config["FrontendBaseUrlForTokenAppend"] ?? throw new InvalidOperationException("FrontendBaseUrlForTokenAppend value is not configured.");
 
             var confirmationUrl = $"{baseUrl}email/confirm-change?token={Uri.EscapeDataString(emailChangeToken)}";
 
@@ -125,7 +125,7 @@ namespace IdentityService.Infrastructure.Clients.NotificationServiceClient
         {
             var token = await GetTokenAsync(cancellationToken);
 
-            var baseUrl = config["HttpClients:IdentityService:BaseUrl"];
+            var baseUrl = config["FrontendBaseUrlForTokenAppend"] ?? throw new InvalidOperationException("FrontendBaseUrlForTokenAppend value is not configured.");
 
             var resetUrl = $"{baseUrl}password/reset?token={Uri.EscapeDataString(passwordResetToken)}";
 
